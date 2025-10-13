@@ -7,7 +7,6 @@ import {
     SquareCheck,
     Hammer,
     Megaphone,
-    ScrollText
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 
@@ -144,25 +143,10 @@ export const superAdminProjects: ProjectData[] = [
 
         ],
     },
-    {
-        title: "Logs",
-        url: "/admin/logs",
-        icon: ScrollText,
-        items: [
-            {
-                title: "Ver logs",
-                url: "/admin/logs",
-            },
-            {
-                title: "Ver por empresa",
-                url: "/admin/logs/by-company",
-            },
 
-        ],
-    },
     {
-        title: "Banners",
-        url: "/admin/banners",
+        title: "Banner general",
+        url: "/admin/banner",
         icon: Megaphone,
     },
 ];
