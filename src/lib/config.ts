@@ -1,8 +1,6 @@
 export const config = {
   apiUrl:
-    process.env.NEXT_PUBLIC_ENVIRONMENT === "dev"
-      ? process.env.NEXT_PUBLIC_API_URL_DEV!
-      : process.env.NEXT_PUBLIC_API_URL_PROD!,
+    process.env.NEXT_PUBLIC_ENVIRONMENT === "dev" ? process.env.NEXT_PUBLIC_API_URL_DEV! : process.env.NEXT_PUBLIC_API_URL_PROD!,
 };
 
 
