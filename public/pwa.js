@@ -35,3 +35,4 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
 }
+
