@@ -20,6 +20,8 @@ import { useAuth } from "@/context/AuthContext";
 import { isSuperAdmin, isCompanyUser } from "@/types/auth";
 import { SuperadminDashboard } from "@/components/dashboards/superadmin/SuperadminDashboard";
 import { CompanyDashboard } from "@/components/dashboards/company/CompanyDashboard";
+import { OwnerDashboard } from "@/components/dashboards/owner/OwnerDashboard";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -40,8 +42,8 @@ export default function DashboardPage() {
     <ProtectedPage>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <SidebarInset className="bg-muted/50">
+          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sticky top-0 z-10 bg-sidebar border-b border-sidebar-border">
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger className="-ml-1" />
               <Separator
@@ -61,13 +63,18 @@ export default function DashboardPage() {
               </Breadcrumb>
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold border-b border-foreground pb-2">Bienvenido, {getDisplayName()}</h2>
-            </div>
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-4">
+            {isSuperAdmin(user) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">Bienvenido, {getDisplayName()}</CardTitle>
+                </CardHeader>
+              </Card>
+            )}
 
             {isSuperAdmin(user) && <SuperadminDashboard />}
-            {isCompanyUser(user) && <CompanyDashboard user={user} />}
+            {isCompanyUser(user) && user.user_role === "owner" && <OwnerDashboard user={user} />}
+            {isCompanyUser(user) && user.user_role !== "owner" && <CompanyDashboard user={user} />}
           </div>
         </SidebarInset>
       </SidebarProvider>

@@ -95,7 +95,7 @@ export function FeedbackSheet() {
 
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Enviar Feedback</SheetTitle>
+          <SheetTitle>FasTrack quiere leerte...</SheetTitle>
           <SheetDescription>Tu retroalimentacion es super importante para nosotros.
             Construimos esta aplicacion a traves de tu opinión y mejoramos el sistema en base
             a tus necesidades e inquietudes.</SheetDescription>

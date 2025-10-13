@@ -2,6 +2,7 @@
 
 import { CompanyUser } from "@/types/auth";
 import { useAuth } from "@/context/AuthContext";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 interface CompanyDashboardProps {
   user: CompanyUser;
@@ -9,6 +10,14 @@ interface CompanyDashboardProps {
 
 export function CompanyDashboard({ user }: CompanyDashboardProps) {
   const { companyConfig } = useAuth();
+
+  const getDisplayName = () => {
+    const userName = user.user_name;
+    if (userName) {
+      return userName;
+    }
+    return user.user_email?.split('@')[0] || "Usuario";
+  };
 
   const getUpdatedRole = () => {
     if (user.user_role === 'owner') {
@@ -25,7 +34,19 @@ export function CompanyDashboard({ user }: CompanyDashboardProps) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">
+            Bienvenido, {getDisplayName()}
+          </CardTitle>
+          <CardDescription>
+            {user.company_name}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
         <div className="space-y-4">
           <p className="text-muted-foreground">
             Rol: <span className="font-medium">{getUpdatedRole()}</span>
@@ -50,7 +71,8 @@ export function CompanyDashboard({ user }: CompanyDashboardProps) {
             </div>
           </div>
         </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

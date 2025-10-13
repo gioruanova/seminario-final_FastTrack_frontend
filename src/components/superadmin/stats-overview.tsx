@@ -6,6 +6,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { Pie, PieChart, Cell, Label } from "recharts";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDashboard } from "@/context/DashboardContext";
 import axios from "axios";
 import { config } from "@/lib/config";
 import { SUPER_API } from "@/lib/superApi/config";
@@ -22,6 +23,12 @@ interface UserData {
   user_id: number;
   user_role: string;
   user_status: number;
+}
+
+interface CompanyData {
+  company_id: number;
+  company_nombre: string;
+  company_estado: number;
 }
 
 interface EspecialidadData {
@@ -42,7 +49,9 @@ const CHART_COLORS = [
 ];
 
 export function StatsOverview() {
+  const { refreshTrigger } = useDashboard();
   const [users, setUsers] = useState<UserData[]>([]);
+  const [companies, setCompanies] = useState<CompanyData[]>([]);
   const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,12 +59,14 @@ export function StatsOverview() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [usersRes, especialidadesRes] = await Promise.all([
+        const [usersRes, companiesRes, especialidadesRes] = await Promise.all([
           apiClient.get(SUPER_API.GET_USERS),
+          apiClient.get(SUPER_API.GET_COMPANIES),
           apiClient.get(SUPER_API.GET_ESPECIALIDADES),
         ]);
         
         setUsers(usersRes.data);
+        setCompanies(companiesRes.data);
         setEspecialidades(especialidadesRes.data);
       } catch (error) {
         console.error("Error obteniendo datos:", error);
@@ -65,7 +76,11 @@ export function StatsOverview() {
     };
 
     fetchData();
-  }, []);
+  }, [refreshTrigger]);
+
+  const activeCompanies = companies.filter(c => c.company_estado === 1).length;
+  const inactiveCompanies = companies.filter(c => c.company_estado === 0).length;
+  const totalCompanies = companies.length;
 
   const nonSuperAdminUsers = users.filter(u => u.user_role !== "superadmin");
   
@@ -76,6 +91,11 @@ export function StatsOverview() {
   const ownerUsers = nonSuperAdminUsers.filter(u => u.user_role === "owner").length;
   const operadorUsers = nonSuperAdminUsers.filter(u => u.user_role === "operador").length;
   const profesionalUsers = nonSuperAdminUsers.filter(u => u.user_role === "profesional").length;
+
+  const companyStatusData = [
+    { name: "Activas", value: activeCompanies, fill: "#10b981" },
+    { name: "Inactivas", value: inactiveCompanies, fill: "#ef4444" },
+  ];
 
   const statusData = [
     { name: "Activos", value: activeUsers, fill: "#10b981" },
@@ -108,8 +128,8 @@ export function StatsOverview() {
     return (
       <div className="space-y-4">
         <div className="h-8 bg-muted animate-pulse rounded w-64"></div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="h-20 bg-muted/50"></CardHeader>
               <CardContent className="h-48 bg-muted/30"></CardContent>
@@ -121,31 +141,82 @@ export function StatsOverview() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Estadísticas Generales</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? (
-            <>
-              <ChevronDown className="h-4 w-4 mr-2" />
-              Expandir
-            </>
-          ) : (
-            <>
-              <ChevronUp className="h-4 w-4 mr-2" />
-              Colapsar
-            </>
-          )}
-        </Button>
-      </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl">Estadísticas Generales</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? (
+              <>
+                <ChevronDown className="h-4 w-4 mr-2" />
+                Expandir
+              </>
+            ) : (
+              <>
+                <ChevronUp className="h-4 w-4 mr-2" />
+                Colapsar
+              </>
+            )}
+          </Button>
+        </div>
+      </CardHeader>
 
       {!isCollapsed && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {/* Gráfico 1: Usuarios Activos vs Inactivos */}
+        <CardContent>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {/* Gráfico 1: Empresas Activas vs Inactivas */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Estado de Empresas</CardTitle>
+              <CardDescription>Activas vs Inactivas</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center pb-0">
+              <ChartContainer
+                config={{
+                  activas: { label: "Activas", color: "#10b981" },
+                  inactivas: { label: "Inactivas", color: "#ef4444" },
+                }}
+                className="mx-auto aspect-square h-[250px]"
+              >
+                <PieChart>
+                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                  <Pie
+                    data={companyStatusData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={60}
+                    strokeWidth={5}
+                  >
+                    {companyStatusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                    <Label
+                      content={({ viewBox }) => {
+                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                          return (
+                            <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                              <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
+                                {totalCompanies}
+                              </tspan>
+                              <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground">
+                                Total
+                              </tspan>
+                            </text>
+                          );
+                        }
+                      }}
+                    />
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Gráfico 2: Usuarios Activos vs Inactivos */}
           <Card>
             <CardHeader>
               <CardTitle>Estado de Usuarios</CardTitle>
@@ -193,7 +264,7 @@ export function StatsOverview() {
             </CardContent>
           </Card>
 
-          {/* Gráfico 2: Usuarios por Rol */}
+          {/* Gráfico 3: Usuarios por Rol */}
           <Card>
             <CardHeader>
               <CardTitle>Usuarios por Rol</CardTitle>
@@ -242,7 +313,7 @@ export function StatsOverview() {
             </CardContent>
           </Card>
 
-          {/* Gráfico 3: Especialidades */}
+          {/* Gráfico 4: Especialidades */}
           <Card>
             <CardHeader>
               <CardTitle>Especialidades</CardTitle>
@@ -293,7 +364,8 @@ export function StatsOverview() {
             </CardContent>
           </Card>
         </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 }

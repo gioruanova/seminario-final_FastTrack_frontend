@@ -6,6 +6,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLe
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useDashboard } from "@/context/DashboardContext";
 import axios from "axios";
 import { config } from "@/lib/config";
 import { SUPER_API } from "@/lib/superApi/config";
@@ -40,6 +41,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ReclamosChart() {
+  const { refreshTrigger } = useDashboard();
   const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("1y");
@@ -58,7 +60,7 @@ export function ReclamosChart() {
     };
 
     fetchData();
-  }, []);
+  }, [refreshTrigger]);
 
   const chartData = useMemo(() => {
     if (!reclamos.length) return [];
@@ -131,30 +133,33 @@ export function ReclamosChart() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Tendencia reclamos</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? (
-            <>
-              <ChevronDown className="h-4 w-4 mr-2" />
-              Expandir
-            </>
-          ) : (
-            <>
-              <ChevronUp className="h-4 w-4 mr-2" />
-              Colapsar
-            </>
-          )}
-        </Button>
-      </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl">Tendencia Incidencias</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? (
+              <>
+                <ChevronDown className="h-4 w-4 mr-2" />
+                Expandir
+              </>
+            ) : (
+              <>
+                <ChevronUp className="h-4 w-4 mr-2" />
+                Colapsar
+              </>
+            )}
+          </Button>
+        </div>
+      </CardHeader>
 
       {!isCollapsed && (
-        <Card>
+        <CardContent>
+        <Card className="border-muted">
           <CardHeader>
             <div className="flex items-center justify-between md:flex-row flex-col text-center md:text-left">
               <div>
@@ -244,8 +249,9 @@ export function ReclamosChart() {
         </ChartContainer>
           </CardContent>
         </Card>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 }
 

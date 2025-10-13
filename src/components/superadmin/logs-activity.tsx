@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useDashboard } from "@/context/DashboardContext";
 import axios from "axios";
 import { config } from "@/lib/config";
 import { SUPER_API } from "@/lib/superApi/config";
@@ -28,6 +29,7 @@ interface LogData {
 }
 
 export function LogsActivity() {
+  const { refreshTrigger } = useDashboard();
   const [logs, setLogs] = useState<LogData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -49,9 +51,9 @@ export function LogsActivity() {
     };
 
     fetchData();
-  }, []);
+  }, [refreshTrigger]);
 
-  const displayedLogs = showAll ? logs : logs.slice(0, 5);
+  const displayedLogs = showAll ? logs : logs.slice(0, 3);
 
   if (isLoading) {
     return (
@@ -66,30 +68,33 @@ export function LogsActivity() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Actividad del Sistema</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? (
-            <>
-              <ChevronDown className="h-4 w-4 mr-2" />
-              Expandir
-            </>
-          ) : (
-            <>
-              <ChevronUp className="h-4 w-4 mr-2" />
-              Colapsar
-            </>
-          )}
-        </Button>
-      </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl">Actividad del Sistema</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? (
+              <>
+                <ChevronDown className="h-4 w-4 mr-2" />
+                Expandir
+              </>
+            ) : (
+              <>
+                <ChevronUp className="h-4 w-4 mr-2" />
+                Colapsar
+              </>
+            )}
+          </Button>
+        </div>
+      </CardHeader>
 
       {!isCollapsed && (
-        <Card>
+        <CardContent>
+        <Card className="border-muted pb-0">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Registros de Actividad</CardTitle>
@@ -111,10 +116,12 @@ export function LogsActivity() {
                   No hay registros de actividad
                 </p>
               ) : (
-                displayedLogs.map((log) => (
+                displayedLogs.map((log, index) => (
                   <div
                     key={log.log_id}
-                    className="flex flex-col sm:flex-row sm:items-start gap-3 pb-3 border-b last:border-0 last:pb-0"
+                    className={`flex flex-col sm:flex-row sm:items-start gap-3 pb-3 ${
+                      index !== displayedLogs.length - 1 ? 'border-b' : ''
+                    }`}
                   >
                     <div className="text-sm text-muted-foreground min-w-[140px] font-medium">
                       {format(parseISO(log.created_at), "dd/MM/yyyy HH:mm", { locale: es })}
@@ -128,8 +135,9 @@ export function LogsActivity() {
             </div>
           </CardContent>
         </Card>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 }
 
