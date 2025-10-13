@@ -18,6 +18,13 @@ self.addEventListener('install', (event) => {
   );
 });
 
+// Manejar mensajes para forzar actualización
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Activación: limpiamos cachés antiguos
 self.addEventListener('activate', (event) => {
   event.waitUntil(
