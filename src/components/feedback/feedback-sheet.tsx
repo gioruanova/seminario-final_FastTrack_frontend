@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MessageCircleHeartIcon, Loader2, CheckCircle } from "lucide-react";
 import axios from "axios";
+import { config } from "@/lib/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
 import {
   SidebarGroup,
@@ -21,7 +22,11 @@ import {
 } from "@/components/ui/sidebar";
 
 const apiClient = axios.create({
+  baseURL: config.apiUrl,
   withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 export function FeedbackSheet() {

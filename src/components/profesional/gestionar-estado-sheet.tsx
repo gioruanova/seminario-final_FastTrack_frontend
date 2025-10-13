@@ -11,18 +11,23 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Clock, Loader2 } from "lucide-react";
 import axios from "axios";
+import { config } from "@/lib/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
 import { useAuth } from "@/context/AuthContext";
 import {
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuItem,
-    SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
 const apiClient = axios.create({
+    baseURL: config.apiUrl,
     withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
 });
 
 export function GestionarEstadoSheet() {
