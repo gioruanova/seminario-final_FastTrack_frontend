@@ -6,7 +6,7 @@ import axios from "axios";
 import { config } from "@/lib/config";
 import { PUBLIC_API } from "@/lib/publicApi/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
-import { User, LoginRequest, LoginResponse, AuthContextType, isCompanyUser } from "@/types/auth";
+import { User, LoginRequest, AuthContextType, isCompanyUser } from "@/types/auth";
 import { CompanyConfigData } from "@/types/company";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (configResponse.data) {
         setCompanyConfig(configResponse.data);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error obteniendo configuración de empresa:", err);
       setCompanyConfig(null);
     }
@@ -46,45 +46,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
-      
+
       if (profileResponse.data && profileResponse.data.user_id) {
         setUser(profileResponse.data);
-        
+
         if (isCompanyUser(profileResponse.data)) {
           await fetchCompanyConfig();
         }
       } else {
         setUser(null);
       }
-    } catch (err: any) {
-      if (err?.response?.status === 401 || err?.response?.status === 403) {
+    } catch (err) {
+      const error = err as { response?: { status?: number } };
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
         try {
           const refreshResponse = await apiClient.get(PUBLIC_API.REFRESH);
-        
+
           if (refreshResponse.data.success) {
             await new Promise(resolve => setTimeout(resolve, 200));
-          
+
             try {
               const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
-            
+
               if (profileResponse.data && profileResponse.data.user_id) {
                 setUser(profileResponse.data);
-                
+
                 if (isCompanyUser(profileResponse.data)) {
                   await fetchCompanyConfig();
                 }
               } else {
                 setUser(null);
               }
-            } catch (profileError: any) {
+            } catch {
               setUser(null);
             }
           } else {
             setUser(null);
           }
-        } catch (refreshErr: any) {
+        } catch {
           setUser(null);
         }
       } else {
@@ -105,14 +106,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (loginResponse.data.success) {
         const profileResponse = await apiClient.get(PUBLIC_API.PROFILE);
-        
+
         if (profileResponse.data && profileResponse.data.user_id) {
           setUser(profileResponse.data);
-          
+
           if (isCompanyUser(profileResponse.data)) {
             await fetchCompanyConfig();
           }
-          
+
           await new Promise(resolve => setTimeout(resolve, 100));
           router.push("/dashboard");
         } else {
@@ -121,19 +122,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         throw new Error(loginResponse.data.message || "Error al iniciar sesión");
       }
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as { message?: string; response?: { data?: { message?: string }; status?: number } };
       let errorMessage = "Error al iniciar sesión";
-      
-      if (err.message === "Network Error" || !err.response) {
+
+      if (error.message === "Network Error" || !error.response) {
         errorMessage = "No se pudo conectar con el servidor. Verifica tu conexión.";
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err.response?.status === 401) {
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 401) {
         errorMessage = "Credenciales incorrectas";
-      } else if (err.response?.status === 500) {
+      } else if (error.response?.status === 500) {
         errorMessage = "Error del servidor. Intenta más tarde.";
       }
-      
+
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -148,7 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setCompanyConfig(null);
       setError(null);
       router.push("/login");
-    } catch (err: any) {
+    } catch {
       setUser(null);
       setCompanyConfig(null);
       setError(null);
@@ -158,6 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value: AuthContextType = {

@@ -2,17 +2,14 @@
 
 import {
   BadgeCheck,
-  Bell,
   ChevronsUpDown,
   CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react"
 
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -55,7 +52,7 @@ export function NavUser() {
       .toUpperCase()
       .slice(0, 2)
   }
-  
+
   const getDisplayName = () => {
     if (!user) return "Usuario"
     const userName = 'user_name' in user ? user.user_name : undefined

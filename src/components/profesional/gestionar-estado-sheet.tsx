@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
     Sheet,
     SheetContent,
-    SheetDescription,
     SheetHeader,
     SheetTitle,
     SheetTrigger,
@@ -15,11 +14,11 @@ import axios from "axios";
 import { CLIENT_API } from "@/lib/clientApi/config";
 import { useAuth } from "@/context/AuthContext";
 import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
 const apiClient = axios.create({

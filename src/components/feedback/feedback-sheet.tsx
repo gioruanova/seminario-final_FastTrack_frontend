@@ -55,8 +55,9 @@ export function FeedbackSheet() {
         setIsOpen(false);
         setSuccess(false);
       }, 2000);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Error al enviar feedback");
+    } catch (err) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || "Error al enviar feedback");
     } finally {
       setIsSending(false);
     }
@@ -90,8 +91,8 @@ export function FeedbackSheet() {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Enviar Feedback</SheetTitle>
-          <SheetDescription>Tu retroalimentacion es super importante para nosotros. 
-            Construimos esta aplicacion a traves de tu opinión y mejoramos el sistema en base 
+          <SheetDescription>Tu retroalimentacion es super importante para nosotros.
+            Construimos esta aplicacion a traves de tu opinión y mejoramos el sistema en base
             a tus necesidades e inquietudes.</SheetDescription>
         </SheetHeader>
 

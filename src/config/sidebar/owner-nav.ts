@@ -4,7 +4,6 @@ import {
   Mail,
   Hammer,
   SquareCheck,
-  MessageCircleHeartIcon
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
