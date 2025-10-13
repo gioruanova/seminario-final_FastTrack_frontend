@@ -6,6 +6,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -16,6 +17,7 @@ export function LoginForm({
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +66,7 @@ export function LoginForm({
             placeholder="m@example.com" 
             value={formData.email}
             onChange={handleChange}
+            autoComplete="email"
             required 
             disabled={isLoading}
           />
@@ -71,15 +74,31 @@ export function LoginForm({
         
         <Field>
           <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-          <Input 
-            id="password" 
-            name="password"
-            type="password" 
-            value={formData.password}
-            onChange={handleChange}
-            required 
-            disabled={isLoading}
-          />
+          <div className="relative">
+            <Input 
+              id="password" 
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="current-password"
+              required 
+              disabled={isLoading}
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4 cursor-pointer" />
+              ) : (
+                <Eye className="h-4 w-4 cursor-pointer" />
+              )}
+            </button>
+          </div>
         </Field>
         
         <Field>
