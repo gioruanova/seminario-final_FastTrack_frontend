@@ -45,7 +45,7 @@ export function LoginForm({
     <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Ingreso a portal</h1>
+          <h1 className="text-2xl font-bold">Portal Clientes Fast Track</h1>
           <p className="text-muted-foreground text-sm text-balance">
             Ingresa tus datos para comenzar a operar
           </p>
