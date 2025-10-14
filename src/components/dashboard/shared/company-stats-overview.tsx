@@ -162,12 +162,12 @@ export function CompanyStatsOverview() {
           >
             {isCollapsed ? (
               <>
-                <ChevronDown className="h-4 w-4 mr-0" />
+                <ChevronDown className="h-4 w-4 mr-1" />
                 Expandir
               </>
             ) : (
               <>
-                <ChevronUp className="h-4 w-4 mr-0" />
+                <ChevronUp className="h-4 w-4 mr-1" />
                 Colapsar
               </>
             )}

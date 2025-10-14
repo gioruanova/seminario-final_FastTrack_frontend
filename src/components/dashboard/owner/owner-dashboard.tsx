@@ -31,9 +31,9 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
             <CardTitle className="text-2xl">
               Bienvenido, {getDisplayName()}
             </CardTitle>
-            <CardDescription className="flex items-center gap-2">
+            <CardDescription className="flex flex-col lg:flex-row lg:items-center gap-2">
               {user.company_name}
-              <span className="text-muted-foreground">•</span>
+              <span className="text-muted-foreground hidden lg:block">•</span>
               <span className="flex items-center gap-1.5">
                 Estado Suscripcion:
                 <span

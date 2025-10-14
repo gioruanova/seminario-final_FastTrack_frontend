@@ -171,17 +171,17 @@ export function StatsOverview() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {/* Gráfico 1: Empresas Activas vs Inactivas */}
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle>Estado de Empresas</CardTitle>
               <CardDescription>Activas vs Inactivas</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center pb-0">
+            <CardContent className="flex justify-center pb-4">
               <ChartContainer
                 config={{
                   activas: { label: "Activas", color: "#10b981" },
                   inactivas: { label: "Inactivas", color: "#ef4444" },
                 }}
-                className="mx-auto aspect-square h-[250px]"
+                className="aspect-square w-full max-w-[250px]"
               >
                 <PieChart>
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
@@ -219,17 +219,17 @@ export function StatsOverview() {
 
           {/* Gráfico 2: Usuarios Activos vs Inactivos */}
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle>Estado de Usuarios</CardTitle>
               <CardDescription>Activos vs Inactivos</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center pb-0">
+            <CardContent className="flex justify-center pb-4">
               <ChartContainer
                 config={{
                   activos: { label: "Activos", color: "#10b981" },
                   inactivos: { label: "Inactivos", color: "#ef4444" },
                 }}
-                className="mx-auto aspect-square h-[250px]"
+                className="aspect-square w-full max-w-[250px]"
               >
                 <PieChart>
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
@@ -267,18 +267,18 @@ export function StatsOverview() {
 
           {/* Gráfico 3: Usuarios por Rol */}
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle>Usuarios por Rol</CardTitle>
               <CardDescription>Distribución de roles</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center pb-0">
+            <CardContent className="flex justify-center pb-4">
               <ChartContainer
                 config={{
                   owners: { label: "Owners", color: "#8b5cf6" },
                   operadores: { label: "Operadores", color: "#3b82f6" },
                   profesionales: { label: "Profesionales", color: "#f59e0b" },
                 }}
-                className="mx-auto aspect-square h-[250px]"
+                className="aspect-square w-full max-w-[250px]"
               >
                 <PieChart>
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />
@@ -316,11 +316,11 @@ export function StatsOverview() {
 
           {/* Gráfico 4: Especialidades */}
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle>Especialidades</CardTitle>
               <CardDescription>Por nombre</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center pb-0">
+            <CardContent className="flex justify-center pb-4">
               <ChartContainer
                 config={especialidadesGrouped.reduce((acc, esp) => {
                   acc[esp.name.toLowerCase()] = {
@@ -329,7 +329,7 @@ export function StatsOverview() {
                   };
                   return acc;
                 }, {} as ChartConfig)}
-                className="mx-auto aspect-square h-[250px]"
+                className="aspect-square w-full max-w-[250px]"
               >
                 <PieChart>
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} />

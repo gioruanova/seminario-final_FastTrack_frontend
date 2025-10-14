@@ -15,7 +15,7 @@ interface QuickActionsBarProps {
 export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
   const router = useRouter();
   const { companyConfig } = useAuth();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(globalThis.innerWidth < 1024 ? true : false);
 
   const handleGenerarIncidencia = () => {
     toast.info("Generando incidencia...");
