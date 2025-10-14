@@ -3,6 +3,7 @@
 import { ProtectedPage } from "@/components/auth/protected-page";
 import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { ShapeLeft, ShapeRight } from "@/components/ui/shape";
 
 export default function DashboardLayout({
   children,
@@ -14,9 +15,20 @@ export default function DashboardLayout({
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
+          <ShapeLeft />
           {children}
+          <div className="text-foreground flex justify-center gap-1 text-center pb-4 text-sm">
+            {new Date().getFullYear()}
+            <div className="italic flex-col">
+              <span className="font-bold">Fast</span>
+              <span className="font-extralight">Track</span>
+            </div>.
+            <span>Todos los derechos reservados.</span>
+          </div>
+          <ShapeRight />
         </SidebarInset>
       </SidebarProvider>
+
     </ProtectedPage>
   );
 }

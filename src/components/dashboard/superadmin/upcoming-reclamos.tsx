@@ -62,7 +62,7 @@ export function SuperadminUpcomingReclamos() {
       setIsLoading(true);
       const response = await apiClient.get(SUPER_API.GET_RECLAMOS);
       setAllReclamos(response.data);
-      
+
       const activeReclamos = response.data
         .filter((r: ReclamoData) => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO")
         .sort((a: ReclamoData, b: ReclamoData) => {
@@ -146,9 +146,9 @@ export function SuperadminUpcomingReclamos() {
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => {
                 const total = allReclamos.length || 1;
                 const percentage = (count / total) * 100;
-                
+
                 if (count === 0) return null;
-                
+
                 return (
                   <div
                     key={estado}
@@ -159,10 +159,10 @@ export function SuperadminUpcomingReclamos() {
                 );
               })}
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => (
-                <div key={estado} className="flex items-center gap-2 text-xs">
+                <div key={estado} className="flex items-center gap-2 text-xs justify-center">
                   <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[estado]}`}></span>
                   <span className="text-muted-foreground">{estado}:</span>
                   <span className="font-semibold">{count}</span>
@@ -171,10 +171,9 @@ export function SuperadminUpcomingReclamos() {
             </div>
           </div>
 
-          <Card className="border-muted">
+          <div className="border-muted">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Reclamos en Actividad</CardTitle>
                 {reclamos.length > 5 && (
                   <Button
                     variant="outline"
@@ -186,7 +185,7 @@ export function SuperadminUpcomingReclamos() {
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-0">
               {displayedReclamos.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
                   No hay reclamos en actividad
@@ -196,18 +195,17 @@ export function SuperadminUpcomingReclamos() {
                   {displayedReclamos.map((reclamo, index) => (
                     <div
                       key={reclamo.reclamo_id}
-                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${
-                        index !== displayedReclamos.length - 1 ? 'mb-3' : ''
-                      }`}
+                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${index !== displayedReclamos.length - 1 ? 'mb-3' : ''
+                        }`}
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-2">
                             <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
                             <h4 className="font-semibold">{reclamo.reclamo_titulo}</h4>
                             <span className="text-xs bg-muted px-2 py-1 rounded">#{reclamo.reclamo_id}</span>
                           </div>
-                          
+
                           <p className="text-sm text-muted-foreground line-clamp-2">
                             {reclamo.reclamo_detalle}
                           </p>
@@ -239,7 +237,7 @@ export function SuperadminUpcomingReclamos() {
                             </span>
                           </div>
                         </div>
-                        
+
                         <Button
                           size="sm"
                           variant="outline"
@@ -254,7 +252,7 @@ export function SuperadminUpcomingReclamos() {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </div>
         </CardContent>
       )}
 

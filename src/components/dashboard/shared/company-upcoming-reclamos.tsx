@@ -161,9 +161,9 @@ export function CompanyUpcomingReclamos() {
               })}
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 justify-center">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => (
-                <div key={estado} className="flex items-center gap-2 text-xs">
+                <div key={estado} className="flex items-center gap-2 text-xs justify-center">
                   <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[estado]}`}></span>
                   <span className="text-muted-foreground">{estado}:</span>
                   <span className="font-semibold">{count}</span>
@@ -200,7 +200,7 @@ export function CompanyUpcomingReclamos() {
                         index !== displayedReclamos.length - 1 ? 'mb-3' : ''
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start justify-between gap-4 md:flex-row flex-col">
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-2">
                             <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>

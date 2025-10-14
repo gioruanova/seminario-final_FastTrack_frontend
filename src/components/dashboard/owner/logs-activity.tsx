@@ -72,10 +72,10 @@ export function OwnerLogsActivity() {
       toast.success("Logs marcados como leídos");
     } catch (error) {
       console.error("Error marcando logs como leídos:", error);
-      
+
       if (axios.isAxiosError(error) && error.response) {
         const status = error.response.status;
-        
+
         if (status === 500) {
           toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
         } else {
@@ -94,10 +94,10 @@ export function OwnerLogsActivity() {
       toast.success("Logs marcados como no leídos");
     } catch (error) {
       console.error("Error marcando logs como no leídos:", error);
-      
+
       if (axios.isAxiosError(error) && error.response) {
         const status = error.response.status;
-        
+
         if (status === 500) {
           toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
         } else {
@@ -117,10 +117,10 @@ export function OwnerLogsActivity() {
       setShowDeleteDialog(false);
     } catch (error) {
       console.error("Error eliminando logs:", error);
-      
+
       if (axios.isAxiosError(error) && error.response) {
         const status = error.response.status;
-        
+
         if (status === 500) {
           toast.error("Error interno del servidor. Intenta nuevamente más tarde.");
         } else {
@@ -175,87 +175,85 @@ export function OwnerLogsActivity() {
 
       {!isCollapsed && (
         <CardContent className="space-y-4">
-        <Card className="border-muted pb-0">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <CardTitle>Registros de Actividad</CardTitle>
-              <div className="flex flex-wrap gap-2">
-                {logs.length > 0 && hasUnreadLogs && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleMarkAllAsRead}
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    Marcar todo como leído
-                  </Button>
-                )}
-                {logs.length > 0 && hasReadLogs && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleMarkAllAsUnread}
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Marcar todo como no leído
-                  </Button>
-                )}
-                {logs.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowDeleteDialog(true)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Borrar todos
-                  </Button>
-                )}
-                {logs.length > 5 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAll(!showAll)}
-                  >
-                    {showAll ? `Mostrar menos` : `Mostrar todos (${logs.length})`}
-                  </Button>
+          <Card className="border-muted pb-0">
+            <CardHeader className="px-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {logs.length > 0 && hasUnreadLogs && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleMarkAllAsRead}
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      Marcar todo como leído
+                    </Button>
+                  )}
+                  {logs.length > 0 && hasReadLogs && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleMarkAllAsUnread}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Marcar todo como no leído
+                    </Button>
+                  )}
+                  {logs.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDeleteDialog(true)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Borrar todos
+                    </Button>
+                  )}
+                  {logs.length > 5 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowAll(!showAll)}
+                    >
+                      {showAll ? `Mostrar menos` : `Mostrar todos (${logs.length})`}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {displayedLogs.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    No hay registros de actividad
+                  </p>
+                ) : (
+                  displayedLogs.map((log, index) => (
+                    <div
+                      key={log.log_id}
+                      className={`flex flex-col sm:flex-row sm:items-start gap-3 pb-3 ${index !== displayedLogs.length - 1 ? 'border-b' : ''
+                        } ${log.log_leido === 0 ? 'bg-muted/30 -mx-4 px-4 py-3 rounded-lg pb-0' : ''}`}
+                    >
+                      <div className="text-sm text-muted-foreground min-w-[140px] font-medium">
+                        {format(parseISO(log.created_at), "dd/MM/yyyy HH:mm", { locale: es })}
+                      </div>
+                      <div className="text-sm flex-1 flex items-start gap-2">
+                        {log.log_leido === 0 && (
+                          <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                        )}
+                        <span className={log.log_leido === 0 ? 'font-medium' : ''}>
+                          {log.log_detalle}
+                        </span>
+                      </div>
+                    </div>
+                  ))
                 )}
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {displayedLogs.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  No hay registros de actividad
-                </p>
-              ) : (
-                 displayedLogs.map((log, index) => (
-                   <div
-                     key={log.log_id}
-                     className={`flex flex-col sm:flex-row sm:items-start gap-3 pb-3 ${
-                       index !== displayedLogs.length - 1 ? 'border-b' : ''
-                     } ${log.log_leido === 0 ? 'bg-muted/30 -mx-4 px-4 py-3 rounded-lg pb-0' : ''}`}
-                   >
-                    <div className="text-sm text-muted-foreground min-w-[140px] font-medium">
-                      {format(parseISO(log.created_at), "dd/MM/yyyy HH:mm", { locale: es })}
-                    </div>
-                    <div className="text-sm flex-1 flex items-start gap-2">
-                      {log.log_leido === 0 && (
-                        <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                      )}
-                      <span className={log.log_leido === 0 ? 'font-medium' : ''}>
-                        {log.log_detalle}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-           </CardContent>
-         </Card>
+            </CardContent>
+          </Card>
         </CardContent>
-       )}
+      )}
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
@@ -273,7 +271,7 @@ export function OwnerLogsActivity() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-     </Card>
-   );
- }
+    </Card>
+  );
+}
 

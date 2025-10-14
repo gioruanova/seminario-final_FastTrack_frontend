@@ -94,47 +94,45 @@ export function LogsActivity() {
 
       {!isCollapsed && (
         <CardContent>
-        <Card className="border-muted pb-0">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Registros de Actividad</CardTitle>
-              {logs.length > 5 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAll(!showAll)}
-                >
-                  {showAll ? `Mostrar menos` : `Mostrar todos (${logs.length})`}
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {displayedLogs.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  No hay registros de actividad
-                </p>
-              ) : (
-                displayedLogs.map((log, index) => (
-                  <div
-                    key={log.log_id}
-                    className={`flex flex-col sm:flex-row sm:items-start gap-3 pb-3 ${
-                      index !== displayedLogs.length - 1 ? 'border-b' : ''
-                    }`}
+          <Card className="border-muted pb-0">
+            <CardHeader className="md:justify-start justify-center">
+              <div className="flex items-center justify-between">
+                {logs.length > 5 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAll(!showAll)}
                   >
-                    <div className="text-sm text-muted-foreground min-w-[140px] font-medium">
-                      {format(parseISO(log.created_at), "dd/MM/yyyy HH:mm", { locale: es })}
+                    {showAll ? `Mostrar menos` : `Mostrar todos (${logs.length})`}
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {displayedLogs.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    No hay registros de actividad
+                  </p>
+                ) : (
+                  displayedLogs.map((log, index) => (
+                    <div
+                      key={log.log_id}
+                      className={`flex flex-col sm:flex-row sm:items-start gap-3 pb-3 ${index !== displayedLogs.length - 1 ? 'border-b' : ''
+                        }`}
+                    >
+                      <div className="text-sm text-muted-foreground min-w-[140px] font-medium">
+                        {format(parseISO(log.created_at), "dd/MM/yyyy HH:mm", { locale: es })}
+                      </div>
+                      <div className="text-sm flex-1">
+                        {log.log_detalle}
+                      </div>
                     </div>
-                    <div className="text-sm flex-1">
-                      {log.log_detalle}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </CardContent>
       )}
     </Card>
