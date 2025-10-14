@@ -33,7 +33,7 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
     <Card className="sticky md:top-19 top-18 bg-sidebar z-10 py-0 pt-1 gap-1">
       <CardHeader className="h-auto">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Acciones Rápidas</CardTitle>
+          <CardTitle className="text-lg mr-0">Acciones Rápidas</CardTitle>
           <Button
             variant="ghost"
             size="sm"
@@ -42,7 +42,7 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
           >
             {isCollapsed ? (
               <>
-                <ChevronDown className="h-4 w-4 mr-2" />
+                <ChevronDown className="h-4 w-4 mr-0" />
                 Expandir
               </>
             ) : (
@@ -60,28 +60,28 @@ export function QuickActionsBar({ userRole }: QuickActionsBarProps) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
             <Button
               variant="default"
-              className="w-full"
+              className="w-full gap-0.5 lg:gap-1"
               onClick={handleGenerarIncidencia}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 mr-0" />
               Crear {companyConfig?.sing_heading_reclamos}
             </Button>
 
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full gap-0.5 lg:gap-1"
               onClick={handleEnCurso}
             >
-              <ListTodo className="h-4 w-4 mr-2" />
+              <ListTodo className="h-4 w-4 mr-0" />
               En Curso
             </Button>
 
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full gap-0.5 lg:gap-1"
               onClick={handleHistorico}
             >
-              <History className="h-4 w-4 mr-2" />
+              <History className="h-4 w-4 mr-0" />
               Histórico
             </Button>
           </div>
