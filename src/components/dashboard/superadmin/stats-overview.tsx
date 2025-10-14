@@ -128,7 +128,7 @@ export function StatsOverview() {
     return (
       <div className="space-y-4">
         <div className="h-8 bg-muted animate-pulse rounded w-64"></div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="h-20 bg-muted/50"></CardHeader>
@@ -168,7 +168,7 @@ export function StatsOverview() {
 
       {!isCollapsed && (
         <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {/* Gráfico 1: Empresas Activas vs Inactivas */}
           <Card>
             <CardHeader>
