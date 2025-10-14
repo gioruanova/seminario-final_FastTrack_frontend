@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -26,6 +25,8 @@ import { config } from "@/lib/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
+import { useAuth } from "@/context/AuthContext";
+import { ContactoRapido } from "@/components/dashboard/profesional/contacto-rapido-feature";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -51,6 +52,8 @@ interface ReclamoData {
   company_name?: string;
   creador: string;
   created_at: string;
+  reclamo_nota_cierre?: string;
+  reclamo_presupuesto?: number;
 }
 
 interface ReclamoDetailSheetProps {
@@ -83,6 +86,7 @@ const ESTADOS_REQUIRE_COMMENT = ["EN PAUSA", "CERRADO", "CANCELADO", "RE-ABIERTO
 
 export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdate }: ReclamoDetailSheetProps) {
   const { refreshDashboard } = useDashboard();
+  const { companyConfig } = useAuth();
   const [selectedEstado, setSelectedEstado] = useState<string>("");
   const [notaCierre, setNotaCierre] = useState("");
   const [presupuesto, setPresupuesto] = useState("");
@@ -104,7 +108,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
     try {
       setIsSubmitting(true);
-      
+
       const endpoint = userRole === "profesional"
         ? CLIENT_API.RECLAMO_GESTION_PROFESIONAL.replace("{id}", reclamo.reclamo_id.toString())
         : CLIENT_API.RECLAMO_GESTION_ADMIN.replace("{id}", reclamo.reclamo_id.toString());
@@ -133,7 +137,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
       onClose();
     } catch (error) {
       console.error("Error actualizando reclamo:", error);
-      
+
       if (axios.isAxiosError(error) && error.response) {
         const errorMessage = error.response.data?.error || error.response.data?.message;
         const status = error.response.status;
@@ -163,6 +167,10 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
   const canChangeEstado = selectedEstado && selectedEstado !== reclamo?.reclamo_estado;
   const requiresComment = ESTADOS_REQUIRE_COMMENT.includes(selectedEstado);
+
+  // Profesionales no pueden gestionar reclamos cerrados o cancelados
+  const isReclamoClosed = reclamo && (reclamo.reclamo_estado === "CERRADO" || reclamo.reclamo_estado === "CANCELADO");
+  const canProfesionalEdit = userRole === "profesional" ? !isReclamoClosed : true;
 
   const getAvailableEstados = () => {
     if (!reclamo) return ESTADOS;
@@ -197,12 +205,13 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
             {reclamo.reclamo_titulo}
             <span className="text-sm font-normal text-muted-foreground">#{reclamo.reclamo_id}</span>
           </SheetTitle>
-          <SheetDescription>
-            Detalles completos del reclamo
-          </SheetDescription>
+
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="mt-1 space-y-6">
+          <SheetTitle className="mb-2">
+            Detalles completos de {companyConfig?.sing_heading_reclamos}:
+          </SheetTitle>
           {/* Información principal */}
           <div className="space-y-4">
             <div>
@@ -220,7 +229,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
               </div>
 
               <div>
-                <Label className="text-muted-foreground">Especialidad</Label>
+                <Label className="text-muted-foreground">{companyConfig?.sing_heading_especialidad}</Label>
                 <p className="mt-1 text-sm">{reclamo.nombre_especialidad}</p>
               </div>
             </div>
@@ -228,7 +237,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Fecha:</span>
+                <span className="text-muted-foreground">Fecha agendada:</span>
                 <span className="font-medium">
                   {format(parseISO(reclamo.agenda_fecha), "dd/MM/yyyy", { locale: es })}
                 </span>
@@ -236,7 +245,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Horario:</span>
+                <span className="text-muted-foreground">Horario agendado:</span>
                 <span className="font-medium">
                   {reclamo.agenda_hora_desde} - {reclamo.agenda_hora_hasta}
                 </span>
@@ -272,9 +281,9 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 <div className="flex items-center gap-2 text-sm">
                   <Link2 className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">URL:</span>
-                  <a 
-                    href={reclamo.reclamo_url} 
-                    target="_blank" 
+                  <a
+                    href={reclamo.reclamo_url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-primary hover:underline"
                   >
@@ -285,74 +294,126 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
             </div>
           </div>
 
-          {/* Gestión de estado */}
-          {userRole !== "superadmin" && (
-            <div className="border-t pt-6 space-y-4">
-              <div>
-                <Label htmlFor="estado">Cambiar Estado</Label>
-                <Select value={selectedEstado || undefined} onValueChange={handleEstadoChange}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Selecciona un nuevo estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getAvailableEstados().map((estado) => (
-                      <SelectItem 
-                        key={estado.value} 
-                        value={estado.value}
-                        disabled={estado.value === reclamo.reclamo_estado}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[estado.value]}`}></span>
-                          {estado.label}
-                          {estado.value === reclamo.reclamo_estado && " (Actual)"}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {/* Mostrar nota de cierre y presupuesto si el reclamo está cerrado/cancelado */}
+          {isReclamoClosed && (reclamo.reclamo_nota_cierre || reclamo.reclamo_presupuesto) && (
+            <>
+              <div className="border-t pt-4 space-y-4">
+                <h3 className="text-sm font-semibold">Información de Cierre</h3>
+                <div className="space-y-3">
+                  {reclamo.reclamo_nota_cierre && (
+                    <div>
+                      <Label className="text-muted-foreground">Nota de Cierre</Label>
+                      <div className="mt-2 rounded-md border bg-muted/50 p-3 text-sm">
+                        {reclamo.reclamo_nota_cierre}
+                      </div>
+                    </div>
+                  )}
+
+                  {reclamo.reclamo_presupuesto && (
+                    <div>
+                      <Label className="text-muted-foreground">Presupuesto</Label>
+                      <div className="mt-2 rounded-md border bg-muted/50 p-3 text-sm font-medium">
+                        ${reclamo.reclamo_presupuesto.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {requiresComment && canChangeEstado && (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="notaCierre">
-                      Nota de Cierre <span className="text-destructive">*</span>
-                    </Label>
-                    <Textarea
-                      id="notaCierre"
-                      placeholder="Ingresa una nota de cierre para esta acción..."
-                      value={notaCierre}
-                      onChange={(e) => setNotaCierre(e.target.value)}
-                      rows={4}
-                      className="mt-2"
-                    />
-                  </div>
+            </>
+          )}
 
-                  <div>
-                    <Label htmlFor="presupuesto">
-                      Presupuesto (Opcional)
-                    </Label>
-                    <input
-                      id="presupuesto"
-                      type="number"
-                      step="0.01"
-                      placeholder="Ingresa el monto del presupuesto..."
-                      value={presupuesto}
-                      onChange={(e) => setPresupuesto(e.target.value)}
-                      className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                  </div>
+          {/* Gestión de estado */}
+          {userRole !== "superadmin" && (
+            <div className="border-t pt-4 space-y-4">
+              {!canProfesionalEdit && userRole === "profesional" && (
+                <div className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+                  <p className="font-medium">Este item se encuentra {reclamo.reclamo_estado.toLowerCase()} y no puede ser modificado.</p>
                 </div>
               )}
 
-              {canChangeEstado && (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting || (requiresComment && !notaCierre.trim())}
-                  className="w-full"
-                >
-                  {isSubmitting ? "Procesando..." : "Confirmar Acción"}
-                </Button>
+
+
+              {canProfesionalEdit && (
+                <>
+                  <div>
+                    <Label htmlFor="estado">Cambiar Estado</Label>
+                    <Select value={selectedEstado || undefined} onValueChange={handleEstadoChange}>
+                      <SelectTrigger className="mt-2 cursor-pointer">
+                        <SelectValue placeholder="Selecciona un nuevo estado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailableEstados().map((estado) => (
+                          <SelectItem
+                            key={estado.value}
+                            value={estado.value}
+                            disabled={estado.value === reclamo.reclamo_estado}
+                          >
+                            <div className="flex items-center gap-2 cursor-pointer">
+                              <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[estado.value]}`}></span>
+                              {estado.label}
+                              {estado.value === reclamo.reclamo_estado && " (Actual)"}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {requiresComment && canChangeEstado && (
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="notaCierre">
+                          Nota de Cierre <span className="text-destructive">*</span>
+                        </Label>
+                        <Textarea
+                          id="notaCierre"
+                          placeholder="Ingresa una nota de cierre para esta acción..."
+                          value={notaCierre}
+                          onChange={(e) => setNotaCierre(e.target.value)}
+                          rows={4}
+                          className="mt-2"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="presupuesto">
+                          Presupuesto (Opcional)
+                        </Label>
+                        <input
+                          id="presupuesto"
+                          type="number"
+                          step="0.01"
+                          placeholder="Ingresa el monto del presupuesto..."
+                          value={presupuesto}
+                          onChange={(e) => setPresupuesto(e.target.value)}
+                          className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {canChangeEstado && (
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || (requiresComment && !notaCierre.trim())}
+                      className="w-full"
+                      variant="default"
+                    >
+                      {isSubmitting ? "Procesando..." : "Confirmar Acción"}
+                    </Button>
+                  )}
+
+                </>
+              )}
+              {userRole === "profesional" && (
+                <div className="border-t pt-4 space-y-4">
+                  <div className="flex flex-col items-start gap-0">
+                    <span>Tenes alguna duda sobre este {companyConfig?.sing_heading_reclamos}?</span>
+                    <span>Contactanos a {companyConfig?.company?.company_nombre} para que podamos ayudarte.</span>
+                  </div>
+                  <ContactoRapido variant="compact" showHeader={false} />
+                </div>
               )}
             </div>
           )}

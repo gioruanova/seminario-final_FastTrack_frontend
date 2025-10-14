@@ -11,6 +11,7 @@ import { config } from "@/lib/config";
 import { SUPER_API } from "@/lib/superApi/config";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
+import { useAuth } from "@/context/AuthContext";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -36,6 +37,8 @@ interface ReclamoData {
   company_name: string;
   creador: string;
   created_at: string;
+  reclamo_nota_cierre?: string;
+  reclamo_presupuesto?: number;
 }
 
 const ESTADO_COLORS: Record<string, string> = {
@@ -49,6 +52,7 @@ const ESTADO_COLORS: Record<string, string> = {
 
 export function SuperadminUpcomingReclamos() {
   const { refreshTrigger } = useDashboard();
+  const { companyConfig } = useAuth();
   const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
   const [allReclamos, setAllReclamos] = useState<ReclamoData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -122,6 +126,7 @@ export function SuperadminUpcomingReclamos() {
           <Button
             variant="ghost"
             size="sm"
+            className="cursor-pointer"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -176,8 +181,9 @@ export function SuperadminUpcomingReclamos() {
               <div className="flex items-center justify-between">
                 {reclamos.length > 5 && (
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
+                    className="cursor-pointer"
                     onClick={() => setShowAll(!showAll)}
                   >
                     {showAll ? `Mostrar menos` : `Mostrar todos (${reclamos.length})`}
@@ -188,7 +194,7 @@ export function SuperadminUpcomingReclamos() {
             <CardContent className="px-0">
               {displayedReclamos.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No hay reclamos en actividad
+                  {`No hay ${companyConfig?.plu_heading_reclamos} en curso`}
                 </p>
               ) : (
                 <div className="space-y-4">
@@ -240,7 +246,7 @@ export function SuperadminUpcomingReclamos() {
 
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="default"
                           onClick={() => handleOpenSheet(reclamo)}
                         >
                           <Eye className="h-4 w-4 mr-2" />

@@ -17,6 +17,7 @@ export interface TeamData {
   name: string;
   logo: LucideIcon;
   plan: string;
+  url: string;
 }
 
 export interface ProjectData {

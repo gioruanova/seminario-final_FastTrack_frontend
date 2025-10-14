@@ -75,6 +75,7 @@ export function LogsActivity() {
           <Button
             variant="ghost"
             size="sm"
+            className="cursor-pointer"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -99,8 +100,9 @@ export function LogsActivity() {
               <div className="flex items-center justify-between">
                 {logs.length > 5 && (
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
+                    className="cursor-pointer"
                     onClick={() => setShowAll(!showAll)}
                   >
                     {showAll ? `Mostrar menos` : `Mostrar todos (${logs.length})`}

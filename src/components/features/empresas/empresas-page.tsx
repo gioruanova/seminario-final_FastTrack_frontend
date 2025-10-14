@@ -301,7 +301,7 @@ export function EmpresasPage() {
                           <div className="flex justify-center gap-2">
                             <Button
                               size="sm"
-                              variant="outline"
+                              variant="default"
                               onClick={() => handleEdit(company)}
                               title="Editar empresa"
                             >

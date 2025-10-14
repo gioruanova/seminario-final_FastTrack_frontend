@@ -2,6 +2,8 @@ import {
   House,
   Mail,
   SquareCheck,
+  Phone,
+  GraduationCap
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
@@ -16,10 +18,18 @@ export const getProfesionalNavItems = (config: CompanyConfigData | null): NavIte
   },
   {
     title: `${config?.plu_heading_reclamos}`,
-    url: "/reclamos",
+    url: "#",
     icon: SquareCheck,
-    isActive: true,
-
+    items: [
+      {
+        title: "En curso",
+        url: "/dashboard/profesional/trabajar-reclamos",
+      },
+      {
+        title: "Ver Historial",
+        url: "/dashboard/profesional/historial-reclamos",
+      },
+    ],
   },
 ];
 
@@ -28,6 +38,7 @@ export const profesionalTeamData = (companyName: string): TeamData[] => [
     name: companyName,
     logo: SquareCheck,
     plan: "Profesional",
+    url: "/dashboard/profesional",
   },
 ];
 
@@ -35,12 +46,21 @@ export const profesionalTeamData = (companyName: string): TeamData[] => [
 
 
 export const profesionalProjects: ProjectData[] = [
-
+  {
+    title: "Contactar Empresa",
+    url: "/dashboard/profesional/contactar-empresa",
+    icon: Phone,
+  },
   {
     title: "Ver Mensajes",
-    url: "/owner/mensajes",
+    url: "/dashboard/profesional/mensajes",
     icon: Mail,
   },
 
+  {
+    title: "Tutoriales",
+    url: "/dashboard/owner/tutoriales",
+    icon: GraduationCap,
+  },
 ];
 

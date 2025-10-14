@@ -140,6 +140,7 @@ export function ReclamosChart() {
           <Button
             variant="ghost"
             size="sm"
+            className="cursor-pointer"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (

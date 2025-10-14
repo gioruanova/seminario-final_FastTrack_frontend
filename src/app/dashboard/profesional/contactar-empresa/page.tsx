@@ -1,11 +1,11 @@
 "use client";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { ProfesionalDashboard } from "@/components/dashboard/profesional/profesional-dashboard";
+import { ContactoRapido } from "@/components/dashboard/profesional/contacto-rapido-feature";
 import { useAuth } from "@/context/AuthContext";
 import { isCompanyUser } from "@/types/auth";
 
-export default function ProfesionalDashboardPage() {
+export default function ContactarEmpresaPage() {
   const { user } = useAuth();
 
   if (!user || !isCompanyUser(user) || user.user_role !== "profesional") {
@@ -14,13 +14,16 @@ export default function ProfesionalDashboardPage() {
 
   return (
     <>
-      <DashboardHeader breadcrumbs={[{ label: "Dashboard" }]} />
+      <DashboardHeader
+        breadcrumbs={[
+          { label: "Dashboard", href: "/dashboard/profesional" },
+          { label: "Contactar Empresa" }
+        ]}
+      />
 
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">
-
-        <ProfesionalDashboard user={user} />
+        <ContactoRapido variant="default" showHeader={true} />
       </div>
     </>
   );
 }
-

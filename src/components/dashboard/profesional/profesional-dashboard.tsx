@@ -2,17 +2,16 @@
 
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { DashboardProvider } from "@/context/DashboardContext";
-import { CompanyStatsOverview } from "../shared/company-stats-overview";
-import { OwnerLogsActivity } from "./logs-activity";
-import { CompanyUpcomingReclamos } from "../shared/company-upcoming-reclamos";
-import { CompanyFinalizedReclamos } from "../shared/company-finalized-reclamos";
 import { CompanyUser } from "@/types/auth";
+import { ProfesionalReclamosActivos } from "./profesional-reclamos-activos";
+import { ProfesionalReclamosFinalizados } from "./profesional-reclamos-finalizados";
+import { ContactoRapido } from "./contacto-rapido-feature";
 
-interface OwnerDashboardProps {
+interface ProfesionalDashboardProps {
   user: CompanyUser;
 }
 
-export function OwnerDashboard({ user }: OwnerDashboardProps) {
+export function ProfesionalDashboard({ user }: ProfesionalDashboardProps) {
   const getDisplayName = () => {
     const userName = user.user_name;
     if (userName) {
@@ -52,10 +51,9 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
 
         {isCompanyActive ? (
           <>
-            <CompanyStatsOverview />
-            <CompanyUpcomingReclamos userRole="owner" />
-            <CompanyFinalizedReclamos userRole="owner" />
-            <OwnerLogsActivity />
+            <ContactoRapido variant="compact" showHeader={true} />
+            <ProfesionalReclamosActivos />
+            <ProfesionalReclamosFinalizados />
           </>
         ) : (
           <Card>

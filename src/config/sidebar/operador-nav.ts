@@ -1,10 +1,12 @@
 import {
   Users,
-  Hammer,
-  BriefcaseBusiness,
+  Wrench,
+  Briefcase,
   SquareCheck,
   House,
-  Mail
+  Mail,
+  GraduationCap,
+  Landmark
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
@@ -14,45 +16,61 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
     title: "Inicio",
     url: "/dashboard/operador",
     icon: House,
-
   },
   {
     title: `${config?.plu_heading_reclamos}`,
-    url: "/dashboard/operador/reclamos",
+    url: "#",
     icon: SquareCheck,
-
+    items: [
+      {
+        title:  "En curso",
+        url: "/dashboard/operador/trabajar-reclamos",
+      },
+      {
+        title: "Ver Historial",
+        url: "/dashboard/operador/historial-reclamos",
+      },
+    ],
+  },
+  {
+    title: `${config?.plu_heading_especialidad}`,
+    url: "/dashboard/operador/especialidades",
+    icon: Wrench,
   },
   {
     title: "Usuarios",
     url: "/dashboard/operador/users",
     icon: Users,
-
   },
   {
-    title: `${config?.plu_heading_especialidad}`,
-    url: "/dashboard/operador/especialidades",
-    icon: Hammer,
+    title: `${config?.plu_heading_solicitante}`,
+    url: "/dashboard/owner/clientess",
+    icon: Briefcase,
 
   },
+
 ];
 
 export const operadorTeamData = (companyName: string): TeamData[] => [
   {
     name: companyName,
-    logo: BriefcaseBusiness,
+    logo: Landmark,
     plan: "Operador",
+    url: "/dashboard/operador",
   },
 ];
 
 export const operadorProjects: ProjectData[] = [
-
   {
     title: "Mensajes",
     url: "/dashboard/operador/mensajes",
     icon: Mail,
-
   },
-
+  {
+    title: "Tutoriales",
+    url: "/dashboard/operador/tutoriales",
+    icon: GraduationCap,
+  },
 
 
 ];

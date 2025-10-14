@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import { DashboardProvider } from "@/context/DashboardContext";
 import { CompanyStatsOverview } from "../shared/company-stats-overview";
 import { CompanyUpcomingReclamos } from "../shared/company-upcoming-reclamos";
+import { CompanyFinalizedReclamos } from "../shared/company-finalized-reclamos";
 import { CompanyUser } from "@/types/auth";
 
 interface OperadorDashboardProps {
@@ -33,7 +34,7 @@ export function OperadorDashboard({ user }: OperadorDashboardProps) {
               {user.company_name}
               <span className="text-muted-foreground">•</span>
               <span className="flex items-center gap-1.5">
-                Estado:
+              Estado Suscripcion:
                 <span
                   className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold uppercase ${
                     isCompanyActive
@@ -51,7 +52,8 @@ export function OperadorDashboard({ user }: OperadorDashboardProps) {
         {isCompanyActive ? (
           <>
             <CompanyStatsOverview />
-            <CompanyUpcomingReclamos />
+            <CompanyUpcomingReclamos userRole="operador" />
+            <CompanyFinalizedReclamos userRole="operador" />
           </>
         ) : (
           <Card>

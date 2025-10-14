@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Calendar, User, Eye, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { ReclamoDetailSheet } from "@/components/features/reclamos/reclamo-detail-sheet";
 import { useDashboard } from "@/context/DashboardContext";
 import axios from "axios";
@@ -12,7 +13,6 @@ import { CLIENT_API } from "@/lib/clientApi/config";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
-import Link from "next/link";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -42,40 +42,31 @@ interface ReclamoData {
 }
 
 const ESTADO_COLORS: Record<string, string> = {
-  "ABIERTO": "bg-blue-500",
-  "EN PROCESO": "bg-yellow-500",
-  "EN PAUSA": "bg-orange-500",
   "CERRADO": "bg-green-500",
   "CANCELADO": "bg-red-500",
-  "RE-ABIERTO": "bg-purple-500",
 };
 
-interface CompanyUpcomingReclamosProps {
-  userRole?: "owner" | "operador";
-}
-
-export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingReclamosProps = {}) {
+export function ProfesionalReclamosFinalizados() {
   const { refreshTrigger } = useDashboard();
   const { companyConfig } = useAuth();
   const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
-  const [allReclamos, setAllReclamos] = useState<ReclamoData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true); // Inicia colapsado
   const [selectedReclamo, setSelectedReclamo] = useState<ReclamoData | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const fetchReclamos = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
-      setAllReclamos(response.data);
+      const response = await apiClient.get(CLIENT_API.GET_RECLAMOS_PROFESIONAL);
       
-      const activeReclamos = response.data
-        .filter((r: ReclamoData) => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO")
+      const finishedReclamos = response.data
+        .filter((r: ReclamoData) => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO")
         .sort((a: ReclamoData, b: ReclamoData) => {
-          return new Date(a.agenda_fecha).getTime() - new Date(b.agenda_fecha).getTime();
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
-      setReclamos(activeReclamos);
+      
+      setReclamos(finishedReclamos);
     } catch (error) {
       console.error("Error obteniendo reclamos:", error);
     } finally {
@@ -101,17 +92,13 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
     fetchReclamos();
   };
 
-  const estadisticasPorEstado = {
-    ABIERTO: allReclamos.filter(r => r.reclamo_estado === "ABIERTO").length,
-    "EN PROCESO": allReclamos.filter(r => r.reclamo_estado === "EN PROCESO").length,
-    "EN PAUSA": allReclamos.filter(r => r.reclamo_estado === "EN PAUSA").length,
-    CERRADO: allReclamos.filter(r => r.reclamo_estado === "CERRADO").length,
-    CANCELADO: allReclamos.filter(r => r.reclamo_estado === "CANCELADO").length,
-    "RE-ABIERTO": allReclamos.filter(r => r.reclamo_estado === "RE-ABIERTO").length,
-  };
-
   const displayedReclamos = reclamos.slice(0, 5);
   const hasMoreReclamos = reclamos.length > 5;
+
+  const estadisticasPorEstado = {
+    CERRADO: reclamos.filter(r => r.reclamo_estado === "CERRADO").length,
+    CANCELADO: reclamos.filter(r => r.reclamo_estado === "CANCELADO").length,
+  };
 
   if (isLoading) {
     return (
@@ -126,7 +113,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl">{companyConfig?.plu_heading_reclamos} en curso</CardTitle>
+          <CardTitle className="text-2xl">Historial de {companyConfig?.plu_heading_reclamos}</CardTitle>
           <Button
             variant="ghost"
             size="sm"
@@ -150,10 +137,11 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
 
       {!isCollapsed && (
         <CardContent className="space-y-4">
+          {/* Estadísticas */}
           <div className="space-y-3">
             <div className="flex h-3 w-full overflow-hidden rounded-lg border">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => {
-                const total = allReclamos.length || 1;
+                const total = reclamos.length || 1;
                 const percentage = (count / total) * 100;
                 
                 if (count === 0) return null;
@@ -169,7 +157,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
               })}
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 justify-center">
+            <div className="grid grid-cols-2 gap-2 justify-center">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => (
                 <div key={estado} className="flex items-center gap-2 text-xs justify-center">
                   <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[estado]}`}></span>
@@ -180,14 +168,15 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
             </div>
           </div>
 
+          {/* Lista de reclamos */}
           <div className="border-muted">
             <CardContent className="px-0">
               {displayedReclamos.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No hay {companyConfig?.plu_heading_reclamos} en curso
+                  No hay reclamos finalizados
                 </p>
               ) : (
-                <div className="space-y-4 b">
+                <div className="space-y-4">
                   {displayedReclamos.map((reclamo, index) => (
                     <div
                       key={reclamo.reclamo_id}
@@ -201,6 +190,13 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                             <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
                             <h4 className="font-semibold">{reclamo.reclamo_titulo}</h4>
                             <span className="text-xs bg-muted px-2 py-1 rounded">#{reclamo.reclamo_id}</span>
+                            <span className={`text-xs px-2 py-1 rounded font-medium ${
+                              reclamo.reclamo_estado === "CERRADO" 
+                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                            }`}>
+                              {reclamo.reclamo_estado}
+                            </span>
                           </div>
                           
                           <p className="text-sm text-muted-foreground line-clamp-2">
@@ -225,9 +221,6 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                           <div className="flex flex-wrap gap-2">
                             <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                               {reclamo.nombre_especialidad}
-                            </span>
-                            <span className="text-xs bg-muted px-2 py-1 rounded">
-                              Profesional: {reclamo.profesional}
                             </span>
                           </div>
                         </div>
@@ -255,8 +248,8 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                   className="w-full"
                   asChild
                 >
-                  <Link href={`/dashboard/${userRole}/trabajar-reclamos`}>
-                    Ver todos los {reclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}
+                  <Link href="/dashboard/profesional/historial-reclamos">
+                    Ver todos los {reclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} finalizados
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
@@ -270,7 +263,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
         reclamo={selectedReclamo}
         isOpen={isSheetOpen}
         onClose={handleCloseSheet}
-        userRole={userRole}
+        userRole="profesional"
         onUpdate={handleUpdate}
       />
     </Card>

@@ -156,6 +156,7 @@ export function OwnerLogsActivity() {
           <Button
             variant="ghost"
             size="sm"
+            className="cursor-pointer"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -181,7 +182,7 @@ export function OwnerLogsActivity() {
                 <div className="flex flex-wrap gap-2 justify-center">
                   {logs.length > 0 && hasUnreadLogs && (
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
                       onClick={handleMarkAllAsRead}
                     >
@@ -191,7 +192,7 @@ export function OwnerLogsActivity() {
                   )}
                   {logs.length > 0 && hasReadLogs && (
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
                       onClick={handleMarkAllAsUnread}
                     >
@@ -201,10 +202,10 @@ export function OwnerLogsActivity() {
                   )}
                   {logs.length > 0 && (
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
                       onClick={() => setShowDeleteDialog(true)}
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive bg-indigo-900 hover:bg-indigo-800"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Borrar todos
@@ -212,8 +213,9 @@ export function OwnerLogsActivity() {
                   )}
                   {logs.length > 5 && (
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
+                      className="cursor-pointer"
                       onClick={() => setShowAll(!showAll)}
                     >
                       {showAll ? `Mostrar menos` : `Mostrar todos (${logs.length})`}

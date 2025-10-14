@@ -5,9 +5,12 @@ import {
     Mails,
     Shield,
     SquareCheck,
-    Hammer,
+    Wrench,
     Megaphone,
-    House
+    House,
+    Briefcase,
+    Landmark,
+    Radio
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 
@@ -21,7 +24,7 @@ export const superAdminNavItems: NavItem[] = [
     {
         title: "Empresas",
         url: "/dashboard/superadmin/empresas",
-        icon: BriefcaseBusiness,
+        icon: Landmark,
 
     },
     {
@@ -33,15 +36,19 @@ export const superAdminNavItems: NavItem[] = [
     {
         title: "Especialidades",
         url: "/admin/especialidades",
-        icon: Hammer,
+        icon: Wrench,
 
     },
     {
         title: "Reclamos",
-        url: "/admin/reclamos",
+        url: "/dashboard/superadmin/reclamos",
         icon: SquareCheck,
-
     },
+    {
+        title: "Clientes Recurrentes",
+        url: "/dashboard/superadmin/clientes",
+        icon: Briefcase,
+      },
 
 
 
@@ -52,6 +59,7 @@ export const superAdminTeamData: TeamData[] = [
         name: "Fast Track Admin",
         logo: Shield,
         plan: "Super Admin",
+        url: "/dashboard/superadmin",
     },
 ];
 
@@ -66,7 +74,7 @@ export const superAdminProjects: ProjectData[] = [
     {
         title: "Mensajes Plataforma",
         url: "/admin/mensajes-plataforma",
-        icon: Mails,
+        icon: Radio,
 
     },
 

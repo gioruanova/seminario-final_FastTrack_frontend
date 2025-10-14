@@ -157,6 +157,7 @@ export function CompanyStatsOverview() {
           <Button
             variant="ghost"
             size="sm"
+            className="cursor-pointer"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
@@ -199,7 +200,7 @@ export function CompanyStatsOverview() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{companyConfig?.plu_heading_reclamos} en actividad</CardTitle>
+                <CardTitle className="text-sm font-medium">{companyConfig?.plu_heading_reclamos} en curso</CardTitle>
                 <FolderOpen className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -209,7 +210,7 @@ export function CompanyStatsOverview() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{companyConfig?.plu_heading_reclamos} finalizados</CardTitle>
+                <CardTitle className="text-sm font-medium">Historial de {companyConfig?.plu_heading_reclamos}</CardTitle>
                 <FolderCheck className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>

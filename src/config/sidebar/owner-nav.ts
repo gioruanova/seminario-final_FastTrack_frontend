@@ -1,10 +1,12 @@
 import {
-  BriefcaseBusiness,
+  Briefcase,
   Users,
   Mail,
-  Hammer,
+  Wrench,
   SquareCheck,
-  House
+  House,
+  GraduationCap,
+  Landmark,
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 import { CompanyConfigData } from "@/types/company";
@@ -19,13 +21,29 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
   {
     title: "Mi Organizacion",
     url: "/dashboard/owner/mi-empresa",
-    icon: BriefcaseBusiness,
+    icon: Landmark,
 
   },
   {
     title: `${config?.plu_heading_reclamos}`,
-    url: "/dashboard/owner/reclamos",
+    url: "#",
     icon: SquareCheck,
+    items: [
+      {
+        title: "En curso",
+        url: "/dashboard/owner/trabajar-reclamos",
+      },
+      {
+        title: "Ver Historial",
+        url: "/dashboard/owner/historial-reclamos",
+      },
+    ],
+
+  },
+  {
+    title: `${config?.plu_heading_especialidad}`,
+    url: "/dashboard/owner/especialidades",
+    icon: Wrench,
 
   },
   {
@@ -34,17 +52,11 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
     icon: Users,
 
   },
-  {
-    title: `${config?.plu_heading_especialidad}`,
-    url: "/dashboard/owner/especialidades",
-    icon: Hammer,
 
-  },
   {
     title: `${config?.plu_heading_solicitante}`,
     url: "/dashboard/owner/clientess",
-    icon: Hammer,
-
+    icon: Briefcase,
   },
 
 ];
@@ -52,8 +64,9 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
 export const ownerTeamData = (companyName: string): TeamData[] => [
   {
     name: companyName,
-    logo: BriefcaseBusiness,
+    logo: Briefcase,
     plan: "Owner",
+    url: "/dashboard/owner",
   },
 ];
 
@@ -63,7 +76,11 @@ export const ownerProjects: ProjectData[] = [
     title: "Mensajes",
     url: "/dashboard/owner/mensajes",
     icon: Mail,
-
+  },
+  {
+    title: "Tutoriales",
+    url: "/dashboard/owner/tutoriales",
+    icon: GraduationCap,
   },
 
 
