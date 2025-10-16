@@ -22,6 +22,7 @@ export const getOperadorNavItems = (config: CompanyConfigData | null): NavItem[]
     title: `${config?.plu_heading_reclamos}`,
     url: "#",
     icon: SquareCheck,
+    isActive: true,
     items: [
       {
         title: `Generar ${config?.sing_heading_reclamos}`,

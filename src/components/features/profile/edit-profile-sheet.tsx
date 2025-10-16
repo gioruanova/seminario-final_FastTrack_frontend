@@ -211,7 +211,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <Edit className="h-5 w-5" />

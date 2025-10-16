@@ -20,6 +20,7 @@ export const getProfesionalNavItems = (config: CompanyConfigData | null): NavIte
     title: `${config?.plu_heading_reclamos}`,
     url: "#",
     icon: SquareCheck,
+    isActive: true,
     items: [
       {
         title: "En curso",

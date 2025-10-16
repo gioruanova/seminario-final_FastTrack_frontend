@@ -147,7 +147,7 @@ export function OwnerEspecialidadesPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <CardTitle className="text-2xl">Gestión de {companyConfig?.plu_heading_especialidad || "Especialidades"}</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1 text-balance">
               Administra las {companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"} de tu empresa
             </p>
           </div>
@@ -265,31 +265,32 @@ export function OwnerEspecialidadesPage() {
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
+        <div className="flex flex-col gap-4">
+          <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
             Mostrando {startIndex + 1}-{Math.min(endIndex, filteredEspecialidades.length)} de {filteredEspecialidades.length} {companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"}
           </div>
           
           {totalPages > 1 && (
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
+                className="text-xs md:text-sm px-2 md:px-3"
               >
-                <ChevronLeft className="h-4 w-4" />
-                Anterior
+                <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                <span className="hidden sm:inline ml-1">Anterior</span>
               </Button>
               
-              <div className="flex items-center space-x-1">
+              <div className="flex flex-wrap items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
                     key={page}
                     variant={currentPage === page ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(page)}
-                    className="w-8 h-8 p-0"
+                    className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
                   >
                     {page}
                   </Button>
@@ -301,9 +302,10 @@ export function OwnerEspecialidadesPage() {
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
+                className="text-xs md:text-sm px-2 md:px-3"
               >
-                Siguiente
-                <ChevronRight className="h-4 w-4" />
+                <span className="hidden sm:inline mr-1">Siguiente</span>
+                <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
               </Button>
             </div>
           )}

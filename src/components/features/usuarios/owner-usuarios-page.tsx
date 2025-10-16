@@ -249,10 +249,10 @@ export function OwnerUsuariosPage() {
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-col md:flex-row gap-2 md:gap-0">
             <div>
               <CardTitle className="text-2xl">Gestión de Usuarios</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1 text-balance">
                 Gestiona los usuarios de tu empresa (operadores y profesionales)
               </p>
             </div>
@@ -390,20 +390,21 @@ export function OwnerUsuariosPage() {
 
               {/* Paginación */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4">
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex flex-col gap-4 mt-4">
+                  <p className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
                     Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, filteredUsers.length)} de {filteredUsers.length} usuarios
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
+                      className="text-xs md:text-sm px-2 md:px-3"
                     >
-                      <ChevronLeft className="h-4 w-4" />
+                      <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                     </Button>
-                    <span className="text-sm">
+                    <span className="text-xs md:text-sm px-2">
                       Página {currentPage} de {totalPages}
                     </span>
                     <Button
@@ -411,8 +412,9 @@ export function OwnerUsuariosPage() {
                       size="sm"
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       disabled={currentPage === totalPages}
+                      className="text-xs md:text-sm px-2 md:px-3"
                     >
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
                     </Button>
                   </div>
                 </div>
@@ -424,7 +426,7 @@ export function OwnerUsuariosPage() {
 
       {/* Sheet para crear/editar usuario */}
       <Sheet open={isUserSheetOpen} onOpenChange={setIsUserSheetOpen}>
-        <SheetContent className="w-[400px] sm:w-[540px]">
+        <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>
               {isEditing ? "Editar Usuario" : "Crear Nuevo Usuario"}
@@ -560,7 +562,7 @@ export function OwnerUsuariosPage() {
 
       {/* Sheet para cambiar contraseña */}
       <Sheet open={isPasswordSheetOpen} onOpenChange={setIsPasswordSheetOpen}>
-        <SheetContent className="w-[400px] sm:w-[540px]">
+        <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>Cambiar Contraseña</SheetTitle>
             <SheetDescription>

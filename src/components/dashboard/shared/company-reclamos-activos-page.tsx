@@ -220,11 +220,11 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
               <CardTitle className="text-2xl">
                 {companyConfig?.plu_heading_reclamos ?? "Reclamos"} Activos
               </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1 text-balance">
                 Gestiona todos los {(companyConfig?.plu_heading_reclamos ?? "Reclamos").toLowerCase()} en curso
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center flex-col md:flex-row gap-2 md:gap-0">
               <Badge variant="secondary" className="px-4 py-1.5 text-sm">
                 {filteredReclamos.length} de {reclamos.length}
               </Badge>
@@ -260,7 +260,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
         </CardHeader>
         <CardContent>
           {/* Filtros */}
-          <div className="flex gap-4 mb-6">
+          <div className="flex mb-6 flex-col md:flex-row gap-2 md:gap-0">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -273,7 +273,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
                 <Button
                   variant="default"
                   size="sm"
-                  className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
+                  className="absolute right-1 top-1/2 h-7 w-auto md:w-7 -translate-y-1/2 p-0"
                   onClick={clearSearch}
                 >
                   <X className="h-4 w-4" />
@@ -282,7 +282,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
             </div>
 
             <Select value={filterEstado} onValueChange={setFilterEstado}>
-              <SelectTrigger className="w-[200px] cursor-pointer">
+              <SelectTrigger className="md:w-[200px] w-auto cursor-pointer">
                 <SelectValue placeholder="Filtrar por estado" />
               </SelectTrigger>
               <SelectContent>
@@ -377,31 +377,32 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
           )}
 
           {/* Información y controles de paginación */}
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-muted-foreground">
+          <div className="flex flex-col gap-4 mt-6">
+            <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredReclamos.length)} de {filteredReclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} en curso
             </div>
             
             {totalPages > 1 && (
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
+                  className="text-xs md:text-sm px-2 md:px-3"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Anterior
+                  <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline ml-1">Anterior</span>
                 </Button>
                 
-                <div className="flex items-center space-x-1">
+                <div className="flex flex-wrap items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <Button
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(page)}
-                      className="w-8 h-8 p-0"
+                      className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
                     >
                       {page}
                     </Button>
@@ -413,9 +414,10 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
                   size="sm"
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
+                  className="text-xs md:text-sm px-2 md:px-3"
                 >
-                  Siguiente
-                  <ChevronRight className="h-4 w-4" />
+                  <span className="hidden sm:inline mr-1">Siguiente</span>
+                  <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
                 </Button>
               </div>
             )}

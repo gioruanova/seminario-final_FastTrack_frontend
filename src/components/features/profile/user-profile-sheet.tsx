@@ -127,7 +127,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle>
             Mi Perfil

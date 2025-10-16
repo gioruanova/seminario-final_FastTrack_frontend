@@ -134,7 +134,7 @@ export function GestionarEstadoSheet() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarGroup>
-            <SheetContent>
+            <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
                 <SheetHeader>
                     <SheetTitle>Gestionar Estado</SheetTitle>
 
