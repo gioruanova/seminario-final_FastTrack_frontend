@@ -232,15 +232,31 @@ export function OwnerUsuariosPage() {
     )
   }
 
+  // Función para mapear role a display name
+  const getRoleDisplayName = (role: string) => {
+    const roleMapping: Record<string, string> = {
+      operador: companyConfig?.sing_heading_operador || "Operador",
+      profesional: companyConfig?.sing_heading_profesional || "Profesional",
+      owner: companyConfig?.sing_heading_owner || "Owner"
+    }
+    return roleMapping[role] || role
+  }
+
+  // Función para mapear display name a role
+  const getRoleFromDisplayName = (displayName: string) => {
+    const displayMapping: Record<string, string> = {
+      [companyConfig?.sing_heading_operador || "Operador"]: "operador",
+      [companyConfig?.sing_heading_profesional || "Profesional"]: "profesional",
+      [companyConfig?.sing_heading_owner || "Owner"]: "owner"
+    }
+    return displayMapping[displayName] || displayName
+  }
+
   const getRoleBadge = (role: string) => {
     const roleColors: Record<string, string> = {
       operador: "bg-purple-100 text-purple-800",
-      profesional: "bg-orange-100 text-orange-800"
-    }
-
-    const roleNames: Record<string, string> = {
-      operador: companyConfig?.sing_heading_operador || "Operador",
-      profesional: companyConfig?.sing_heading_profesional || "Profesional"
+      profesional: "bg-orange-100 text-orange-800",
+      owner: "bg-blue-100 text-blue-800"
     }
 
     return (
@@ -249,7 +265,7 @@ export function OwnerUsuariosPage() {
           roleColors[role] || "bg-gray-100 text-gray-800"
         }`}
       >
-        {roleNames[role] || role}
+        {getRoleDisplayName(role)}
       </span>
     )
   }
@@ -307,8 +323,8 @@ export function OwnerUsuariosPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los roles</SelectItem>
-                <SelectItem value="operador">Operador</SelectItem>
-                <SelectItem value="profesional">Profesional</SelectItem>
+                <SelectItem value="operador">{companyConfig?.sing_heading_operador || "Operador"}</SelectItem>
+                <SelectItem value="profesional">{companyConfig?.sing_heading_profesional || "Profesional"}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -495,8 +511,12 @@ export function OwnerUsuariosPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="operador" className="cursor-pointer">Operador</SelectItem>
-                  <SelectItem value="profesional" className="cursor-pointer">Profesional</SelectItem>
+                  <SelectItem value="operador" className="cursor-pointer">
+                    {companyConfig?.sing_heading_operador || "Operador"}
+                  </SelectItem>
+                  <SelectItem value="profesional" className="cursor-pointer">
+                    {companyConfig?.sing_heading_profesional || "Profesional"}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -26,6 +26,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Search, X, ChevronLeft, ChevronRight, Plus, Edit, Lock, Unlock, Building2, Shield } from "lucide-react";
 import { toast } from "sonner";
@@ -151,11 +152,10 @@ export function SuperadminUsuariosPage() {
   const getStatusBadge = (status: number) => {
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
-          status === 1
-            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-        }`}
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${status === 1
+          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          }`}
       >
         {status === 1 ? 'Activo' : 'Inactivo'}
       </span>
@@ -278,14 +278,14 @@ export function SuperadminUsuariosPage() {
         await apiClient.post(SUPER_API.USERS_CREATE, userFormData);
         toast.success("Usuario creado correctamente");
       }
-      
+
       setIsUserSheetOpen(false);
       setEditingUser(null);
       fetchUsuarios(); // Recargar la lista
     } catch (error: unknown) {
-      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error || 
-                          (error as { message?: string })?.message || 
-                          "Error al guardar el usuario";
+      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
+        (error as { message?: string })?.message ||
+        "Error al guardar el usuario";
       toast.error(errorMessage);
     }
   };
@@ -486,7 +486,7 @@ export function SuperadminUsuariosPage() {
             <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredUsuarios.length)} de {filteredUsuarios.length} usuarios
             </div>
-            
+
             {totalPages > 1 && (
               <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
                 <Button
@@ -499,7 +499,7 @@ export function SuperadminUsuariosPage() {
                   <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                   <span className="hidden sm:inline ml-1">Anterior</span>
                 </Button>
-                
+
                 <div className="flex flex-wrap items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <Button
@@ -513,7 +513,7 @@ export function SuperadminUsuariosPage() {
                     </Button>
                   ))}
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -541,7 +541,8 @@ export function SuperadminUsuariosPage() {
               {isEditing ? "Modifica los datos del usuario" : "Completa los datos para crear un nuevo usuario"}
             </SheetDescription>
           </SheetHeader>
-          <div className="space-y-4 mt-6">
+          <Separator />
+          <div className="space-y-4 mt-0">
             <div>
               <label className="text-sm font-medium">Nombre completo</label>
               <Input
@@ -582,7 +583,7 @@ export function SuperadminUsuariosPage() {
             <div>
               <label className="text-sm font-medium">Rol</label>
               <Select value={userFormData.user_role} onValueChange={(value) => setUserFormData(prev => ({ ...prev, user_role: value }))}>
-                <SelectTrigger className="cursor-pointer">
+                <SelectTrigger className="min-w-full cursor-pointer">
                   <SelectValue placeholder="Selecciona un rol" />
                 </SelectTrigger>
                 <SelectContent>
@@ -595,7 +596,7 @@ export function SuperadminUsuariosPage() {
             <div>
               <label className="text-sm font-medium">Empresa</label>
               <Select value={userFormData.company_id.toString()} onValueChange={(value) => setUserFormData(prev => ({ ...prev, company_id: parseInt(value) }))}>
-                <SelectTrigger className="cursor-pointer">
+                <SelectTrigger className="min-w-full cursor-pointer">
                   <SelectValue placeholder="Selecciona una empresa" />
                 </SelectTrigger>
                 <SelectContent>
@@ -628,15 +629,17 @@ export function SuperadminUsuariosPage() {
               )}
             </div>
             <div className="flex gap-2 pt-4">
-              <Button onClick={handleSaveUser} className="flex-1">
-                {isEditing ? "Actualizar Usuario" : "Crear Usuario"}
-              </Button>
               <Button
+                className="flex-1"
                 variant="outline"
                 onClick={() => setIsUserSheetOpen(false)}
               >
                 Cancelar
               </Button>
+              <Button onClick={handleSaveUser} className="flex-1">
+                {isEditing ? "Actualizar" : "Crear Usuario"}
+              </Button>
+
             </div>
           </div>
         </SheetContent>

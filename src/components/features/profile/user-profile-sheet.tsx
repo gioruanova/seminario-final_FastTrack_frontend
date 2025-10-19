@@ -30,7 +30,7 @@ interface UserProfileSheetProps {
 }
 
 export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSheetProps) {
-  const { user } = useAuth()
+  const { user, companyConfig } = useAuth()
   const [internalOpen, setInternalOpen] = useState(false)
 
   const isOpen = open !== undefined ? open : internalOpen
@@ -95,12 +95,23 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
     }
   }
 
+  // Función para mapear role a display name
+  const getRoleDisplayName = (role: string) => {
+    const roleMapping: Record<string, string> = {
+      owner: companyConfig?.sing_heading_owner || "Owner",
+      operador: companyConfig?.sing_heading_operador || "Operador",
+      profesional: companyConfig?.sing_heading_profesional || "Profesional"
+    }
+    return roleMapping[role] || role
+  }
+
   const getRoleDisplay = () => {
     if (isSuperAdmin(user)) {
       return "Super Administrador"
     }
     if (isCompanyUser(user)) {
-      return `${(user.user_role).toUpperCase()}`
+      const userRole = (user as { user_role?: string }).user_role
+      return getRoleDisplayName(userRole || "")
     }
     return (user as { user_role?: string }).user_role || "Usuario"
   }
@@ -146,7 +157,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
               <h3 className="font-medium text-lg">
                 {user.user_name || user.user_email.split('@')[0]}
               </h3>
-              <p className="text-sm text-muted-foreground">{user.user_email}</p>
+
             </div>
 
             <div className="space-y-3">

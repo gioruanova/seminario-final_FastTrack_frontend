@@ -225,15 +225,19 @@ export function OperadorUsuariosPage() {
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage)
 
+  // Función para mapear role a display name
+  const getRoleDisplayName = (role: string) => {
+    const roleMapping: Record<string, string> = {
+      operador: companyConfig?.sing_heading_operador || "Operador",
+      profesional: companyConfig?.sing_heading_profesional || "Profesional"
+    }
+    return roleMapping[role] || role
+  }
+
   const getRoleBadge = (role: string) => {
     const roleColors: Record<string, string> = {
       operador: "bg-purple-100 text-purple-800",
       profesional: "bg-orange-100 text-orange-800"
-    }
-
-    const roleNames: Record<string, string> = {
-      operador: "Operador",
-      profesional: "Profesional"
     }
 
     return (
@@ -242,7 +246,7 @@ export function OperadorUsuariosPage() {
           roleColors[role] || "bg-gray-100 text-gray-800"
         }`}
       >
-        {roleNames[role] || role}
+        {getRoleDisplayName(role)}
       </span>
     )
   }
@@ -314,8 +318,8 @@ export function OperadorUsuariosPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los roles</SelectItem>
-                <SelectItem value="operador">Operador</SelectItem>
-                <SelectItem value="profesional">Profesional</SelectItem>
+                <SelectItem value="operador">{companyConfig?.sing_heading_operador || "Operador"}</SelectItem>
+                <SelectItem value="profesional">{companyConfig?.sing_heading_profesional || "Profesional"}</SelectItem>
               </SelectContent>
             </Select>
 

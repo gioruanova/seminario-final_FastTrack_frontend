@@ -19,6 +19,8 @@ import { Edit, Eye, EyeOff, AlertTriangle } from "lucide-react"
 import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
+import { SUPER_API } from "@/lib/superApi/config"
+import { isSuperAdmin } from "@/types/auth"
 
 interface EditProfileSheetProps {
   children: React.ReactNode
@@ -87,7 +89,9 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
     if (!user) return
 
     try {
-      const response = await apiClient.get(CLIENT_API.GET_USERS)
+      // Usar endpoint diferente según el tipo de usuario
+      const endpoint = isSuperAdmin(user) ? SUPER_API.GET_USERS : CLIENT_API.GET_USERS
+      const response = await apiClient.get(endpoint)
       const users: UserData[] = response.data
 
       // Buscar el usuario actual en el array
@@ -184,7 +188,9 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         return
       }
 
-      const url = CLIENT_API.USERS_EDIT.replace("{id}", user.user_id.toString())
+      // Usar endpoint diferente según el tipo de usuario
+      const endpoint = isSuperAdmin(user) ? SUPER_API.USERS_EDIT : CLIENT_API.USERS_EDIT
+      const url = endpoint.replace("{id}", user.user_id.toString())
       await apiClient.put(url, updateData)
 
       toast.success("Perfil actualizado exitosamente")
