@@ -69,7 +69,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
       setIsLoading(true);
       const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
       setAllReclamos(response.data);
-      
+
       const activeReclamos = response.data
         .filter((r: ReclamoData) => r.reclamo_estado !== "CERRADO" && r.reclamo_estado !== "CANCELADO")
         .sort((a: ReclamoData, b: ReclamoData) => {
@@ -155,9 +155,9 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => {
                 const total = allReclamos.length || 1;
                 const percentage = (count / total) * 100;
-                
+
                 if (count === 0) return null;
-                
+
                 return (
                   <div
                     key={estado}
@@ -168,7 +168,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                 );
               })}
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 justify-center">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => (
                 <div key={estado} className="flex items-center gap-2 text-xs justify-center">
@@ -191,9 +191,8 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                   {displayedReclamos.map((reclamo, index) => (
                     <div
                       key={reclamo.reclamo_id}
-                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${
-                        index !== displayedReclamos.length - 1 ? 'mb-3' : ''
-                      }`}
+                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${index !== displayedReclamos.length - 1 ? 'mb-3' : ''
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-4 md:flex-row flex-col">
                         <div className="flex-1 space-y-2">
@@ -201,11 +200,11 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                             <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
                             <h4 className="font-semibold">{reclamo.reclamo_titulo}</h4>
                             <span className="text-xs bg-muted px-2 py-1 rounded">#{reclamo.reclamo_id}</span>
+                            -
+                            <span className={`text-xs px-2 py-1 rounded font-medium ${ESTADO_COLORS[reclamo.reclamo_estado]}`}>
+                              {reclamo.reclamo_estado}
+                            </span>
                           </div>
-                          
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {reclamo.reclamo_detalle}
-                          </p>
 
                           <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
@@ -216,22 +215,28 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                                 {reclamo.agenda_hora_desde} - {reclamo.agenda_hora_hasta}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              <span>{reclamo.cliente_complete_name}</span>
-                            </div>
                           </div>
+
+                          <div className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            <span>{reclamo.cliente_complete_name}</span>
+                          </div>
+
+
+
 
                           <div className="flex flex-wrap gap-2">
                             <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                               {reclamo.nombre_especialidad}
                             </span>
+                            -
                             <span className="text-xs bg-muted px-2 py-1 rounded">
-                              Profesional: {reclamo.profesional}
+                              {reclamo.profesional}
                             </span>
                           </div>
+
                         </div>
-                        
+
                         <Button
                           size="sm"
                           variant="default"
@@ -246,7 +251,7 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
                 </div>
               )}
             </CardContent>
-            
+
             {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
               <CardContent className="pt-0">

@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, User, MapPin, Clock, FileText, Link2 } from "lucide-react";
+import { Calendar, User, MapPin, Clock, FileText, Link2, Wrench } from "lucide-react";
 import { useDashboard } from "@/context/DashboardContext";
 import { toast } from "sonner";
 import axios from "axios";
@@ -27,6 +27,7 @@ import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
 import { ContactoRapido } from "@/components/dashboard/profesional/contacto-rapido-feature";
+import { Separator } from "@/components/ui/separator";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -207,36 +208,49 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
           </SheetTitle>
 
         </SheetHeader>
+        <Separator />
 
         <div className="mt-1 space-y-6">
-          <SheetTitle className="mb-2">
-            Detalles completos de {companyConfig?.sing_heading_reclamos}:
-          </SheetTitle>
-          {/* Información principal */}
+          <div className="flex items-center gap-2 text-sm">
+
+            <div className="flex items-start flex-col gap-2 text-sm mb-0">
+              <div className="flex items-center gap-2 text-sm flex-1">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Creado por:</span>
+              </div>
+              <span className="font-medium">{reclamo.creador}</span>
+            </div>
+
+            <div className="flex flex-col items-center gap-2 text-sm flex-1">
+              <div className="flex items-center gap-2 text-sm">
+                <Wrench className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{companyConfig?.sing_heading_especialidad}:</span>
+              </div>
+              <p className="font-medium">{reclamo.nombre_especialidad}</p>
+            </div>
+
+          </div>
+
+          <div className="flex items-start flex-col gap-2 text-sm">
+            <div className="flex items-center gap-2 text-sm">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">{companyConfig?.sing_heading_profesional} responsable:</span>
+            </div>
+            <span className="font-medium">{reclamo.profesional}</span>
+          </div>
+          <Separator />
+
           <div className="space-y-4">
-            <div>
-              <Label className="text-muted-foreground">Descripción</Label>
-              <p className="mt-1 text-sm">{reclamo.reclamo_detalle}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-muted-foreground">Estado Actual</Label>
-                <div className="mt-1 flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
-                  <span className="text-sm font-medium">{reclamo.reclamo_estado}</span>
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-muted-foreground">{companyConfig?.sing_heading_especialidad}</Label>
-                <p className="mt-1 text-sm">{reclamo.nombre_especialidad}</p>
-              </div>
-            </div>
-
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <User className="w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{companyConfig?.sing_heading_solicitante}:</span>
+                <span className="font-medium">{reclamo.cliente_complete_name}</span>
+              </div>
+
+
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Fecha agendada:</span>
                 <span className="font-medium">
                   {format(parseISO(reclamo.agenda_fecha), "dd/MM/yyyy", { locale: es })}
@@ -244,42 +258,25 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
               </div>
 
               <div className="flex items-center gap-2 text-sm">
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock className="w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Horario agendado:</span>
                 <span className="font-medium">
                   {reclamo.agenda_hora_desde} - {reclamo.agenda_hora_hasta}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Cliente:</span>
-                <span className="font-medium">{reclamo.cliente_complete_name}</span>
-              </div>
 
               {reclamo.cliente_direccion && (
                 <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <MapPin className="w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Dirección:</span>
                   <span className="font-medium">{reclamo.cliente_direccion}</span>
                 </div>
               )}
 
-              <div className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Profesional:</span>
-                <span className="font-medium">{reclamo.profesional}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Creado por:</span>
-                <span className="font-medium">{reclamo.creador}</span>
-              </div>
-
               {reclamo.reclamo_url && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Link2 className="h-4 w-4 text-muted-foreground" />
+                  <Link2 className="w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">URL:</span>
                   <a
                     href={reclamo.reclamo_url}
@@ -291,13 +288,24 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                   </a>
                 </div>
               )}
+
             </div>
+
           </div>
+          <Separator />
+
+
+
+          <div>
+            <Label className="text-muted-foreground">Descripción:</Label>
+            <p className="mt-1 text-sm">{reclamo.reclamo_detalle}</p>
+          </div>
+          <Separator />
 
           {/* Mostrar nota de cierre y presupuesto si el reclamo está cerrado/cancelado */}
-          {isReclamoClosed && (reclamo.reclamo_nota_cierre || reclamo.reclamo_presupuesto) && (
+          {reclamo.reclamo_nota_cierre && (reclamo.reclamo_nota_cierre || reclamo.reclamo_presupuesto) && (
             <>
-              <div className="border-t pt-4 space-y-4">
+              <div className="space-y-4">
                 <h3 className="text-sm font-semibold">Información de Cierre</h3>
                 <div className="space-y-3">
                   {reclamo.reclamo_nota_cierre && (
@@ -323,9 +331,17 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
             </>
           )}
 
+          <div className="space-y-2">
+            <Label className="text-muted-foreground">Estado Actual</Label>
+            <div className="mt-1 flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
+              <span className="text-sm font-medium">{reclamo.reclamo_estado}</span>
+            </div>
+          </div>
+
           {/* Gestión de estado */}
           {userRole !== "superadmin" && (
-            <div className="border-t pt-4 space-y-4">
+            <div className="pt-0 space-y-4">
               {!canProfesionalEdit && userRole === "profesional" && (
                 <div className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">
                   <p className="font-medium">Este item se encuentra {reclamo.reclamo_estado.toLowerCase()} y no puede ser modificado.</p>

@@ -65,7 +65,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
       setIsLoading(true);
       const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
       setAllReclamos(response.data);
-      
+
       const finishedReclamos = response.data
         .filter((r: ReclamoData) => r.reclamo_estado === "CERRADO" || r.reclamo_estado === "CANCELADO")
         .sort((a: ReclamoData, b: ReclamoData) => {
@@ -147,9 +147,9 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => {
                 const total = reclamos.length || 1;
                 const percentage = (count / total) * 100;
-                
+
                 if (count === 0) return null;
-                
+
                 return (
                   <div
                     key={estado}
@@ -160,7 +160,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
                 );
               })}
             </div>
-            
+
             <div className="grid grid-cols-2 gap-2 justify-center">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => (
                 <div key={estado} className="flex items-center gap-2 text-xs justify-center">
@@ -183,9 +183,8 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
                   {displayedReclamos.map((reclamo, index) => (
                     <div
                       key={reclamo.reclamo_id}
-                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${
-                        index !== displayedReclamos.length - 1 ? 'mb-3' : ''
-                      }`}
+                      className={`p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors ${index !== displayedReclamos.length - 1 ? 'mb-3' : ''
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-4 md:flex-row flex-col">
                         <div className="flex-1 space-y-2">
@@ -193,18 +192,32 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
                             <span className={`h-2 w-2 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
                             <h4 className="font-semibold">{reclamo.reclamo_titulo}</h4>
                             <span className="text-xs bg-muted px-2 py-1 rounded">#{reclamo.reclamo_id}</span>
-                            <span className={`text-xs px-2 py-1 rounded font-medium ${
-                              reclamo.reclamo_estado === "CERRADO" 
-                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                            }`}>
+                            -
+                            <span className={`text-xs px-2 py-1 rounded font-medium ${reclamo.reclamo_estado === "CERRADO"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                              }`}>
                               {reclamo.reclamo_estado}
                             </span>
                           </div>
-                          
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {reclamo.reclamo_detalle}
-                          </p>
+
+
+
+
+                          <div className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            <span>{reclamo.cliente_complete_name}</span>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                              {reclamo.nombre_especialidad}
+                            </span>
+                            -
+                            <span className="text-xs bg-muted px-2 py-1 rounded">
+                              {reclamo.profesional}
+                            </span>
+                          </div>
 
                           <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
@@ -215,22 +228,11 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
                                 {reclamo.agenda_hora_desde} - {reclamo.agenda_hora_hasta}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              <span>{reclamo.cliente_complete_name}</span>
-                            </div>
                           </div>
 
-                          <div className="flex flex-wrap gap-2">
-                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                              {reclamo.nombre_especialidad}
-                            </span>
-                            <span className="text-xs bg-muted px-2 py-1 rounded">
-                              Profesional: {reclamo.profesional}
-                            </span>
-                          </div>
+
                         </div>
-                        
+
                         <Button
                           size="sm"
                           variant="default"
@@ -245,7 +247,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
                 </div>
               )}
             </CardContent>
-            
+
             {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
               <CardContent className="pt-0">
