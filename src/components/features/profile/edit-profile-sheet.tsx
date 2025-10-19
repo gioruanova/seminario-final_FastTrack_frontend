@@ -89,17 +89,17 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
     try {
       const response = await apiClient.get(CLIENT_API.GET_USERS)
       const users: UserData[] = response.data
-      
+
       // Buscar el usuario actual en el array
       const userInfo = users.find(u => u.user_id === user.user_id)
-      
+
       if (!userInfo) {
         toast.error("No se pudo encontrar la información del usuario")
         return
       }
 
       setUserData(userInfo)
-      
+
       const profileInfo: ProfileData = {
         user_id: userInfo.user_id,
         user_complete_name: userInfo.user_complete_name || "",
@@ -108,7 +108,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         user_email: userInfo.user_email || "",
         user_password: ""
       }
-      
+
       setProfileData(profileInfo)
       setOriginalData(profileInfo)
       setEmailChanged(false)
@@ -188,7 +188,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
       await apiClient.put(url, updateData)
 
       toast.success("Perfil actualizado exitosamente")
-      
+
       if (emailChanged) {
         toast.info("El email ha cambiado. La próxima vez que inicies sesión deberás usar el nuevo email.", {
           duration: 5000
@@ -222,33 +222,30 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <Separator />
+
+        <div className="mt-0 space-y-6">
           {/* Información Personal */}
           <div className="space-y-4">
-            <h4 className="font-medium">Información Personal</h4>
-            
+
             {/* User ID - Solo lectura */}
             <div className="space-y-2">
-              <Label htmlFor="user_id">ID de Usuario</Label>
-              <Input
+              <Label htmlFor="user_id">ID Unico</Label>
+              <div className="p-2 bg-muted rounded-md "
                 id="user_id"
-                value={profileData.user_id}
-                disabled
-                className="bg-muted"
-                placeholder="ID del usuario"
-              />
+
+              >{profileData.user_id}</div>
             </div>
 
             {/* DNI - Solo lectura */}
             <div className="space-y-2">
               <Label>DNI</Label>
-              <div className="p-3 bg-muted rounded-md border">
+              <div className="p-2 bg-muted rounded-md ">
                 <span className="text-sm font-medium">{profileData.user_dni || "No disponible"}</span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                El DNI no se puede modificar por seguridad
-              </p>
             </div>
+
+            <Separator />
 
             {/* Nombre Completo */}
             <div className="space-y-2">
@@ -301,7 +298,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
             <p className="text-sm text-muted-foreground">
               Deja el campo vacío si no deseas cambiar tu contraseña
             </p>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Nueva Contraseña</Label>
               <div className="relative">

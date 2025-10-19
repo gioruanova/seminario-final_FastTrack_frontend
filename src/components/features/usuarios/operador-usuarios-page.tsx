@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { Search, Plus, Edit, UserCheck, UserX, Key, X, ChevronLeft, ChevronRight } from "lucide-react"
@@ -31,7 +32,7 @@ interface User {
 // Interfaces eliminadas ya que no se usan
 
 export function OperadorUsuariosPage() {
-  const { companyConfig } = useAuth()
+  const { companyConfig, user } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
@@ -202,15 +203,20 @@ export function OperadorUsuariosPage() {
     }
   }
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.user_dni.includes(searchTerm)
+  const filteredUsers = users.filter(userItem => {
+    // Excluir el usuario logueado
+    if (user && userItem.user_id === user.user_id) {
+      return false
+    }
     
-    const matchesRole = filterRole === "all" || user.user_role === filterRole
+    const matchesSearch = userItem.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         userItem.user_dni.includes(searchTerm)
+    
+    const matchesRole = filterRole === "all" || userItem.user_role === filterRole
     const matchesStatus = filterStatus === "all" || 
-                         (filterStatus === "active" && user.user_status === 1) ||
-                         (filterStatus === "blocked" && user.user_status === 0)
+                         (filterStatus === "active" && userItem.user_status === 1) ||
+                         (filterStatus === "blocked" && userItem.user_status === 0)
     
     return matchesSearch && matchesRole && matchesStatus
   })
@@ -263,7 +269,7 @@ export function OperadorUsuariosPage() {
             <div>
               <CardTitle className="text-2xl">Gestión de Usuarios</CardTitle>
               <p className="text-sm text-muted-foreground mt-1 text-balance">
-                Gestiona operadores y profesionales de tu empresa
+                Gestiona {companyConfig?.plu_heading_operador} y {companyConfig?.plu_heading_profesional} de tu empresa
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -445,7 +451,9 @@ export function OperadorUsuariosPage() {
               {isEditing ? "Modifica la información del usuario" : `Completa la información para crear un nuevo usuario (rol ${companyConfig?.sing_heading_profesional} por defecto)`}
             </SheetDescription>
           </SheetHeader>
-          <div className="mt-6 space-y-4">
+          
+          <Separator />
+          <div className="mt-0 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="complete_name">Nombre Completo</Label>
               <Input

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { Search, Plus, Edit, X, ChevronLeft, ChevronRight, Key } from "lucide-react"
@@ -15,6 +16,8 @@ import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
 import { Eye, EyeOff, UserX, UserCheck } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
+
 
 interface User {
   user_id: number
@@ -38,6 +41,7 @@ export function OwnerUsuariosPage() {
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
+  const { companyConfig, user } = useAuth()
 
   // Estados para sheets
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false)
@@ -192,15 +196,20 @@ export function OwnerUsuariosPage() {
     }
   }
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.user_dni.includes(searchTerm)
+  const filteredUsers = users.filter(userItem => {
+    // Excluir el usuario logueado
+    if (user && userItem.user_id === user.user_id) {
+      return false
+    }
     
-    const matchesRole = filterRole === "all" || user.user_role === filterRole
+    const matchesSearch = userItem.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         userItem.user_dni.includes(searchTerm)
+    
+    const matchesRole = filterRole === "all" || userItem.user_role === filterRole
     const matchesStatus = filterStatus === "all" || 
-                         (filterStatus === "active" && user.user_status === 1) ||
-                         (filterStatus === "blocked" && user.user_status === 0)
+                         (filterStatus === "active" && userItem.user_status === 1) ||
+                         (filterStatus === "blocked" && userItem.user_status === 0)
     
     return matchesSearch && matchesRole && matchesStatus
   })
@@ -230,8 +239,8 @@ export function OwnerUsuariosPage() {
     }
 
     const roleNames: Record<string, string> = {
-      operador: "Operador",
-      profesional: "Profesional"
+      operador: companyConfig?.sing_heading_operador || "Operador",
+      profesional: companyConfig?.sing_heading_profesional || "Profesional"
     }
 
     return (
@@ -253,7 +262,7 @@ export function OwnerUsuariosPage() {
             <div>
               <CardTitle className="text-2xl">Gestión de Usuarios</CardTitle>
               <p className="text-sm text-muted-foreground mt-1 text-balance">
-                Gestiona los usuarios de tu empresa (operadores y profesionales)
+                Gestiona los usuarios de tu empresa ({companyConfig?.plu_heading_operador} y {companyConfig?.plu_heading_profesional})
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -435,7 +444,8 @@ export function OwnerUsuariosPage() {
               {isEditing ? "Modifica la información del usuario" : "Completa la información para crear un nuevo usuario"}
             </SheetDescription>
           </SheetHeader>
-          <div className="mt-6 space-y-4">
+          <Separator />
+          <div className="mt-0 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="complete_name">Nombre Completo</Label>
               <Input
@@ -481,12 +491,12 @@ export function OwnerUsuariosPage() {
                   setUserFormData(prev => ({ ...prev, user_role: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="min-w-full cursor-pointer">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="operador">Operador</SelectItem>
-                  <SelectItem value="profesional">Profesional</SelectItem>
+                  <SelectItem value="operador" className="cursor-pointer">Operador</SelectItem>
+                  <SelectItem value="profesional" className="cursor-pointer">Profesional</SelectItem>
                 </SelectContent>
               </Select>
             </div>

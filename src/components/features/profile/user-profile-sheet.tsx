@@ -32,7 +32,7 @@ interface UserProfileSheetProps {
 export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSheetProps) {
   const { user } = useAuth()
   const [internalOpen, setInternalOpen] = useState(false)
-  
+
   const isOpen = open !== undefined ? open : internalOpen
   const setIsOpen = onOpenChange || setInternalOpen
   const [isLoading, setIsLoading] = useState(false)
@@ -47,7 +47,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!isSuperAdmin(user)) {
       toast.error("Solo los super administradores pueden cambiar contraseñas")
       return
@@ -65,7 +65,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
 
     try {
       setIsLoading(true)
-      
+
       const apiClient = axios.create({
         baseURL: config.apiUrl,
         withCredentials: true,
@@ -75,7 +75,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
       })
 
       const endpoint = SUPER_API.USER_RESTORE.replace("{id}", user.user_id.toString())
-      
+
       await apiClient.put(endpoint, {
         new_password: passwordData.newPassword
       })
@@ -100,7 +100,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
       return "Super Administrador"
     }
     if (isCompanyUser(user)) {
-      return `${user.company_name} - ${user.user_role}`
+      return `${(user.user_role).toUpperCase()}`
     }
     return (user as { user_role?: string }).user_role || "Usuario"
   }
@@ -137,7 +137,9 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <Separator />
+
+        <div className="mt-0 space-y-6">
           {/* Información del Usuario */}
           <div className="space-y-4">
             <div className="space-y-2">
