@@ -122,8 +122,8 @@ export function MapSelector({ onLocationSelect, onCancel, initialPosition, initi
   }, [initialAddress, initialPosition, readOnly, geocodeAddress])
 
   // Cuando se geocodifica una dirección, actualizar la posición pero NO llamar onLocationSelect
-  const handleGeocodeSuccess = useCallback((lat: number, lng: number) => {
-    const newPosition: [number, number] = [lat, lng]
+  const _handleGeocodeSuccess = useCallback((_lat: number, _lng: number) => {
+    const newPosition: [number, number] = [_lat, _lng]
     setPosition(newPosition)
     // NO llamamos onLocationSelect aquí, solo actualizamos la posición
   }, [])

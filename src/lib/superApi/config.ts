@@ -20,6 +20,11 @@ export const SUPER_API = {
   USER_RESTORE: `${config.apiUrl}/${slugs.superApi}/users/restore/{id}`,
 
 
+  // gestion de clientes recurrentes
+  GET_CLIENTES: `${config.apiUrl}/${slugs.superApi}/clientes-recurrentes`,
+  ACTIVAR_CLIENTE: `${config.apiUrl}/${slugs.superApi}/clientes-recurrentes/unblock/{cliente_id}`,
+  DESACTIVAR_CLIENTE: `${config.apiUrl}/${slugs.superApi}/clientes-recurrentes/block/{cliente_id}`,
+
   // gestion especialidades
   GET_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades`,
   CREATE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades`,

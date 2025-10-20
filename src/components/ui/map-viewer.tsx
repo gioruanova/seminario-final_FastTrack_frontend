@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Button } from './button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
+import { Dialog, DialogContent, DialogTitle } from './dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MapPin, Maximize2, X } from 'lucide-react';
 
 // Declaración de tipos para Leaflet (se carga dinámicamente)
 declare global {
     interface Window {
-        L: any;
+        L: typeof import('leaflet');
     }
 }
 
@@ -25,11 +25,11 @@ export function MapViewer({
     showExpandButton = true 
 }: MapViewerProps) {
     const mapRef = useRef<HTMLDivElement>(null);
-    const mapInstanceRef = useRef<any>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [position, setPosition] = useState<[number, number] | null>(null);
+    const [, setPosition] = useState<[number, number] | null>(null);
 
     useEffect(() => {
         const loadMap = () => {
@@ -50,23 +50,25 @@ export function MapViewer({
                 // Geocodificar la dirección para obtener coordenadas
                 geocodeAddress(address).then((coords) => {
                     if (coords) {
-                        const [lat, lng] = coords;
+                        // Usar las coordenadas directamente
                         setPosition(coords);
 
                         // Crear el mapa
-                        const map = window.L.map(mapRef.current).setView(coords, 15);
-                        mapInstanceRef.current = map;
+                        if (mapRef.current) {
+                            const map = window.L.map(mapRef.current).setView(coords, 15);
+                            mapInstanceRef.current = map;
 
-                        // Agregar tiles de OpenStreetMap
-                        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '© OpenStreetMap contributors',
-                            maxZoom: 19,
-                        }).addTo(map);
+                            // Agregar tiles de OpenStreetMap
+                            window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap contributors',
+                                maxZoom: 19,
+                            }).addTo(map);
 
-                        // Agregar marcador en la ubicación
-                        window.L.marker(coords).addTo(map);
+                            // Agregar marcador en la ubicación
+                            window.L.marker(coords).addTo(map);
 
-                        setIsLoading(false);
+                            setIsLoading(false);
+                        }
                     } else {
                         setError('No se pudo encontrar la ubicación');
                         setIsLoading(false);
@@ -83,7 +85,7 @@ export function MapViewer({
         const loadLeaflet = () => {
             if (window.L) {
                 setTimeout(() => {
-                    if (window.L && window.L.map) {
+                    if (window.L && typeof window.L.map === 'function') {
                         loadMap();
                     } else {
                         setError('Error: Leaflet no está completamente cargado');
@@ -104,8 +106,9 @@ export function MapViewer({
             script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
             script.onload = () => {
                 setTimeout(() => {
-                    if (window.L && window.L.map) {
+                    if (window.L && typeof window.L.map === 'function') {
                         // Configuración necesaria para iconos de Leaflet
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         delete (window.L.Icon.Default.prototype as any)._getIconUrl;
                         window.L.Icon.Default.mergeOptions({
                             iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',

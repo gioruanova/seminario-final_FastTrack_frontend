@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    // Ayuda con problemas de SSR en Next.js 15
-    serverComponentsExternalPackages: ['axios'],
-  },
+  // Configuración para paquetes externos en server components
+  serverExternalPackages: ['axios'],
   // Configuración para evitar problemas de hidratación
   transpilePackages: [],
   // Configuración de headers para evitar problemas de CORS

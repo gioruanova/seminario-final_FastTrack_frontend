@@ -6,7 +6,7 @@ import { Button } from './button'
 // Tipos para Leaflet (carga dinámica)
 declare global {
     interface Window {
-        L: any
+        L: typeof import('leaflet')
     }
 }
 
@@ -30,7 +30,7 @@ export function OSMMapSelector({
     height = "400px"
 }: OSMMapSelectorProps) {
     const mapRef = useRef<HTMLDivElement>(null)
-    const mapInstanceRef = useRef<any>(null)
+    const mapInstanceRef = useRef<L.Map | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [position, setPosition] = useState<[number, number] | null>(initialPosition || null)
@@ -72,7 +72,7 @@ export function OSMMapSelector({
 
                 // Configurar eventos de click
                 if (!readOnly) {
-                    map.on('click', (e: any) => {
+                    map.on('click', (e: L.LeafletMouseEvent) => {
                         try {
                             const newPos: [number, number] = [e.latlng.lat, e.latlng.lng]
                             marker.setLatLng(newPos)
@@ -85,7 +85,7 @@ export function OSMMapSelector({
                     })
 
                     // Configurar eventos de arrastre
-                    marker.on('dragend', (e: any) => {
+                    marker.on('dragend', (e: L.DragEndEvent) => {
                         try {
                             const newPos: [number, number] = [e.target.getLatLng().lat, e.target.getLatLng().lng]
                             setPosition(newPos)
@@ -115,7 +115,7 @@ export function OSMMapSelector({
             if (window.L) {
                 // Leaflet ya está cargado, esperar inicialización
                 setTimeout(() => {
-                    if (window.L && window.L.map) {
+                    if (window.L && typeof window.L.map === 'function') {
                         loadOSMMap()
                     } else {
                         setError('Error: Leaflet no está completamente cargado')
@@ -137,8 +137,9 @@ export function OSMMapSelector({
             script.onload = () => {
                 // Esperar inicialización completa
                 setTimeout(() => {
-                    if (window.L && window.L.map) {
+                    if (window.L && typeof window.L.map === 'function') {
                         // Configuración necesaria para iconos de Leaflet
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         delete (window.L.Icon.Default.prototype as any)._getIconUrl
                         window.L.Icon.Default.mergeOptions({
                             iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -168,9 +169,9 @@ export function OSMMapSelector({
                 mapInstanceRef.current = null
             }
         }
-    }, [initialPosition, initialAddress, readOnly])
+    }, [initialPosition, initialAddress, readOnly]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    const geocodeAddress = async (address: string, map: any, marker: any) => {
+    const geocodeAddress = async (address: string, map: L.Map, marker: L.Marker) => {
         try {
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
