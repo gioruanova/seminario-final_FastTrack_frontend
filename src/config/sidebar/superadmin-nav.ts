@@ -46,7 +46,7 @@ export const superAdminNavItems: NavItem[] = [
         title: "Clientes Recurrentes",
         url: "/dashboard/superadmin/clientes",
         icon: Briefcase,
-      },
+    },
 
 
 
@@ -67,7 +67,6 @@ export const superAdminProjects: ProjectData[] = [
         title: "Mensajes publicos",
         url: "/dashboard/superadmin/mensajes",
         icon: Mail,
-
     },
     {
         title: "Mensajes Plataforma",
