@@ -39,6 +39,8 @@ Aplicación web progresiva (PWA) para la gestión de incidencias y tareas, desar
 | ![Recharts](https://img.shields.io/badge/Recharts-FF6B6B?logo=chart.js&logoColor=white) | Gráficos y visualización de datos |
 | ![Embla Carousel](https://img.shields.io/badge/Embla_Carousel-8B5CF6?logo=react&logoColor=white) | Carruseles y sliders |
 | ![Lucide Icons](https://img.shields.io/badge/Lucide-F56565?logo=lucide&logoColor=white) | Iconografía moderna |
+| ![Leaflet](https://img.shields.io/badge/Leaflet-199900?logo=leaflet&logoColor=white) | Mapas interactivos con OpenStreetMap |
+| ![React Leaflet](https://img.shields.io/badge/React_Leaflet-199900?logo=react&logoColor=white) | Componentes React para Leaflet |
 
 ### 📱 PWA & Funcionalidades
 | Tecnología   | Descripción                |
