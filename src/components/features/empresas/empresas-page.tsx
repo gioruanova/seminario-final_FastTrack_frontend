@@ -36,14 +36,6 @@ import axios from "axios";
 import { config } from "@/lib/config";
 import { SUPER_API } from "@/lib/superApi/config";
 
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 interface CompanyData {
   company_id: number;
   company_unique_id: string;
@@ -78,6 +70,15 @@ export function EmpresasPage() {
   const [companyToToggle, setCompanyToToggle] = useState<{ id: number; estado: number } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Crear apiClient con la configuración correcta de autenticación
+  const apiClient = axios.create({
+    baseURL: config.apiUrl,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 
   const fetchCompanies = async () => {
     try {

@@ -220,7 +220,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                 Todos los {(companyConfig?.plu_heading_reclamos ?? "Reclamos").toLowerCase()} finalizados
               </p>
             </div>
-            <div className="flex items-center flex-col md:flex-row gap-2 md:gap-0">
+            <div className="flex items-center flex-col md:flex-row gap-2 md:gap-1">
               <Badge variant="secondary" className="px-4 py-1.5 text-sm">
                 {filteredReclamos.length} de {reclamos.length}
               </Badge>

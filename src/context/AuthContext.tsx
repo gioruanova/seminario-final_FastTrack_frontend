@@ -12,19 +12,20 @@ import { CompanyConfigData } from "@/types/company";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [companyConfig, setCompanyConfig] = useState<CompanyConfigData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  // Configurar cliente API con autenticación
+  const apiClient = axios.create({
+    baseURL: config.apiUrl,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
   const fetchCompanyConfig = async () => {
     try {
@@ -59,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       const error = err as { response?: { status?: number } };
       
-      // Intentar refresh token si es error de autenticación
+      // Intentar renovar token si hay error de autenticación
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         try {
           const refreshResponse = await apiClient.get(PUBLIC_API.REFRESH);
@@ -90,21 +91,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Función auxiliar para manejo de errores
+  // Manejo centralizado de errores
   const getErrorMessage = (error: unknown): string => {
-    // Errores de validación del frontend (seguros) - no tienen response
+    // Errores de validación del frontend (sin response)
     const errorObj = error as { message?: string; response?: { data?: { code?: string }; status?: number }; code?: string };
     
     if (errorObj.message && !errorObj.response) {
       return errorObj.message;
     }
 
-    // Errores de red
+    // Errores de conexión
     if (errorObj.message === "Network Error" || (!errorObj.response && !errorObj.message)) {
       return "No se pudo conectar con el servidor. Verifica tu conexión a internet.";
     }
 
-    // Errores seguros del backend (códigos específicos)
+    // Errores seguros del backend
     const safeErrorCodes = ["MISSING_CREDENTIALS", "INVALID_EMAIL_FORMAT", "INVALID_PASSWORD_LENGTH", "VALIDATION_ERROR"];
     if (errorObj.response?.data?.code && safeErrorCodes.includes(errorObj.response.data.code)) {
       const errorMessages: Record<string, string> = {
@@ -116,17 +117,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return errorMessages[errorObj.response.data.code];
     }
 
-    // Error 400 (datos inválidos) - seguro
+    // Error 400 (datos inválidos)
     if (errorObj.response?.status === 400) {
       return "Datos de entrada inválidos";
     }
 
-    // Error 401 (credenciales incorrectas) - mensaje específico pero seguro
+    // Error 401 (credenciales incorrectas)
     if (errorObj.response?.status === 401) {
       return "Credenciales incorrectas";
     }
 
-    // Todos los demás errores son sensibles - mensaje genérico
+    // Por seguridad, no exponer detalles de errores internos
     return "Ha habido un error. Póngase en contacto con su administrador";
   };
 
@@ -134,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
 
-      // Validaciones del frontend
+      // Validaciones básicas
       if (!email.trim()) throw new Error("El email es requerido");
       if (!password.trim()) throw new Error("La contraseña es requerida");
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("El formato del email no es válido");
@@ -157,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
         } catch {
-          // Si falla el perfil, usar el mensaje genérico
+          // Si falla el perfil, usar mensaje genérico
           throw new Error("Ha habido un error. Póngase en contacto con su administrador");
         }
       } else {
@@ -199,7 +200,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     refreshCompanyConfig,
     isLoading,
-    error: null, // Ya no usamos error state, solo toasts
+    error: null, // Solo usamos toasts para errores
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -235,7 +235,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
           Gestionar {companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidades"}
         </Button>
       </SheetTrigger>
-      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
+      <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle>
             Gestionar {companyConfig?.sing_heading_especialidad || "Especialidades"} - {profesional.user_complete_name}

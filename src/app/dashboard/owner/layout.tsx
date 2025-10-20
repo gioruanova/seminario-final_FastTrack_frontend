@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { isCompanyUser } from "@/types/auth";
 
@@ -12,12 +12,12 @@ export default function OwnerLayout({
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && user) {
       // Solo redirigir si estamos realmente en una ruta del owner
-      const currentPath = window.location.pathname;
-      const isOwnerRoute = currentPath.startsWith('/dashboard/owner');
+      const isOwnerRoute = pathname.startsWith('/dashboard/owner');
       
       if (isOwnerRoute && (!isCompanyUser(user) || user.user_role !== "owner")) {
         router.replace("/dashboard");

@@ -14,14 +14,6 @@ import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 interface ReclamoData {
   reclamo_id: number;
   reclamo_titulo: string;
@@ -59,6 +51,15 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
   const [isCollapsed, setIsCollapsed] = useState(true); // Inicia colapsado
   const [selectedReclamo, setSelectedReclamo] = useState<ReclamoData | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  // Crear apiClient con la configuración correcta de autenticación
+  const apiClient = axios.create({
+    baseURL: config.apiUrl,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 
   const fetchReclamos = async () => {
     try {

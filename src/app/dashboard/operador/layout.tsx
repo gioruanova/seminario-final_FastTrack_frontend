@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { isCompanyUser } from "@/types/auth";
 
@@ -12,12 +12,12 @@ export default function OperadorLayout({
 }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && user) {
       // Solo redirigir si estamos realmente en una ruta del operador
-      const currentPath = window.location.pathname;
-      const isOperadorRoute = currentPath.startsWith('/dashboard/operador');
+      const isOperadorRoute = pathname.startsWith('/dashboard/operador');
       
       if (isOperadorRoute && (!isCompanyUser(user) || user.user_role !== "operador")) {
         router.replace("/dashboard");

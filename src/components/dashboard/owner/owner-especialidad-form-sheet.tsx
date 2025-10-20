@@ -135,7 +135,7 @@ export function OwnerEspecialidadFormSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
+      <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle>
             {isEditing ? "Editar Especialidad" : "Nueva Especialidad"}

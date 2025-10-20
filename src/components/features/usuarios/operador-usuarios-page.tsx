@@ -446,7 +446,7 @@ export function OperadorUsuariosPage() {
 
       {/* Sheet para crear/editar usuario */}
       <Sheet open={isUserSheetOpen} onOpenChange={setIsUserSheetOpen}>
-        <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
+        <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>
               {isEditing ? "Editar Usuario" : "Crear Nuevo Usuario"}
@@ -540,7 +540,7 @@ export function OperadorUsuariosPage() {
 
       {/* Sheet para cambiar contraseña */}
       <Sheet open={isPasswordSheetOpen} onOpenChange={setIsPasswordSheetOpen}>
-        <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
+        <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>Cambiar Contraseña</SheetTitle>
             <SheetDescription>

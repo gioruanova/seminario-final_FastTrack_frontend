@@ -143,3 +143,26 @@
 [data-sonner-toast][data-type="success"] [data-icon] {
   color: #14532d !important;
 }
+
+/* Estilos para Leaflet */
+.leaflet-container {
+  background: transparent !important;
+  font-family: inherit !important;
+}
+
+.leaflet-control-container {
+  font-family: inherit !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px !important;
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: white !important;
+}

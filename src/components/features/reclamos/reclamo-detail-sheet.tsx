@@ -28,6 +28,7 @@ import { es } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
 import { ContactoRapido } from "@/components/dashboard/profesional/contacto-rapido-feature";
 import { Separator } from "@/components/ui/separator";
+import { MapViewer } from "@/components/ui/map-viewer";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -199,7 +200,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
+      <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <span className={`h-3 w-3 rounded-full ${ESTADO_COLORS[reclamo.reclamo_estado]}`}></span>
@@ -267,10 +268,22 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
 
               {reclamo.cliente_direccion && (
-                <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Dirección:</span>
-                  <span className="font-medium">{reclamo.cliente_direccion}</span>
+                <div className="space-y-3">
+                  <div className="flex items-start flex-col gap-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">Dirección:</span>
+                    </div>
+                    <span className="font-medium">{reclamo.cliente_direccion}</span>
+                  </div>
+
+                  <div className="mt-3">
+                    <MapViewer
+                      address={reclamo.cliente_direccion}
+                      height="200px"
+                      showExpandButton={true}
+                    />
+                  </div>
                 </div>
               )}
 

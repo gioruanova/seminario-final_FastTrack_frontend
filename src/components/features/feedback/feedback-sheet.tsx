@@ -91,7 +91,7 @@ export function FeedbackSheet() {
         </SidebarMenu>
       </SidebarGroup>
 
-      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
+      <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle>FasTrack quiere leerte...</SheetTitle>
           <SheetDescription>Tu retroalimentacion es super importante para nosotros.

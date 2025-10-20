@@ -89,12 +89,12 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
     if (!user) return
 
     try {
-      // Usar endpoint diferente según el tipo de usuario
+      // Seleccionar endpoint según tipo de usuario
       const endpoint = isSuperAdmin(user) ? SUPER_API.GET_USERS : CLIENT_API.GET_USERS
       const response = await apiClient.get(endpoint)
       const users: UserData[] = response.data
 
-      // Buscar el usuario actual en el array
+      // Encontrar usuario actual
       const userInfo = users.find(u => u.user_id === user.user_id)
 
       if (!userInfo) {
@@ -141,7 +141,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
     try {
       setIsLoading(true)
 
-      // Validaciones básicas
+      // Validar datos
       if (!profileData.user_complete_name.trim()) {
         toast.error("El nombre completo es requerido")
         return
@@ -164,7 +164,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
 
       const updateData: Record<string, string> = {}
 
-      // Solo incluir campos que hayan cambiado
+      // Solo campos modificados
       if (profileData.user_complete_name !== originalData.user_complete_name) {
         updateData.user_complete_name = profileData.user_complete_name
       }
@@ -177,18 +177,18 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         updateData.user_email = profileData.user_email
       }
 
-      // Solo incluir contraseña si se proporcionó
+      // Incluir contraseña solo si se proporcionó
       if (profileData.user_password) {
         updateData.user_password = profileData.user_password
       }
 
-      // Si no hay cambios, no hacer nada
+      // Sin cambios, salir
       if (Object.keys(updateData).length === 0) {
         toast.info("No hay cambios para guardar")
         return
       }
 
-      // Usar endpoint diferente según el tipo de usuario
+      // Seleccionar endpoint según tipo de usuario
       const endpoint = isSuperAdmin(user) ? SUPER_API.USERS_EDIT : CLIENT_API.USERS_EDIT
       const url = endpoint.replace("{id}", user.user_id.toString())
       await apiClient.put(url, updateData)
@@ -217,7 +217,7 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
-      <SheetContent className="sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
+      <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <Edit className="h-5 w-5" />

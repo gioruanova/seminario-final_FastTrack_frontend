@@ -85,7 +85,7 @@ export function ContactoRapido({
 
     const titleContacto = "Contactos Rápido";
 
-    // verssion para el dashboard main
+    // Versión compacta para el dashboard principal
     if (variant === "compact") {
         return (
             <Card className={cn("border-2 gap-1", cardClassName)}>
@@ -133,7 +133,7 @@ export function ContactoRapido({
         );
     }
 
-    // version dedicada para la pagina de contactar empresa
+    // Versión completa para la página de contacto con empresa
     return (
         <Card className={cn("border-2 gap-1", cardClassName)}>
             {showHeader && (
