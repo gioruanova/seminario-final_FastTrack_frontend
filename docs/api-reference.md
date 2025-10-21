@@ -2,48 +2,127 @@
 
 Documentación de la API: https://fast-track-api.up.railway.app/api-docs/
 
-## Endpoints disponibles
+## Endpoints por Rol y Permisos
 
-### Autenticación
+### 🔐 Autenticación (Público)
 - `POST /api/auth/login` - Iniciar sesión
 - `POST /api/auth/register` - Registrarse
 - `GET /api/auth/profile` - Obtener perfil del usuario
 - `POST /api/auth/refresh` - Renovar token
 
-### Banners
-- `GET /api/superadmin/banners` - Obtener todos los banners (superadmin)
+### 👑 SUPERADMIN (Acceso completo)
+
+#### Gestión de Usuarios
+- `GET /api/superadmin/users` - Listar todos los usuarios
+- `POST /api/superadmin/users` - Crear usuario
+- `PUT /api/superadmin/users/{id}` - Editar usuario
+- `POST /api/superadmin/users/block/{id}` - Bloquear usuario
+- `POST /api/superadmin/users/unblock/{id}` - Desbloquear usuario
+- `PUT /api/superadmin/users/restore/{id}` - Cambiar contraseña
+
+#### Gestión de Empresas
+- `GET /api/superadmin/companies` - Listar todas las empresas
+- `POST /api/superadmin/companies` - Crear empresa
+- `PUT /api/superadmin/companies/{id}` - Editar empresa
+
+#### Gestión de Especialidades
+- `GET /api/superadmin/specialties` - Listar especialidades
+- `POST /api/superadmin/specialties` - Crear especialidad
+- `PUT /api/superadmin/specialties/{id}` - Editar especialidad
+- `POST /api/superadmin/specialties/block/{id}` - Desactivar especialidad
+- `POST /api/superadmin/specialties/unblock/{id}` - Activar especialidad
+
+#### Gestión de Banners
+- `GET /api/superadmin/banners` - Listar todos los banners
 - `POST /api/superadmin/banners` - Crear banner
 - `PUT /api/superadmin/banners/{id}` - Editar banner
 - `DELETE /api/superadmin/banners/{id}` - Eliminar banner
 - `POST /api/superadmin/banners/enable/{id}` - Activar banner
 - `POST /api/superadmin/banners/disable/{id}` - Desactivar banner
-- `GET /api/customers/active-banner` - Obtener banner activo (usuarios)
 
-### Mensajes
-- `GET /api/superadmin/messages` - Mensajes públicos (superadmin)
-- `GET /api/customers/messages` - Mensajes de plataforma (usuarios)
+#### Gestión de Mensajes Públicos
+- `GET /api/superadmin/messages` - Listar mensajes públicos
+- `POST /api/superadmin/messages/read/{id}` - Marcar como leído
+- `DELETE /api/superadmin/messages/{id}` - Eliminar mensaje
 
-### Usuarios
-- `GET /api/superadmin/users` - Listar usuarios (superadmin)
-- `POST /api/superadmin/users` - Crear usuario
-- `PUT /api/superadmin/users/{id}` - Editar usuario
-- `DELETE /api/superadmin/users/{id}` - Eliminar usuario
+#### Gestión de Reclamos
+- `GET /api/superadmin/claims` - Listar todos los reclamos
+- `GET /api/superadmin/claims/{id}` - Ver detalle de reclamo
 
-### Empresas
-- `GET /api/superadmin/companies` - Listar empresas (superadmin)
-- `POST /api/superadmin/companies` - Crear empresa
-- `PUT /api/superadmin/companies/{id}` - Editar empresa
+#### Gestión de Clientes
+- `GET /api/superadmin/clientes-recurrentes` - Listar clientes recurrentes
+- `POST /api/superadmin/clientes-recurrentes/block/{id}` - Bloquear cliente
+- `POST /api/superadmin/clientes-recurrentes/unblock/{id}` - Desbloquear cliente
 
-### Especialidades
-- `GET /api/superadmin/specialties` - Listar especialidades (superadmin)
-- `POST /api/superadmin/specialties` - Crear especialidad
-- `PUT /api/superadmin/specialties/{id}` - Editar especialidad
+### 🏢 OWNER (Gestión de empresa)
 
-### Reclamos
-- `GET /api/superadmin/claims` - Listar reclamos (superadmin)
-- `GET /api/customers/claims` - Listar reclamos (usuarios)
-- `POST /api/customers/claims` - Crear reclamo
-- `PUT /api/customers/claims/{id}` - Editar reclamo
+#### Gestión de Usuarios de la Empresa
+- `GET /api/owner/users` - Listar usuarios de mi empresa
+- `POST /api/owner/users` - Crear usuario en mi empresa
+- `PUT /api/owner/users/{id}` - Editar usuario de mi empresa
+
+#### Gestión de Especialidades
+- `GET /api/owner/especialidades` - Listar especialidades de mi empresa
+- `POST /api/owner/especialidades` - Crear especialidad
+- `PUT /api/owner/especialidades/{id}` - Editar especialidad
+
+#### Gestión de Profesionales
+- `GET /api/owner/profesionales` - Listar profesionales de mi empresa
+- `POST /api/owner/profesionales` - Agregar profesional
+- `PUT /api/owner/profesionales/{id}` - Editar profesional
+
+#### Gestión de Reclamos
+- `GET /api/owner/reclamos` - Listar reclamos de mi empresa
+- `GET /api/owner/reclamos/{id}` - Ver detalle de reclamo
+- `POST /api/owner/reclamos` - Crear reclamo
+
+#### Gestión de Clientes
+- `GET /api/owner/clientes` - Listar clientes de mi empresa
+- `POST /api/owner/clientes` - Agregar cliente
+- `PUT /api/owner/clientes/{id}` - Editar cliente
+
+#### Configuración de Empresa
+- `GET /api/owner/mi-empresa` - Ver configuración de mi empresa
+- `PUT /api/owner/mi-empresa` - Editar configuración de mi empresa
+
+### 👨‍💼 OPERADOR (Gestión operativa)
+
+#### Gestión de Reclamos
+- `GET /api/operador/reclamos` - Listar reclamos asignados
+- `GET /api/operador/reclamos/{id}` - Ver detalle de reclamo
+- `PUT /api/operador/reclamos/{id}` - Actualizar estado de reclamo
+
+#### Gestión de Profesionales
+- `GET /api/operador/profesionales` - Listar profesionales disponibles
+- `GET /api/operador/especialidades` - Listar especialidades
+
+#### Gestión de Clientes
+- `GET /api/operador/clientes` - Listar clientes
+- `POST /api/operador/clientes` - Crear cliente
+
+### 👨‍⚕️ PROFESIONAL (Trabajo directo)
+
+#### Mis Reclamos
+- `GET /api/profesional/reclamos` - Listar mis reclamos asignados
+- `GET /api/profesional/reclamos/{id}` - Ver detalle de reclamo
+- `PUT /api/profesional/reclamos/{id}` - Actualizar progreso de reclamo
+
+#### Contacto con Empresa
+- `GET /api/profesional/contactar-empresa` - Información de contacto
+- `POST /api/profesional/contactar-empresa` - Enviar mensaje a empresa
+
+### 🔄 COMPARTIDOS (Todos los roles autenticados)
+
+#### Mensajes de Plataforma
+- `GET /api/customers/messages` - Listar mensajes de plataforma
+- `POST /api/customers/messages/read/{id}` - Marcar mensaje como leído
+
+#### Banner Activo
+- `GET /api/customers/active-banner` - Obtener banner activo
+
+#### Perfil de Usuario
+- `GET /api/customers/profile` - Obtener mi perfil
+- `PUT /api/customers/profile` - Actualizar mi perfil
 
 ## Estructura de respuestas
 
