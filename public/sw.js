@@ -58,6 +58,7 @@ self.addEventListener('fetch', (event) => {
 
 // PUSH NOTIFICATIONS
 self.addEventListener('push', (event) => {
+  // Notificar a los clientes que se recibió un push
   self.clients.matchAll().then(clients => {
     clients.forEach(client => {
       client.postMessage({
@@ -124,6 +125,8 @@ self.addEventListener('push', (event) => {
       await self.registration.showNotification(notificationData.title, notificationData);
       
       const clients = await self.clients.matchAll();
+      console.log('🔔 Service Worker: Found clients:', clients.length);
+      console.log('🔔 Service Worker: Client URLs:', clients.map(c => c.url));
       
       clients.forEach(client => {
         const message = {
