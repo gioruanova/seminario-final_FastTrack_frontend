@@ -45,6 +45,11 @@ export function NotificationCenter() {
 
   useEffect(() => {
     loadNotifications();
+    
+    // Temporal: verificar que el componente se monta en iOS
+    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+      alert('🔔 NotificationCenter se montó correctamente');
+    }
   }, []);
 
   useEffect(() => {
@@ -84,6 +89,15 @@ export function NotificationCenter() {
       }
     };
 
+    // Temporal: verificar Service Worker en iOS
+    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+      if (navigator.serviceWorker) {
+        alert('🔔 Service Worker disponible, agregando listener');
+      } else {
+        alert('🔔 ERROR: Service Worker no disponible');
+      }
+    }
+    
     navigator.serviceWorker?.addEventListener('message', handleMessage);
 
     return () => {
