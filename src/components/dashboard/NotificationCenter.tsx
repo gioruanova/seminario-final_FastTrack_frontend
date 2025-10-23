@@ -107,6 +107,24 @@ export function NotificationCenter() {
       }
     };
 
+    const handleWindowMessage = (event: MessageEvent) => {
+      // Temporal: mostrar alerta para debug en iOS
+      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+        alert('🔔 NotificationCenter recibió mensaje via window.postMessage: ' + JSON.stringify(event.data));
+      }
+      
+      if (event.data?.type === 'NOTIFICATION_SHOWN') {
+        const notificationData = event.data.data;
+        
+        // Temporal: mostrar alerta para debug en iOS
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          alert('🔔 Procesando notificación via window.postMessage: ' + notificationData.title);
+        }
+        
+        addNotification(notificationData.title, notificationData.body, notificationData.path);
+      }
+    };
+
     // Temporal: verificar Service Worker en iOS
     if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
       if (navigator.serviceWorker) {
@@ -132,6 +150,9 @@ export function NotificationCenter() {
         console.log('BroadcastChannel not supported');
       }
     }
+    
+    // También escuchar window.postMessage como fallback
+    window.addEventListener('message', handleWindowMessage);
 
     return () => {
       navigator.serviceWorker?.removeEventListener('message', handleMessage);
@@ -139,6 +160,7 @@ export function NotificationCenter() {
         broadcastChannel.removeEventListener('message', handleBroadcastMessage);
         broadcastChannel.close();
       }
+      window.removeEventListener('message', handleWindowMessage);
     };
   }, []);
 
