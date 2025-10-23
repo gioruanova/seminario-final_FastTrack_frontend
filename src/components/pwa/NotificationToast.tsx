@@ -34,6 +34,26 @@ export function NotificationToast() {
 
         setIsVisible(true);
 
+        // Solo en iOS: reenviar mensaje para que NotificationCenter lo reciba
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          const forwardedMessage = {
+            type: 'NOTIFICATION_SHOWN',
+            data: notificationData,
+            source: 'NotificationToast'
+          };
+          
+          // Usar BroadcastChannel para iOS
+          if (typeof BroadcastChannel !== 'undefined') {
+            try {
+              const channel = new BroadcastChannel('notification-channel');
+              channel.postMessage(forwardedMessage);
+              channel.close();
+            } catch (error) {
+              console.log('BroadcastChannel failed');
+            }
+          }
+        }
+
         setTimeout(() => {
           setIsAnimatingOut(true);
           setTimeout(() => {

@@ -73,10 +73,32 @@ export function NotificationCenter() {
       }
     };
 
+    const handleBroadcastMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'NOTIFICATION_SHOWN' && event.data?.source === 'NotificationToast') {
+        const notificationData = event.data.data;
+        addNotification(notificationData.title, notificationData.body, notificationData.path);
+      }
+    };
+
     navigator.serviceWorker?.addEventListener('message', handleMessage);
+
+    // Solo en iOS: escuchar BroadcastChannel
+    let broadcastChannel = null;
+    if ((navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) && typeof BroadcastChannel !== 'undefined') {
+      try {
+        broadcastChannel = new BroadcastChannel('notification-channel');
+        broadcastChannel.addEventListener('message', handleBroadcastMessage);
+      } catch (error) {
+        console.log('BroadcastChannel not supported');
+      }
+    }
 
     return () => {
       navigator.serviceWorker?.removeEventListener('message', handleMessage);
+      if (broadcastChannel) {
+        broadcastChannel.removeEventListener('message', handleBroadcastMessage);
+        broadcastChannel.close();
+      }
     };
   }, []);
 
