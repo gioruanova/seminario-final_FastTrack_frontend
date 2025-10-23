@@ -199,10 +199,15 @@ export function NotificationCenter() {
 
       try {
         localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
-        // Force a small delay for iOS localStorage sync
+        
+        // Temporal: verificar localStorage en iOS
         if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          alert('🔔 Guardando en localStorage: ' + updatedNotifications.length + ' notificaciones');
+          
+          // Force a small delay for iOS localStorage sync
           setTimeout(() => {
             localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
+            alert('🔔 localStorage actualizado: ' + updatedNotifications.length + ' notificaciones');
           }, 100);
         }
       } catch (error) {
