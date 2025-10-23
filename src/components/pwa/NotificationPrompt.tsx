@@ -10,14 +10,12 @@ import { useAuth } from '@/context/AuthContext';
 export function NotificationPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasDecision, setHasDecision] = useState(false);
   const { isSupported, subscribeToPush, hasNotificationDecision } = usePushNotifications();
   const { user } = useAuth();
 
   useEffect(() => {
     if (user?.user_id) {
       const userHasDecision = hasNotificationDecision(user.user_id.toString());
-      setHasDecision(userHasDecision);
       
       if (!userHasDecision && isSupported) {
         setTimeout(() => {

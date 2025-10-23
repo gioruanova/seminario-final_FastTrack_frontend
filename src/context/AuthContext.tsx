@@ -14,7 +14,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // notificaciones
   const {
-    fetchCompanyConfig,
     refreshCompanyConfig,
     checkAuth,
     login,

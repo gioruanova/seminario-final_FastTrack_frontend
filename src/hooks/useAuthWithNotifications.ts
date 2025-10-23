@@ -9,7 +9,7 @@ import { PUBLIC_API } from '@/lib/publicApi/config';
 import { CLIENT_API } from '@/lib/clientApi/config';
 import { User, isCompanyUser } from '@/types/auth';
 import { CompanyConfigData } from '@/types/company';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
+// import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface UseAuthWithNotificationsProps {
   setUser: (user: User | null) => void;
@@ -23,7 +23,8 @@ export function useAuthWithNotifications({
   setIsLoading 
 }: UseAuthWithNotificationsProps) {
   const router = useRouter();
-  const { checkSupport, checkSubscription, subscribeToPush } = usePushNotifications();
+  // Hook de notificaciones push disponible para uso futuro
+  // const { checkSupport, checkSubscription, subscribeToPush } = usePushNotifications();
 
   // Configurar cliente API con autenticación
   const apiClient = axios.create({

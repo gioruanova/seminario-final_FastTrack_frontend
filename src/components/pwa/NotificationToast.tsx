@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bell, X, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 
 interface NotificationData {
   title: string;
   body: string;
   icon?: string;
   tag?: string;
-  data?: any;
+  data?: Record<string, unknown>;
   path?: string; // redirect segun rol
 }
 
@@ -98,10 +99,12 @@ export function NotificationToast() {
             <div className="flex-shrink-0">
               <div className="w-10 h-10 rounded-full flex items-center justify-center">
                 {latestNotification.icon ? (
-                  <img
+                  <Image
                     src={latestNotification.icon}
                     alt="Notification icon"
                     className="w-8 h-8 rounded-full object-cover"
+                    width={32}
+                    height={32}
                   />
                 ) : (
                   <Bell className="h-5 w-5 text-primary" />
