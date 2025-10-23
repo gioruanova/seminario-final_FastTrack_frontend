@@ -125,8 +125,6 @@ self.addEventListener('push', (event) => {
       await self.registration.showNotification(notificationData.title, notificationData);
       
       const clients = await self.clients.matchAll();
-      console.log('🔔 Service Worker: Found clients:', clients.length);
-      console.log('🔔 Service Worker: Client URLs:', clients.map(c => c.url));
       
       clients.forEach(client => {
         const message = {
@@ -138,7 +136,6 @@ self.addEventListener('push', (event) => {
             icon: notificationData.icon // icono app
           }
         };
-        console.log('🔔 Service Worker: Sending message to client:', client.url);
         client.postMessage(message);
       });
     } catch (error) {
