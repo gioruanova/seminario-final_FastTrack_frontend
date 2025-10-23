@@ -45,19 +45,40 @@ export function NotificationToast() {
           path: notificationData.path,
         };
 
+        // Debug para iOS
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+          alert('🔔 NotificationToast: Procesando notificación en iOS');
+          alert('🔔 NotificationToast: User Agent: ' + navigator.userAgent);
+          alert('🔔 NotificationToast: Standalone: ' + window.navigator.standalone);
+        }
+
         try {
           const stored = localStorage.getItem('fasttrack_notifications');
           const existingNotifications = stored ? JSON.parse(stored) : [];
           const updatedNotifications = [newNotification, ...existingNotifications].slice(0, 50);
           localStorage.setItem('fasttrack_notifications', JSON.stringify(updatedNotifications));
           
+          // Debug para iOS
+          if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+            alert('🔔 NotificationToast: Notificación guardada en localStorage');
+            alert('🔔 NotificationToast: Total notificaciones: ' + updatedNotifications.length);
+          }
+          
           // Disparar evento para que el NotificationCenter actualice su estado
           const updateEvent = new CustomEvent('notificationsUpdated', {
             detail: updatedNotifications
           });
           window.dispatchEvent(updateEvent);
+          
+          // Debug para iOS
+          if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+            alert('🔔 NotificationToast: Evento disparado para NotificationCenter');
+          }
         } catch (error) {
           console.error('Error saving notification:', error);
+          if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+            alert('🔔 NotificationToast: Error guardando notificación: ' + error.message);
+          }
         }
 
 

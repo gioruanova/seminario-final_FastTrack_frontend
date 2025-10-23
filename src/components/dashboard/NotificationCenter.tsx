@@ -66,8 +66,21 @@ export function NotificationCenter() {
   }, [isOpen, refreshSubscriptionStatus]);
 
   useEffect(() => {
+    // Debug para iOS
+    if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+      alert('🔔 NotificationCenter: Configurando listener para iOS');
+      alert('🔔 NotificationCenter: User Agent: ' + navigator.userAgent);
+      alert('🔔 NotificationCenter: Standalone: ' + window.navigator.standalone);
+    }
+
     // Escuchar cuando las notificaciones se actualizan (desde NotificationToast)
     const handleNotificationsUpdate = (event: CustomEvent) => {
+      // Debug para iOS
+      if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+        alert('🔔 NotificationCenter: Recibió evento de actualización');
+        alert('🔔 NotificationCenter: Notificaciones recibidas: ' + event.detail.length);
+      }
+      
       const updatedNotifications = event.detail;
       setNotifications(updatedNotifications);
     };
