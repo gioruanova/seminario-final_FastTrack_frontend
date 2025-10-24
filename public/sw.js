@@ -59,15 +59,17 @@ self.addEventListener('fetch', (event) => {
 // PUSH NOTIFICATIONS
 self.addEventListener('push', (event) => {
   // Notificar a los clientes que se recibió un push
-  // self.clients.matchAll().then(clients => {
-  //   clients.forEach(client => {
-  //     client.postMessage({
-  //       type: 'PUSH_RECEIVED',
-  //       data: event.data ? event.data.text() : null
-  //     });
-  //   });
-  // });
-  
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'PUSH_RECEIVED',
+        data: event.data ? event.data.text() : null
+      });
+    });
+  });
+});
+
+self.addEventListener('push', (event) => {
   let notificationData = {
     title: 'Nueva notificación',
     body: 'Tienes una nueva notificación',
