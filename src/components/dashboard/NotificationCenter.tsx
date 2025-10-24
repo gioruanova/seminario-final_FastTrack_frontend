@@ -66,10 +66,8 @@ export function NotificationCenter() {
   }, [isOpen, refreshSubscriptionStatus]);
 
   useEffect(() => {
-    // Pequeño delay para asegurar que el componente esté montado
-    const timeoutId = setTimeout(() => {
-      // Escuchar cuando las notificaciones se actualizan (desde NotificationToast)
-      const handleNotificationsUpdate = (event: CustomEvent) => {
+    // Escuchar cuando las notificaciones se actualizan (desde NotificationToast)
+    const handleNotificationsUpdate = (event: CustomEvent) => {
       
       const updatedNotifications = event.detail;
       setNotifications(updatedNotifications);
@@ -80,8 +78,7 @@ export function NotificationCenter() {
     return () => {
       window.removeEventListener('notificationsUpdated', handleNotificationsUpdate as EventListener);
     };
-  }, 50); // 50ms delay para montaje
-}, []);
+  }, []);
 
   const loadNotifications = () => {
     try {

@@ -59,14 +59,14 @@ self.addEventListener('fetch', (event) => {
 // PUSH NOTIFICATIONS
 self.addEventListener('push', (event) => {
   // Notificar a los clientes que se recibió un push
-  self.clients.matchAll().then(clients => {
-    clients.forEach(client => {
-      client.postMessage({
-        type: 'PUSH_RECEIVED',
-        data: event.data ? event.data.text() : null
-      });
-    });
-  });
+  // self.clients.matchAll().then(clients => {
+  //   clients.forEach(client => {
+  //     client.postMessage({
+  //       type: 'PUSH_RECEIVED',
+  //       data: event.data ? event.data.text() : null
+  //     });
+  //   });
+  // });
   
   let notificationData = {
     title: 'Nueva notificación',
@@ -126,21 +126,18 @@ self.addEventListener('push', (event) => {
       
       const clients = await self.clients.matchAll();
       
-      // Pequeño delay para asegurar que los componentes estén listos
-      setTimeout(() => {
-        clients.forEach(client => {
-          const message = {
-            type: 'NOTIFICATION_SHOWN',
-            data: {
-              title: notificationData.title,
-              body: notificationData.body,
-              path: notificationData.data?.path, // path para redirigr
-              icon: notificationData.icon // icono app
-            }
-          };
-          client.postMessage(message);
-        });
-      }, 100); // 100ms delay
+      clients.forEach(client => {
+        const message = {
+          type: 'NOTIFICATION_SHOWN',
+          data: {
+            title: notificationData.title,
+            body: notificationData.body,
+            path: notificationData.data?.path, // path para redirigr
+            icon: notificationData.icon // icono app
+          }
+        };
+        client.postMessage(message);
+      });
     } catch (error) {
       console.error('Error showing notification:', error);
       
