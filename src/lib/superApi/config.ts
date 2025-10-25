@@ -2,8 +2,16 @@ import { config, slugs } from "../config";
 
 export const SUPER_API = {
 
-  GET_COMPANIES: `${config.apiUrl}/${slugs.superApi}/companies`,
+  // NOTIFICACIONES PUSH - Superadmin
+  // Estos endpoints deben existir en el backend para que funcione correctamente
+  // NOTA: Si el backend usa los mismos endpoints que customersApi, cambiar slugs.superApi por slugs.customersApi
+  NOTIFICATION_GET_VAPID: `${config.apiUrl}/${slugs.superApi}/notifications/vapid-public-key`,
+  NOTIFICATION_SUBSCRIBE: `${config.apiUrl}/${slugs.superApi}/notifications/register-token`,
+  NOTIFICATION_UNSUBSCRIBE: `${config.apiUrl}/${slugs.superApi}/notifications/unregister-token`,
+  NOTIFICATION_UNSUBSCRIBE_SPECIFIC: `${config.apiUrl}/${slugs.superApi}/notifications/unregister-specific-token`,
+  NOTIFICATION_UNSUBSCRIBE_ALL_DEVICES: `${config.apiUrl}/${slugs.superApi}/notifications/unregister-token`,
 
+  GET_COMPANIES: `${config.apiUrl}/${slugs.superApi}/companies`,
   GET_RECLAMOS: `${config.apiUrl}/${slugs.superApi}/reclamos`,
   GET_LOGS: `${config.apiUrl}/${slugs.superApi}/globalLogs`,
 

@@ -26,9 +26,9 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ breadcrumbs, rightContent, userRole }: DashboardHeaderProps) {
   
-  const canSeeNotifications = userRole && ['owner', 'operador', 'profesional'].includes(userRole);
+  const canSeeNotifications = userRole && ['owner', 'operador', 'profesional', 'superadmin'].includes(userRole);
   return (
-    <header className="flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sticky top-0 z-50 bg-sidebar md:bg-card border-b border-border">
+    <header className="flex z-1 h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 sticky top-0 bg-sidebar md:bg-card border-b border-border">
       <div className="flex items-center gap-2 px-4 flex-1 min-w-0">
         <SidebarTrigger className="-ml-1 flex-shrink-0" />
         <Separator

@@ -11,6 +11,7 @@ export default function SuperadminEmpresasPage() {
           { label: "Dashboard", href: "/dashboard/superadmin" },
           { label: "Empresas" }
         ]} 
+        userRole="superadmin"
       />
       
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

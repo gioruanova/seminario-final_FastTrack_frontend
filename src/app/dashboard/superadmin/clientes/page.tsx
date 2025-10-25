@@ -11,6 +11,7 @@ export default function ClientesRecurrentesPage() {
           { label: "Dashboard", href: "/dashboard/superadmin" },
           { label: "Clientes Recurrentes" }
         ]} 
+        userRole="superadmin"
       />
       
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

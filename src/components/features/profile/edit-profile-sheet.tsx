@@ -13,9 +13,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { Edit, Eye, EyeOff, AlertTriangle } from "lucide-react"
+import { Edit, Eye, EyeOff, AlertTriangle, Lock, Loader2 } from "lucide-react"
 import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
@@ -56,6 +66,8 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(true)
   const [emailChanged, setEmailChanged] = useState(false)
+  const [showPasswordChangeDialog, setShowPasswordChangeDialog] = useState(false)
+  const [showLogoutOverlay, setShowLogoutOverlay] = useState(false)
 
   const [profileData, setProfileData] = useState<ProfileData>({
     user_id: 0,
@@ -162,6 +174,29 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         return
       }
 
+      // Si hay cambio de contraseña, mostrar diálogo de confirmación
+      if (profileData.user_password) {
+        setIsLoading(false)
+        setShowPasswordChangeDialog(true)
+        return
+      }
+
+      // Si no hay cambio de contraseña, proceder normalmente
+      await saveProfileChanges()
+    } catch (error) {
+      console.error("Error al actualizar perfil:", error)
+      toast.error("Error al actualizar el perfil")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const saveProfileChanges = async () => {
+    if (!user) return
+
+    try {
+      setIsLoading(true)
+
       const updateData: Record<string, string> = {}
 
       // Solo campos modificados
@@ -201,13 +236,28 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         })
       }
 
+      // Cerrar el Sheet
       handleOpen(false)
+
+      // Si hubo cambio de contraseña, mostrar overlay y redirigir
+      if (profileData.user_password) {
+        setShowLogoutOverlay(true)
+        // Redirigir después de 4 segundos
+        setTimeout(() => {
+          window.location.href = '/login'
+        }, 4000)
+      }
     } catch (error) {
       console.error("Error al actualizar perfil:", error)
       toast.error("Error al actualizar el perfil")
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleConfirmPasswordChange = () => {
+    setShowPasswordChangeDialog(false)
+    saveProfileChanges()
   }
 
   if (!user) return null
@@ -355,6 +405,75 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
           </div>
         </div>
       </SheetContent>
+
+      {/* Diálogo de Confirmación de Cambio de Contraseña */}
+      <AlertDialog open={showPasswordChangeDialog} onOpenChange={setShowPasswordChangeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-amber-100 rounded-full">
+                <Lock className="h-5 w-5 text-amber-600" />
+              </div>
+              <AlertDialogTitle>¿Cambiar contraseña?</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription>
+              Esta acción cambiará tu contraseña y cerrará tu sesión actual.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="bg-amber-50 border border-amber-200 rounded-md p-3 space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-amber-900">Información importante:</p>
+                <ul className="text-sm text-amber-800 space-y-1 list-disc list-inside">
+                  <li>Este cambio es irreversible</li>
+                  <li>Tu sesión se cerrará automáticamente</li>
+                  <li>Deberás iniciar sesión nuevamente con tu nueva contraseña</li>
+                  <li>Asegúrate de recordar tu nueva contraseña</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmPasswordChange}
+              disabled={isLoading}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {isLoading ? "Cambiando..." : "Sí, cambiar contraseña"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Overlay de cierre de sesión */}
+      {showLogoutOverlay && (
+        <div className="fixed inset-0 z-[9999] bg-background/95 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center space-y-6">
+            <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <Lock className="h-8 w-8 text-green-600" />
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-2xl font-semibold text-foreground">
+                Contraseña actualizada exitosamente
+              </h3>
+              <p className="text-lg text-muted-foreground">
+                Cerrando sesión...
+              </p>
+            </div>
+
+            <div className="flex justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          </div>
+        </div>
+      )}
     </Sheet>
   )
 }

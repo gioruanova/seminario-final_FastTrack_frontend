@@ -11,6 +11,7 @@ export default function EspecialidadesPage() {
           { label: "Dashboard", href: "/dashboard/superadmin" },
           { label: "Especialidades" }
         ]} 
+        userRole="superadmin"
       />
       
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">

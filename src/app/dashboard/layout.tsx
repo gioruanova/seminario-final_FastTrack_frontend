@@ -13,10 +13,10 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedPage>
-      <SiteBannerUsers />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
+          <SiteBannerUsers />
           <ShapeLeft />
           {children}
           <div className="text-foreground flex justify-center gap-1 text-center pb-4 text-sm">

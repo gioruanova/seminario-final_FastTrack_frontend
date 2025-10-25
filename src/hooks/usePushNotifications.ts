@@ -3,6 +3,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import { CLIENT_API } from '@/lib/clientApi/config';
+import { SUPER_API } from '@/lib/superApi/config';
+import { useAuth } from '@/context/AuthContext';
 
 // Función para convertir VAPID key de base64 a Uint8Array
 function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
@@ -24,6 +26,12 @@ export function usePushNotifications() {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+
+  // Determinar qué API usar basado en el rol del usuario
+  const getApiConfig = () => {
+    return user?.user_role === 'superadmin' ? SUPER_API : CLIENT_API;
+  };
 
   // Verificar si las notificaciones push están soportadas
   const checkSupport = useCallback(() => {
@@ -90,7 +98,8 @@ export function usePushNotifications() {
   // Obtener clave pública VAPID
   const getVapidPublicKey = async (): Promise<string> => {
     try {
-      const response = await fetch(CLIENT_API.NOTIFICATION_GET_VAPID, {
+      const apiConfig = getApiConfig();
+      const response = await fetch(apiConfig.NOTIFICATION_GET_VAPID, {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +121,8 @@ export function usePushNotifications() {
   // Registrar token en el backend
   const registerToken = async (subscription: PushSubscription): Promise<void> => {
     try {
-      const response = await fetch(CLIENT_API.NOTIFICATION_SUBSCRIBE, {
+      const apiConfig = getApiConfig();
+      const response = await fetch(apiConfig.NOTIFICATION_SUBSCRIBE, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -224,7 +234,8 @@ export function usePushNotifications() {
         
         // Notificar al backend que se desuscribió
         try {
-          await fetch(CLIENT_API.NOTIFICATION_UNSUBSCRIBE, {
+          const apiConfig = getApiConfig();
+          await fetch(apiConfig.NOTIFICATION_UNSUBSCRIBE, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
@@ -273,7 +284,8 @@ export function usePushNotifications() {
       }
 
       // Notificar al backend para cancelar en todos los dispositivos
-      const response = await fetch(CLIENT_API.NOTIFICATION_UNSUBSCRIBE_ALL_DEVICES, {
+      const apiConfig = getApiConfig();
+      const response = await fetch(apiConfig.NOTIFICATION_UNSUBSCRIBE_ALL_DEVICES, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
