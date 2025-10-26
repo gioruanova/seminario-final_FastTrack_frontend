@@ -317,7 +317,7 @@ export function OwnerCompanySettingsCard() {
                       <div key={`${item.group}-${index}`} className="rounded-lg border bg-muted/30 p-4">
                         <div className="mb-4">
                           <h4 className="text-sm font-semibold text-foreground">Etiquetas {item.group}</h4>
-                          <p className="text-xs text-muted-foreground">Aca podrá editar cómo se visualizarán los rótulos para la categoría &quot;{item.group}&quot;</p>
+                          <p className="text-xs text-muted-foreground">Aca podes editar cómo se visualizarán los rótulos para la categorías &quot;{item.group}&quot;</p>
                         </div>
 
                         <div className="space-y-2">
@@ -343,7 +343,7 @@ export function OwnerCompanySettingsCard() {
                               <div className="flex gap-2 flex-col items-start">
                                 <span>Ejemplo:</span>
                                  <span>&quot;Ejemplo de <span className="font-medium underline text-primary">{String(singValue) || "-"}</span> a visualizar&quot;</span>
-                                 <span>&quot;En esta seccion podra ver el listado de sus <span className="font-medium underline text-primary">{String(pluValue) || "-"}</span>&quot;</span>
+                                 <span>&quot;En esta seccion podes ver el listado de tus <span className="font-medium underline text-primary">{String(pluValue) || "-"}</span>&quot;</span>
 
                               </div>
 
