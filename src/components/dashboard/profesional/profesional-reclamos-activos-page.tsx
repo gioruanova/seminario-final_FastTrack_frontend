@@ -97,7 +97,8 @@ export function ProfesionalReclamosActivosPage() {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter((reclamo) =>
         reclamo.reclamo_titulo.toLowerCase().includes(searchLower) ||
-        reclamo.reclamo_detalle.toLowerCase().includes(searchLower)
+        reclamo.reclamo_detalle.toLowerCase().includes(searchLower) ||
+        reclamo.reclamo_id.toString().includes(searchTerm)
       );
     }
 
@@ -168,7 +169,7 @@ export function ProfesionalReclamosActivosPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Buscar por título o descripción..."
+                placeholder={`Buscar por id de ${companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"}, por título, descripción o ${companyConfig?.sing_heading_solicitante?.toLowerCase() || "cliente"}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 pr-9"
@@ -213,8 +214,8 @@ export function ProfesionalReclamosActivosPage() {
           ) : filteredReclamos.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               {searchTerm || filterEstado !== "all"
-                ? "No se encontraron reclamos que coincidan con los filtros"
-                : "No hay reclamos activos"}
+                ? `No se encontraron ${companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} que coincidan con los filtros`
+                : `No se registran ${companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} en curso`}
             </div>
           ) : (
             <div className="border rounded-lg">

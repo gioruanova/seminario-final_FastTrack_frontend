@@ -55,7 +55,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
   const fetchReclamos = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       // Crear cliente API dentro del callback para evitar dependencias
       const apiClient = axios.create({
         baseURL: config.apiUrl,
@@ -64,7 +64,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
           'Content-Type': 'application/json',
         },
       });
-      
+
       const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
       setAllReclamos(response.data);
 
@@ -178,7 +178,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
             <CardContent className="px-0">
               {displayedReclamos.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No hay reclamos finalizados
+                  No se encontro historial de {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}
                 </p>
               ) : (
                 <div className="space-y-4 b">

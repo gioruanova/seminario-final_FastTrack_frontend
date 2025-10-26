@@ -173,7 +173,7 @@ export function ProfesionalReclamosFinalizados() {
             <CardContent className="px-0">
               {displayedReclamos.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No hay reclamos finalizados
+                  No se encontro historial de {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}
                 </p>
               ) : (
                 <div className="space-y-4">

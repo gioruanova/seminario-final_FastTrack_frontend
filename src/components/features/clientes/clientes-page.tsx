@@ -303,14 +303,14 @@ export function ClientesPage({ userRole }: ClientesPageProps) {
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between flex-col md:flex-row gap-2 md:gap-0">
+          <div className="flex items-start md:items-center justify-between flex-col md:flex-row gap-2 md:gap-0">
             <div>
               <CardTitle className="text-2xl">Gestión de {companyConfig?.plu_heading_solicitante}</CardTitle>
               <p className="text-sm text-muted-foreground mt-1 text-balance">
                 Gestiona los {companyConfig?.plu_heading_solicitante} recurrentes de tu empresa
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-start md:items-center md:flex-row md:gap-2 gap-1">
               <Badge variant="secondary" className="text-lg px-4 py-1">
                 {filteredClientes.length} de {clientes.length}
               </Badge>

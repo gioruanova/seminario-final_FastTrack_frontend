@@ -4,14 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search, X, ChevronLeft, ChevronRight, Wrench, Users, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, X, ChevronLeft, ChevronRight, Wrench, Users, CheckCircle, XCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
@@ -193,16 +187,13 @@ export function OperadorEspecialidadesPage() {
               Consulta las {companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"} y {companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales"} disponibles para brindar soporte
             </p>
           </div>
-          <div className="flex flex-col md:flex-row gap-2 md:gap-0">
+          <div className="flex flex-col items-start md:items-center md:flex-row md:gap-2 gap-1">
             <Badge variant="secondary" className="text-lg px-4 py-1">
               {filteredEspecialidades.length} de {especialidades.length}
             </Badge>
-            <Badge variant="outline" className="text-lg px-4 py-2">
-              {profesionales.filter(p => p.user_status === 1).length} {profesionales.filter(p => p.user_status === 1).length === 1 
-                ? (companyConfig?.sing_heading_profesional?.toLowerCase() || "profesional")
-                : (companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales")
-              } activo{profesionales.filter(p => p.user_status === 1).length !== 1 ? 's' : ''}
-            </Badge>
+            <Button onClick={fetchData} variant="outline" size="sm">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -272,7 +263,7 @@ export function OperadorEspecialidadesPage() {
                         <Wrench className="h-5 w-5 text-primary" />
                         <div>
                           <CardTitle className="text-lg">{especialidad.nombre_especialidad}</CardTitle>
-                        
+
                         </div>
                       </div>
                       {getEstadoIcon(especialidad.estado_especialidad, especialidad.profesionales_count || 0)}
@@ -290,12 +281,12 @@ export function OperadorEspecialidadesPage() {
                         </span>
                       </div>
 
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">{companyConfig?.plu_heading_profesional || "profesionales"}:</span>
-                          <Badge variant="outline" className="text-sm">
-                            {especialidad.profesionales_count || 0} disponible{(especialidad.profesionales_count || 0) !== 1 ? 's' : ''}
-                          </Badge>
-                        </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{companyConfig?.plu_heading_profesional || "profesionales"}:</span>
+                        <Badge variant="outline" className="text-sm">
+                          {especialidad.profesionales_count || 0} disponible{(especialidad.profesionales_count || 0) !== 1 ? 's' : ''}
+                        </Badge>
+                      </div>
 
                       {especialidad.profesionales && especialidad.profesionales.length > 0 && (
                         <div className="space-y-2">
@@ -338,7 +329,7 @@ export function OperadorEspecialidadesPage() {
                 <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                 <span className="hidden sm:inline ml-1">Anterior</span>
               </Button>
-              
+
               <div className="flex flex-wrap items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -352,7 +343,7 @@ export function OperadorEspecialidadesPage() {
                   </Button>
                 ))}
               </div>
-              
+
               <Button
                 variant="outline"
                 size="sm"

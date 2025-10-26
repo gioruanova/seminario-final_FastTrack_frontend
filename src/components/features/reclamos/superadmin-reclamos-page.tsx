@@ -111,7 +111,8 @@ export function SuperadminReclamosPage() {
       filtered = filtered.filter((reclamo) =>
         reclamo.reclamo_titulo.toLowerCase().includes(searchLower) ||
         reclamo.reclamo_detalle.toLowerCase().includes(searchLower) ||
-        reclamo.nombre_especialidad.toLowerCase().includes(searchLower)
+        reclamo.nombre_especialidad.toLowerCase().includes(searchLower) ||
+        reclamo.reclamo_id.toString().includes(searchTerm)
       );
     }
 
@@ -171,9 +172,11 @@ export function SuperadminReclamosPage() {
                 Visualiza y gestiona todos los reclamos del sistema
               </p>
             </div>
-            <Badge variant="secondary" className="text-lg px-4 py-1">
-              {filteredReclamos.length} de {reclamos.length}
-            </Badge>
+            <div className="flex flex-col items-start md:items-center md:flex-row md:gap-2 gap-1">
+              <Badge variant="secondary" className="text-lg px-4 py-1">
+                {filteredReclamos.length} de {reclamos.length}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -183,7 +186,7 @@ export function SuperadminReclamosPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Buscar por título, descripción o especialidad..."
+                placeholder={`Buscar por id de reclamo, por título, descripción o cliente...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 pr-9"
@@ -312,45 +315,45 @@ export function SuperadminReclamosPage() {
             <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredReclamos.length)} de {filteredReclamos.length} reclamos
             </div>
-            
+
             {totalPages > 1 && (
-            <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="text-xs md:text-sm px-2 md:px-3"
-              >
-                <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
-                <span className="hidden sm:inline ml-1">Anterior</span>
-              </Button>
-              
-              <div className="flex flex-wrap items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
-                  >
-                    {page}
-                  </Button>
-                ))}
+              <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="text-xs md:text-sm px-2 md:px-3"
+                >
+                  <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline ml-1">Anterior</span>
+                </Button>
+
+                <div className="flex flex-wrap items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs md:text-sm"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="text-xs md:text-sm px-2 md:px-3"
+                >
+                  <span className="hidden sm:inline mr-1">Siguiente</span>
+                  <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+                </Button>
               </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="text-xs md:text-sm px-2 md:px-3"
-              >
-                <span className="hidden sm:inline mr-1">Siguiente</span>
-                <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
-              </Button>
-            </div>
             )}
           </div>
         </CardContent>

@@ -42,12 +42,14 @@ const apiClient = axios.create({
 export function useBannerStatus() {
   const [banner, setBanner] = useState<BannerData | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, companyConfig } = useAuth();
 
   const fetchBannerStatus = useCallback(async () => {
     try {
       setLoading(true);
       let response;
+
+
 
       if (isSuperAdmin(user)) {
         response = await apiClient.get(SUPER_API.GET_BANNERS);
@@ -70,10 +72,18 @@ export function useBannerStatus() {
   }, [user]);
 
   useEffect(() => {
-    if (user) {
+    // Si la compañía está inactiva, no mostrar banner
+    if (companyConfig?.company?.company_estado === 0) {
+      setBanner(null);
+      setLoading(false);
+      return;
+    }
+    
+    // Si hay usuario y la compañía está activa, cargar banner
+    if (user && companyConfig?.company?.company_estado === 1) {
       fetchBannerStatus();
     }
-  }, [user, fetchBannerStatus]);
+  }, [companyConfig?.company?.company_estado, user, fetchBannerStatus]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

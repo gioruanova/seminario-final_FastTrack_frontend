@@ -12,6 +12,7 @@ import { CLIENT_API } from "@/lib/clientApi/config";
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
+import { useAuth } from "@/context/AuthContext";
 
 const apiClient = axios.create({
   baseURL: config.apiUrl,
@@ -42,6 +43,8 @@ interface PlatformMessage {
 }
 
 export function ProfessionalPlatformMessagesManagement() {
+  const { companyConfig } = useAuth();
+  
   // Estados para listado de mensajes
   const [messages, setMessages] = useState<PlatformMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +56,13 @@ export function ProfessionalPlatformMessagesManagement() {
 
   // Funciones para listado de mensajes
   const fetchMessages = async () => {
+    // Si la compañía está inactiva, no cargar mensajes
+    if (companyConfig?.company?.company_estado === 0) {
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await apiClient.get(CLIENT_API.GET_MESSAGES_PLATFORM);

@@ -11,14 +11,14 @@ export function NotificationPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { isSupported, subscribeToPush, hasNotificationDecision } = usePushNotifications();
-  const { user } = useAuth();
+  const { user, companyConfig } = useAuth();
 
 
   useEffect(() => {
-    // Solo ejecutar si el usuario está completamente cargado
-    if (user?.user_id) {
+    // Solo ejecutar si el usuario está completamente cargado y empresa activa
+    if (user?.user_id && companyConfig?.company?.company_estado === 1) {
       const userHasDecision = hasNotificationDecision(user.user_id.toString());
-      
+
       if (!userHasDecision && isSupported) {
         setTimeout(() => {
           setShowPrompt(true);
@@ -35,10 +35,10 @@ export function NotificationPrompt() {
     }
 
     setIsLoading(true);
-    
+
     try {
       const success = await subscribeToPush(true, user.user_id.toString(), user.user_role);
-      
+
       if (success) {
         localStorage.setItem(`fasttrack_notification_decision_${user.user_id.toString()}`, 'accepted');
         setShowPrompt(false);
@@ -70,12 +70,12 @@ export function NotificationPrompt() {
           </div>
           <CardTitle className="text-xl">¿Activar notificaciones?</CardTitle>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <p className="text-center text-foreground">
             Te enviaremos notificaciones sobre nuevos mensajes, reclamos y actualizaciones importantes.
           </p>
-          
+
           <div className="flex gap-3">
             <Button
               onClick={handleDecline}
@@ -86,7 +86,7 @@ export function NotificationPrompt() {
               <X className="h-4 w-4 " />
               No, gracias
             </Button>
-            
+
             <Button
               onClick={handleAccept}
               className="flex-1"
@@ -96,7 +96,7 @@ export function NotificationPrompt() {
               {isLoading ? 'Activando...' : 'Sí, activar'}
             </Button>
           </div>
-          
+
           <p className="text-xs text-center text-foreground">
             Podes cambiar esta configuración en cualquier momento desde el dashboard.
           </p>

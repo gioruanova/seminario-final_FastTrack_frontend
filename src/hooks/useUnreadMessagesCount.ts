@@ -24,9 +24,16 @@ const apiClient = axios.create({
 export function useUnreadMessagesCount() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, companyConfig } = useAuth();
 
   const fetchUnreadCount = useCallback(async () => {
+    // Si la compañía está inactiva, no cargar mensajes
+    if (companyConfig?.company?.company_estado === 0) {
+      setUnreadCount(0);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       let response;
@@ -46,7 +53,7 @@ export function useUnreadMessagesCount() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, companyConfig]);
 
   useEffect(() => {
     if (user) {

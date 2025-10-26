@@ -316,7 +316,7 @@ export function SuperadminUsuariosPage() {
                 Gestiona todos los usuarios del sistema
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col items-start md:items-center md:flex-row md:gap-2 gap-1">
               <Badge variant="secondary" className="text-lg px-4 py-1">
                 {filteredUsuarios.length} de {usuarios.length}
               </Badge>

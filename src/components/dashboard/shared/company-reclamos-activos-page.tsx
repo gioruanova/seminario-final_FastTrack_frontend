@@ -103,7 +103,8 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
       filtered = filtered.filter((reclamo) =>
         reclamo.reclamo_titulo.toLowerCase().includes(searchLower) ||
         reclamo.reclamo_detalle.toLowerCase().includes(searchLower) ||
-        reclamo.cliente_complete_name.toLowerCase().includes(searchLower)
+        reclamo.cliente_complete_name.toLowerCase().includes(searchLower) ||
+        reclamo.reclamo_id.toString().includes(searchTerm)
       );
     }
 
@@ -211,7 +212,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
                 Gestiona todos los {(companyConfig?.plu_heading_reclamos ?? "Reclamos").toLowerCase()} en curso
               </p>
             </div>
-            <div className="flex items-center flex-col md:flex-row gap-2 md:gap-1">
+            <div className="flex items-start md:items-center flex-col md:flex-row gap-2 md:gap-1">
               <Badge variant="secondary" className="px-4 py-1.5 text-sm">
                 {filteredReclamos.length} de {reclamos.length}
               </Badge>
@@ -254,7 +255,7 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Buscar por título, descripción o cliente..."
+                placeholder={`Buscar por id de ${companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"}, por título, descripción o ${companyConfig?.sing_heading_solicitante?.toLowerCase() || "cliente"}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 pr-9"
@@ -297,8 +298,8 @@ export function CompanyReclamosActivosPage({ userRole }: CompanyReclamosActivosP
           ) : filteredReclamos.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               {searchTerm || filterEstado !== "all"
-                ? "No se encontraron reclamos que coincidan con los filtros"
-                : "No hay reclamos activos"}
+                ? `No se encontraron ${companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} que coincidan con los filtros`
+                : `No se registran ${companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} en curso`}
             </div>
           ) : (
             <div className="border rounded-lg">

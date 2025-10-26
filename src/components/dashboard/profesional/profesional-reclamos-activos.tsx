@@ -179,7 +179,7 @@ export function ProfesionalReclamosActivos() {
             <CardContent className="px-0">
               {displayedReclamos.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No hay reclamos activos
+                  No hay {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} en curso
                 </p>
               ) : (
                 <div className="space-y-4">
