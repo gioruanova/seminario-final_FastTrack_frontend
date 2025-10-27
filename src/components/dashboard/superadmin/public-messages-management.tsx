@@ -273,11 +273,16 @@ export function PublicMessagesManagement() {
     });
   };
 
+  // Ordenar mensajes por fecha (más recientes primero)
+  const sortedMessages = [...messages].sort((a, b) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
   // calcular paginado
-  const totalPages = Math.ceil(messages.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedMessages.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedMessages = messages.slice(startIndex, endIndex);
+  const paginatedMessages = sortedMessages.slice(startIndex, endIndex);
 
   const unreadCount = messages.filter(msg => msg.message_read === 0).length;
 
@@ -357,7 +362,7 @@ export function PublicMessagesManagement() {
                                 <ExternalLink className="h-4 w-4" />
                               </Button>
                             </SheetTrigger>
-                            <SheetContent className="w-[400px] sm:w-[540px]">
+                            <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
                               <SheetHeader>
                                 <SheetTitle>Mensaje Completo</SheetTitle>
                                 <SheetDescription>

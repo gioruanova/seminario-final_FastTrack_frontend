@@ -9,7 +9,6 @@ import { PUBLIC_API } from '@/lib/publicApi/config';
 import { CLIENT_API } from '@/lib/clientApi/config';
 import { User, isCompanyUser } from '@/types/auth';
 import { CompanyConfigData } from '@/types/company';
-// import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface UseAuthWithNotificationsProps {
   setUser: (user: User | null) => void;
@@ -31,7 +30,26 @@ export function useAuthWithNotifications({
     headers: {
       'Content-Type': 'application/json',
     },
+    timeout: 10000, // 10 segundos de timeout
   });
+
+  apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (!error.response) {
+        if (error.code === 'ECONNREFUSED') {
+          error.message = 'ERR_CONNECTION_REFUSED';
+        } else if (error.code === 'ETIMEDOUT') {
+          error.message = 'ERR_CONNECTION_TIMED_OUT';
+        } else if (error.code === 'ENOTFOUND') {
+          error.message = 'ERR_NETWORK';
+        } else if (!error.message) {
+          error.message = 'Network Error';
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
 
   const fetchCompanyConfig = useCallback(async () => {
     try {
@@ -100,15 +118,37 @@ export function useAuthWithNotifications({
     const errorObj = error as {
       message?: string;
       response?: { data?: { code?: string }; status?: number };
-      code?: string
+      code?: string;
+      request?: any;
     };
+
+    const isNetworkError =
+      errorObj.message === "Network Error" ||
+      errorObj.message === "ERR_NETWORK" ||
+      errorObj.message === "ERR_INTERNET_DISCONNECTED" ||
+      errorObj.message === "ERR_CONNECTION_REFUSED" ||
+      errorObj.message === "ERR_CONNECTION_TIMED_OUT" ||
+      (!errorObj.response && !errorObj.message) ||
+      (errorObj.code && ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'].includes(errorObj.code));
+
+    if (isNetworkError) {
+      if (errorObj.message === "ERR_CONNECTION_REFUSED" || errorObj.code === 'ECONNREFUSED') {
+        return "El servidor no está disponible en este momento. Por favor, inténtalo más tarde.";
+      }
+
+      if (errorObj.message === "ERR_CONNECTION_TIMED_OUT" || errorObj.code === 'ETIMEDOUT') {
+        return "La conexión con el servidor está tardando demasiado. Verifica tu conexión a internet.";
+      }
+
+      if (errorObj.message === "ERR_INTERNET_DISCONNECTED") {
+        return "No hay conexión a internet. Verifica tu conexión.";
+      }
+
+      return "No se pudo conectar con el servidor. Verifica tu conexión a internet o inténtalo más tarde.";
+    }
 
     if (errorObj.message && !errorObj.response) {
       return errorObj.message;
-    }
-
-    if (errorObj.message === "Network Error" || (!errorObj.response && !errorObj.message)) {
-      return "No se pudo conectar con el servidor. Verifica tu conexión a internet.";
     }
 
     const safeErrorCodes = ["MISSING_CREDENTIALS", "INVALID_EMAIL_FORMAT", "INVALID_PASSWORD_LENGTH", "VALIDATION_ERROR"];
@@ -128,6 +168,14 @@ export function useAuthWithNotifications({
 
     if (errorObj.response?.status === 401) {
       return "Credenciales incorrectas";
+    }
+
+    if (errorObj.response?.status === 500) {
+      return "Error interno del servidor. Por favor, inténtalo más tarde.";
+    }
+
+    if (errorObj.response?.status === 503) {
+      return "El servicio no está disponible temporalmente. Por favor, inténtalo más tarde.";
     }
 
     return "Ha habido un error. Póngase en contacto con su administrador";
@@ -158,12 +206,15 @@ export function useAuthWithNotifications({
 
             router.push("/dashboard");
           } else {
+
             throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
         } catch {
+
           throw new Error("Ha habido un error. Póngase en contacto con su administrador");
         }
       } else {
+
         throw new Error("Ha habido un error. Póngase en contacto con su administrador");
       }
     } catch (err) {
