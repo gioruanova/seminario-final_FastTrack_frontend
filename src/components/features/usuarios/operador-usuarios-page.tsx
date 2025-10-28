@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { Search, Plus, UserCheck, UserX, Key, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Plus, UserCheck, UserX, Key, X, ChevronLeft, ChevronRight, RefreshCw, RefreshCcw } from "lucide-react"
 import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
@@ -242,13 +242,17 @@ export function OperadorUsuariosPage() {
     return (
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${status === 1
-            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
           }`}
       >
         {status === 1 ? 'Activo' : 'Inactivo'}
       </span>
     )
+  }
+
+  const handleRefreshUsers = () => {
+    fetchUsers()
   }
 
   return (
@@ -267,8 +271,11 @@ export function OperadorUsuariosPage() {
                 {filteredUsers.length} de {users.length}
               </Badge>
               <Button onClick={handleCreateUser}>
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Crear Usuario
+              </Button>
+              <Button onClick={handleRefreshUsers} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -361,13 +368,14 @@ export function OperadorUsuariosPage() {
                         {getStatusBadge(user.user_status)}
                       </TableCell>
                       <TableCell className="text-center">
-                        {user.apto_recibir === 1 ? <Badge variant="default" className="bg-green-500 text-white px-2 py-1 rounded-md">Si</Badge> : <Badge variant="default" className="bg-red-500 text-white px-2 py-1 rounded-md">No</Badge>}
+                        {user.apto_recibir === 1 ? (user.user_role !== "operador" ? <Badge variant="default" className="bg-green-500 text-white px-2 py-1 rounded-md">Si</Badge> : "-") : (user.user_role !== "operador" ? <Badge variant="default" className="bg-red-500 text-white px-2 py-1 rounded-md">No</Badge> : "-")}
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-end gap-2">
                           <Button
                             variant="outline"
                             size="sm"
+                            title="Restaurar usuario"
                             onClick={() => handleOpenPasswordSheet(user)}
                           >
                             <Key className="h-4 w-4" />
@@ -375,6 +383,7 @@ export function OperadorUsuariosPage() {
                           <Button
                             variant="outline"
                             size="sm"
+                            title={user.user_status === 1 ? "Bloquear usuario" : "Desbloquear usuario"}
                             onClick={() => handleToggleUserStatus(user)}
                             className={user.user_status === 1 ? "text-red-600" : "text-green-600"}
                           >

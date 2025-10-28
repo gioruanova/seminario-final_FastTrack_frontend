@@ -72,13 +72,21 @@ export function PublicMessagesManagement() {
     try {
       setLoading(true);
       const response = await apiClient.get(SUPER_API.GET_PUBLIC_MESSAGES);
-      setMessages(response.data);
+
+      setMessages(response.data.map((message: PublicMessage) => ({
+        ...message,
+        message_content: message.category_original === "otro" || message.category_original?.toLowerCase().includes("bloqueo")
+          ? message.message_content
+          : message.message_content.replace(/<[^>]*>?/g, ''),
+      })));
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast.error('Error al cargar los mensajes');
     } finally {
       setLoading(false);
     }
+
+
   };
 
   const markAsRead = async (messageId: number) => {
@@ -87,17 +95,17 @@ export function PublicMessagesManagement() {
         SUPER_API.READ_PUBLIC_MESSAGES.replace('{message_id}', messageId.toString())
       );
 
-      setMessages(prev => 
-        prev.map(msg => 
+      setMessages(prev =>
+        prev.map(msg =>
           msg.message_id === messageId ? { ...msg, message_read: 1 } : msg
         )
       );
-      
+
       // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
-      
+
       toast.success('Mensaje marcado como leído');
     } catch (error) {
       console.error('Error marking as read:', error);
@@ -111,17 +119,17 @@ export function PublicMessagesManagement() {
         SUPER_API.UNREAD_PUBLIC_MESSAGES.replace('{message_id}', messageId.toString())
       );
 
-      setMessages(prev => 
-        prev.map(msg => 
+      setMessages(prev =>
+        prev.map(msg =>
           msg.message_id === messageId ? { ...msg, message_read: 0 } : msg
         )
       );
-      
+
       // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
-      
+
       toast.success('Mensaje marcado como no leído');
     } catch (error) {
       console.error('Error marking as unread:', error);
@@ -136,12 +144,12 @@ export function PublicMessagesManagement() {
       );
 
       setMessages(prev => prev.filter(msg => msg.message_id !== messageId));
-      
+
       // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
-      
+
       toast.success('Mensaje eliminado correctamente');
     } catch (error) {
       console.error('Error deleting message:', error);
@@ -391,7 +399,19 @@ export function PublicMessagesManagement() {
                                 </div>
                                 <div>
                                   <h4 className="font-medium mb-2">Mensaje:</h4>
-                                  <p className="whitespace-pre-wrap max-h-[300px] overflow-y-auto">{message.message_content}</p>
+                                  <div className="bg-muted p-4 rounded-lg">
+                                    {message.category_original?.toLowerCase().includes("bloqueo") ? (
+                                      <div
+                                        className="whitespace-pre-wrap max-h-[300px] overflow-y-auto prose prose-sm max-w-none"
+                                        dangerouslySetInnerHTML={{
+                                          __html: message.message_content
+                                        }}
+                                      />
+
+                                    ) : (
+                                      <p className="whitespace-pre-wrap max-h-[300px] overflow-y-auto">{message.message_content}</p>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </SheetContent>
@@ -665,6 +685,6 @@ export function PublicMessagesManagement() {
         </DialogContent>
       </Dialog>
 
-    </div>
+    </div >
   );
 }

@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Search, X, ChevronLeft, ChevronRight, Plus, Edit, Lock, Unlock, Building2, Shield } from "lucide-react";
+import { Search, X, ChevronLeft, ChevronRight, Plus, Edit, Lock, Unlock, Building2, Shield, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
@@ -70,9 +70,8 @@ export function SuperadminUsuariosPage() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterCompany, setFilterCompany] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // maximo 5 usuarios por pagina
+  const itemsPerPage = 10; // maximo 10 usuarios por pagina
 
-  // estados para el sheet de cambio de contraseña
   const [isPasswordSheetOpen, setIsPasswordSheetOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -209,6 +208,7 @@ export function SuperadminUsuariosPage() {
     const lastFourDigits = user.user_dni.slice(-4);
     setNewPassword(`Fast${lastFourDigits}`);
     setIsPasswordSheetOpen(true);
+
   };
 
   const handleChangePassword = async () => {
@@ -225,7 +225,9 @@ export function SuperadminUsuariosPage() {
     } catch {
       toast.error("Error al cambiar la contraseña");
     }
+    fetchUsuarios();
   };
+
 
   const handleCreateUser = () => {
     setIsEditing(false);
@@ -320,10 +322,15 @@ export function SuperadminUsuariosPage() {
               <Badge variant="secondary" className="text-lg px-4 py-1">
                 {filteredUsuarios.length} de {usuarios.length}
               </Badge>
-              <Button onClick={handleCreateUser}>
-                <Plus className="h-4 w-4 mr-2" />
-                Crear Usuario
-              </Button>
+              <div className="flex gap-2 items-center">
+                <Button onClick={handleCreateUser}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Crear Usuario
+                </Button>
+                <Button onClick={fetchUsuarios} variant="outline" size="sm">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -468,7 +475,7 @@ export function SuperadminUsuariosPage() {
                             size="sm"
                             variant="default"
                             onClick={() => handleOpenPasswordSheet(user)}
-                            title="Cambiar contraseña"
+                            title="Restaurar usuario"
                           >
                             <Shield className="h-4 w-4" />
                           </Button>
@@ -649,12 +656,12 @@ export function SuperadminUsuariosPage() {
       <Sheet open={isPasswordSheetOpen} onOpenChange={setIsPasswordSheetOpen}>
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
-            <SheetTitle>Cambiar Contraseña</SheetTitle>
+            <SheetTitle>Restaurar usuario</SheetTitle>
             <SheetDescription>
-              Cambiar la contraseña para {selectedUser?.user_complete_name}
+              Cambiar la contraseña para {selectedUser?.user_complete_name} y desbloquearlo automaticamente
             </SheetDescription>
           </SheetHeader>
-          <div className="space-y-4 mt-6">
+          <div className="space-y-4 mt-0">
             <div>
               <label className="text-sm font-medium">Nueva contraseña</label>
               <Input

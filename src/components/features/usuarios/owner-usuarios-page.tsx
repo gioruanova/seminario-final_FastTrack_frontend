@@ -15,7 +15,7 @@ import { Search, Plus, Edit, X, ChevronLeft, ChevronRight, Key } from "lucide-re
 import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
-import { Eye, EyeOff, UserX, UserCheck } from "lucide-react"
+import { Eye, EyeOff, UserX, UserCheck, RefreshCw } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 
@@ -223,8 +223,8 @@ export function OwnerUsuariosPage() {
     return (
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${status === 1
-            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
           }`}
       >
         {status === 1 ? 'Activo' : 'Inactivo'}
@@ -260,6 +260,10 @@ export function OwnerUsuariosPage() {
     )
   }
 
+  const handleRefreshUsers = () => {
+    fetchUsers()
+  }
+
   return (
     <>
       <Card>
@@ -278,6 +282,9 @@ export function OwnerUsuariosPage() {
               <Button onClick={handleCreateUser}>
                 <Plus className="h-4 w-4 mr-2" />
                 Crear Usuario
+              </Button>
+              <Button onClick={handleRefreshUsers} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -351,7 +358,7 @@ export function OwnerUsuariosPage() {
                     <TableHead className="text-center">Rol</TableHead>
                     <TableHead className="text-center">Estado</TableHead>
                     <TableHead className="text-center">Recibiendo?</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
+                    <TableHead className="text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -378,12 +385,14 @@ export function OwnerUsuariosPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleEditUser(user)}
+                            title="Editar usuario"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
+                            title="Restaurar usuario"
                             onClick={() => handleOpenPasswordSheet(user)}
                           >
                             <Key className="h-4 w-4" />
@@ -392,6 +401,7 @@ export function OwnerUsuariosPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleToggleUserStatus(user)}
+                            title={user.user_status === 1 ? "Bloquear usuario" : "Desbloquear usuario"}
                             className={user.user_status === 1 ? "text-red-600" : "text-green-600"}
                           >
                             {user.user_status === 1 ? (
