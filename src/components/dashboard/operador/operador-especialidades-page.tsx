@@ -62,7 +62,6 @@ interface ProfesionalData {
 export function OperadorEspecialidadesPage() {
   const { companyConfig } = useAuth();
   const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
-  const [profesionales, setProfesionales] = useState<ProfesionalData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterEstado, setFilterEstado] = useState<string>("all");
@@ -102,7 +101,6 @@ export function OperadorEspecialidadesPage() {
       });
 
       setEspecialidades(especialidadesConProfesionales);
-      setProfesionales(profesionalesData);
     } catch {
       toast.error(`Error al cargar las ${companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"}`);
     } finally {

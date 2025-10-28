@@ -39,13 +39,13 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
 
   const selectedCliente = clientesOptions.find(c => c.cliente_id === formData.cliente_id);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetForm();
     clearError();
     onClose();
-  };
+  }, [resetForm, clearError, onClose]);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const errors: string[] = [];
 
     if (!formData.cliente_id) {
@@ -88,7 +88,7 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
     }
 
     return errors;
-  };
+  }, [companyConfig, formData, isHorarioDisponible]);
 
   const handleSubmit = useCallback(async () => {
     const validationErrors = validateForm();
@@ -136,6 +136,15 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
     // NO actualizar el estado, solo el ref para evitar re-renders
     formDataRef.current.reclamo_detalle = e.target.value;
   }, []);
+
+  const handleEspecialidadChange = useCallback((especialidadId: number) => {
+    // Limpiar campos dependientes cuando cambia la especialidad
+    updateField("especialidad_id", especialidadId);
+    updateField("profesional_id", null);
+    updateField("agenda_fecha", null);
+    updateField("agenda_hora_desde", null);
+    updateField("agenda_hora_hasta", null);
+  }, [updateField]);
 
   const tituloPlaceholder = useMemo(() =>
     `Detalle rapido de ${companyConfig?.sing_heading_reclamos || "Reclamo"}`,
@@ -272,7 +281,7 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
         <SheetHeader>
           <SheetTitle>Iniciar {companyConfig?.sing_heading_reclamos || "Reclamo"}</SheetTitle>
           <SheetDescription>
-            Formulario para crear iniciar {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"}.
+            Formulario para iniciar {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"}.
             Complete todos los campos requeridos para programar la cita.
           </SheetDescription>
         </SheetHeader>
@@ -324,7 +333,7 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             </Label>
             <Select
               value={formData.especialidad_id?.toString() || ""}
-              onValueChange={(value) => updateField("especialidad_id", parseInt(value))}
+              onValueChange={(value) => handleEspecialidadChange(parseInt(value))}
               disabled={loadingEspecialidades}
             >
               <SelectTrigger id="especialidad" className="cursor-pointer w-full">
@@ -351,8 +360,8 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                 {companyConfig?.sing_heading_profesional || "Profesional"} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.asignacion_id?.toString() || ""}
-                onValueChange={(value) => updateField("asignacion_id", parseInt(value))}
+                value={formData.profesional_id?.toString() || ""}
+                onValueChange={(value) => updateField("profesional_id", parseInt(value))}
                 disabled={loadingAsignaciones}
               >
                 <SelectTrigger id="profesional" className="cursor-pointer w-full">

@@ -35,7 +35,7 @@ interface ClientesPageProps {
   userRole: "owner" | "operador"
 }
 
-export function ClientesPage({ userRole }: ClientesPageProps) {
+export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   // userrole se usa para validacion de tipos, la logica de permisos se maneja en el layout
   const { companyConfig } = useAuth()
   const [clientes, setClientes] = useState<Cliente[]>([])

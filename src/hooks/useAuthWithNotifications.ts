@@ -119,7 +119,7 @@ export function useAuthWithNotifications({
       message?: string;
       response?: { data?: { code?: string }; status?: number };
       code?: string;
-      request?: any;
+      request?: unknown;
     };
 
     const isNetworkError =

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -55,7 +55,7 @@ export function ProfessionalPlatformMessagesManagement() {
 
 
   // Funciones para listado de mensajes
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     // Si la compañía está inactiva, no cargar mensajes
     if (companyConfig?.company?.company_estado === 0) {
       setMessages([]);
@@ -73,7 +73,7 @@ export function ProfessionalPlatformMessagesManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyConfig?.company?.company_estado]);
 
   const markAsRead = async (messageId: number) => {
     try {
@@ -145,7 +145,7 @@ export function ProfessionalPlatformMessagesManagement() {
 
   useEffect(() => {
     fetchMessages();
-  }, []);
+  }, [fetchMessages]);
 
   // Resetear página cuando cambien los mensajes
   useEffect(() => {

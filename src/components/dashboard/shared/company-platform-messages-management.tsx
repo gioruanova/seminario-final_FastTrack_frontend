@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,7 +74,7 @@ export function CompanyPlatformMessagesManagement() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   // Funciones para mensajes de plataforma
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await apiClient.get(CLIENT_API.GET_USERS);
       // Filtrar el usuario actual de la lista
@@ -84,16 +84,16 @@ export function CompanyPlatformMessagesManagement() {
       console.error('Error fetching users:', error);
       toast.error('Error al cargar los usuarios');
     }
-  };
+  }, [currentUserId]);
 
-  const getCurrentUser = async () => {
+  const getCurrentUser = useCallback(async () => {
     try {
       const response = await apiClient.get('/publicApi/profile');
       setCurrentUserId(response.data.user_id);
     } catch (error) {
       console.error('Error getting current user:', error);
     }
-  };
+  }, []);
 
   const handleMessageTypeChange = (type: MessageType) => {
     setMessageType(type);
@@ -148,7 +148,7 @@ export function CompanyPlatformMessagesManagement() {
   };
 
   // Funciones para listado de mensajes
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     // Si la compañía está inactiva, no cargar mensajes
     if (companyConfig?.company?.company_estado === 0) {
       setMessages([]);
@@ -166,7 +166,7 @@ export function CompanyPlatformMessagesManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyConfig?.company?.company_estado]);
 
   const markAsRead = async (messageId: number) => {
     try {
@@ -239,7 +239,7 @@ export function CompanyPlatformMessagesManagement() {
   useEffect(() => {
     getCurrentUser();
     fetchMessages();
-  }, []);
+  }, [getCurrentUser, fetchMessages]);
 
   // Resetear página cuando cambien los mensajes
   useEffect(() => {

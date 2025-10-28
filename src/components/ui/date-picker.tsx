@@ -33,14 +33,14 @@ export function DatePicker({
     value ? new Date(value + "T00:00:00") : undefined
   );
 
-  // Estado para controlar qué mes mostrar en el calendario
   const [month, setMonth] = React.useState<Date>(
     value ? new Date(value + "T00:00:00") : new Date()
   );
 
+  const [open, setOpen] = React.useState(false);
+
   React.useEffect(() => {
     if (value) {
-      // Agregar T00:00:00 para evitar problemas de zona horaria
       const newDate = new Date(value + "T00:00:00");
       setDate(newDate);
       setMonth(newDate);
@@ -51,23 +51,21 @@ export function DatePicker({
     if (!selectedDate) return;
     setDate(selectedDate);
     onChange(format(selectedDate, "yyyy-MM-dd"));
+    setOpen(false);
   };
 
-  // Crear función para deshabilitar días anteriores a hoy
   const getDisabledDays = () => {
     const disabled = [];
-    
-    // Si hay minDate, deshabilitar días anteriores
+
     if (minDate) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       disabled.push((date: Date) => {
         return date < today;
       });
     }
-    
-    // Si hay custom disabledDays, agregarlos
+
     if (disabledDays) {
       if (typeof disabledDays === 'function') {
         disabled.push(disabledDays);
@@ -75,12 +73,12 @@ export function DatePicker({
         disabled.push(...disabledDays);
       }
     }
-    
+
     return disabled;
   };
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
