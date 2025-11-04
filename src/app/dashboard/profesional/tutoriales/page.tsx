@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { useAuth } from "@/context/AuthContext";
 import { isCompanyUser } from "@/types/auth";
+import { TutorialesVideosList } from "@/components/dashboard/shared/tutoriales-videos-list";
 
 export default function ProfesionalTutorialesPage() {
   const { companyConfig, user } = useAuth();
@@ -26,18 +27,17 @@ export default function ProfesionalTutorialesPage() {
 
   return (
     <>
-      <DashboardHeader 
+      <DashboardHeader
         breadcrumbs={[
           { label: "Dashboard", href: "/dashboard/profesional" },
           { label: "Tutoriales" }
-        ]} 
+        ]}
         userRole={user.user_role}
       />
-      
+
       <div className="flex flex-1 flex-col gap-4 p-4 pt-5">
-        <div className="rounded-lg border bg-card p-8 text-center">
-          <h2 className="text-2xl font-semibold mb-2">Tutoriales</h2>
-          <p className="text-muted-foreground">Aca va a una seccion de tutoriales sobre el uso del portal (algunos componentes van a ser compartidos entre los roles, y otros dedicados por perfil) - tengo que evaluar la logica y componentizacion todavia</p>
+        <div className="space-y-4">
+          <TutorialesVideosList role={user.user_role} />
         </div>
       </div>
     </>

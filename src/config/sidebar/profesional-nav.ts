@@ -11,34 +11,33 @@ import { CompanyConfigData } from "@/types/company";
 
 export const getProfesionalNavItems = (config: CompanyConfigData | null): NavItem[] => {
   const isCompanyActive = config?.company?.company_estado === 1;
-  
-  return [
-  {
-    title: "Inicio",
-    url: "/dashboard/profesional",
-    icon: House,
 
-  },
-  {
-    title: `${config?.plu_heading_reclamos}`,
-    url: "#",
-    icon: SquareCheck,
-    isActive: !isCompanyActive ? false : true,
-    disabled: !isCompanyActive,
-    items: [
-      {
-        title: "En curso",
-        url: "/dashboard/profesional/trabajar-reclamos",
-        disabled: !isCompanyActive,
-      },
-      {
-        title: "Ver Historial",
-        url: "/dashboard/profesional/historial-reclamos",
-        disabled: !isCompanyActive,
-      },
-    ],
-  },
-];
+  return [
+    {
+      title: "Inicio",
+      url: "/dashboard/profesional",
+      icon: House,
+    },
+    {
+      title: `${config?.plu_heading_reclamos}`,
+      url: "#",
+      icon: SquareCheck,
+      isActive: !isCompanyActive ? false : true,
+      disabled: !isCompanyActive,
+      items: [
+        {
+          title: "En curso",
+          url: "/dashboard/profesional/trabajar-reclamos",
+          disabled: !isCompanyActive,
+        },
+        {
+          title: "Ver Historial",
+          url: "/dashboard/profesional/historial-reclamos",
+          disabled: !isCompanyActive,
+        },
+      ],
+    },
+  ];
 
 };
 
@@ -50,8 +49,6 @@ export const profesionalTeamData = (companyName: string): TeamData[] => [
     url: "/dashboard/profesional",
   },
 ];
-
-
 
 
 export const profesionalProjects: ProjectData[] = [

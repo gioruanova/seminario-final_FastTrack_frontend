@@ -3,8 +3,6 @@ import { config, slugs } from "../config";
 export const SUPER_API = {
 
   // NOTIFICACIONES PUSH - Superadmin
-  // Estos endpoints deben existir en el backend para que funcione correctamente
-  // NOTA: Si el backend usa los mismos endpoints que customersApi, cambiar slugs.superApi por slugs.customersApi
   NOTIFICATION_GET_VAPID: `${config.apiUrl}/${slugs.superApi}/notifications/vapid-public-key`,
   NOTIFICATION_SUBSCRIBE: `${config.apiUrl}/${slugs.superApi}/notifications/register-token`,
   NOTIFICATION_UNSUBSCRIBE: `${config.apiUrl}/${slugs.superApi}/notifications/unregister-token`,
@@ -55,11 +53,11 @@ export const SUPER_API = {
 
 
   // gestion de banner
-  GET_BANNERS: `${config.apiUrl}/${slugs.superApi}/banners`, // GET trae todos los banners
-  GET_ACTIVE_BANNER: `${config.apiUrl}/${slugs.superApi}/active-banner`, // GET trae el banner activo
-  CREATE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners`, // POST crea un nuevo banner
-  EDIT_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, // PUT edita un banner
-  DELETE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, // DELETE elimina un banner
-  DISABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/disable/{banner_id}`, // DISABLE deshabilita un banner
-  ENABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/enable/{banner_id}`, // ENABLE habilita un banner
+  GET_BANNERS: `${config.apiUrl}/${slugs.superApi}/banners`, 
+  GET_ACTIVE_BANNER: `${config.apiUrl}/${slugs.superApi}/active-banner`, 
+  CREATE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners`, 
+  EDIT_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`, 
+  DELETE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/{banner_id}`,
+  DISABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/disable/{banner_id}`, 
+  ENABLE_BANNER: `${config.apiUrl}/${slugs.superApi}/banners/enable/{banner_id}`, 
 };

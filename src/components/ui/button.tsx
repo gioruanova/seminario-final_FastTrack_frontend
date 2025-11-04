@@ -48,7 +48,6 @@ function Button({
   }) {
   const Comp = asChild ? Slot : "button"
   
-  // Estabilizar las clases para evitar errores de hidratación
   const buttonClasses = React.useMemo(() => 
     cn(buttonVariants({ variant, size, className })), 
     [variant, size, className]

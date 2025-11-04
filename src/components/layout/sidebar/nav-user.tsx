@@ -34,8 +34,7 @@ export function NavUser() {
   const { user, logout, companyConfig } = useAuth()
   const { isMobile } = useSidebar()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  
-  // Verificar si la empresa está activa
+
   const isCompanyActive = companyConfig?.company?.company_estado === 1;
 
   if (!user) return null
@@ -125,10 +124,10 @@ export function NavUser() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => setIsProfileOpen(true)}
-                  disabled={!isCompanyActive}
-                  className={!isCompanyActive ? 'opacity-50 cursor-not-allowed' : ''}
+                  disabled={!isSuperAdmin(user) && !isCompanyActive}
+                  className={(!isSuperAdmin(user) && !isCompanyActive) ? 'opacity-50 cursor-not-allowed' : ''}
                 >
                   <BadgeCheck />
                   Mi Perfil
@@ -142,6 +141,7 @@ export function NavUser() {
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarMenuItem>
+
       </SidebarMenu>
 
       <UserProfileSheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>

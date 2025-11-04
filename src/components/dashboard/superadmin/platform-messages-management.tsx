@@ -37,7 +37,6 @@ interface User {
 type MessageType = 'all' | 'company' | 'user';
 
 export function PlatformMessagesManagement() {
-  // Estados para mensajes de plataforma
   const [messageType, setMessageType] = useState<MessageType>('all');
   const [companies, setCompanies] = useState<Company[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -48,7 +47,6 @@ export function PlatformMessagesManagement() {
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
-  // Funciones para mensajes de plataforma
   const fetchCompanies = async () => {
     try {
       const response = await apiClient.get(SUPER_API.GET_COMPANIES);
@@ -62,7 +60,6 @@ export function PlatformMessagesManagement() {
   const fetchUsers = async () => {
     try {
       const response = await apiClient.get(SUPER_API.GET_USERS);
-      // Filtrar el usuario actual de la lista
       const filteredUsers = response.data.filter((user: User) => user.user_id !== currentUserId);
       setUsers(filteredUsers);
     } catch (error) {
@@ -125,7 +122,6 @@ export function PlatformMessagesManagement() {
         platform_message_content: platformMessageContent.trim()
       });
 
-      // Reset form
       setPlatformMessageTitle("");
       setPlatformMessageContent("");
       setSelectedCompany(null);
@@ -155,7 +151,6 @@ export function PlatformMessagesManagement() {
       </CardHeader>
       <CardContent>
         <div className="space-y-6 w-full">
-          {/* Selector de tipo de mensaje */}
           <div className="space-y-2 w-full">
             <Label htmlFor="messageType">Tipo de mensaje</Label>
              <Select value={messageType} onValueChange={handleMessageTypeChange}>
@@ -170,7 +165,6 @@ export function PlatformMessagesManagement() {
              </Select>
           </div>
 
-          {/* Dropdown para empresas */}
           {messageType === 'company' && (
             <div className="space-y-2 w-full">
               <Label htmlFor="company">Empresa</Label>
@@ -189,7 +183,6 @@ export function PlatformMessagesManagement() {
             </div>
           )}
 
-          {/* Dropdown para usuarios */}
           {messageType === 'user' && (
             <div className="space-y-2 w-full">
               <Label htmlFor="user">Usuario</Label>
@@ -208,7 +201,6 @@ export function PlatformMessagesManagement() {
             </div>
           )}
 
-          {/* Formulario de mensaje */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="messageTitle">Título del mensaje</Label>

@@ -48,7 +48,7 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
   const [reclamos, setReclamos] = useState<ReclamoData[]>([]);
   const [allReclamos, setAllReclamos] = useState<ReclamoData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(true); // Inicia colapsado
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedReclamo, setSelectedReclamo] = useState<ReclamoData | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -56,7 +56,6 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
     try {
       setIsLoading(true);
 
-      // Crear cliente API dentro del callback para evitar dependencias
       const apiClient = axios.create({
         baseURL: config.apiUrl,
         withCredentials: true,
@@ -250,7 +249,6 @@ export function CompanyFinalizedReclamos({ userRole = "owner" }: CompanyFinalize
               )}
             </CardContent>
 
-            {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
               <CardContent className="pt-0 flex justify-center mt-5">
                 <Button

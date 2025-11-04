@@ -13,11 +13,13 @@ interface ClienteRecurrente {
   cliente_phone?: string;
   cliente_direccion?: string;
   cliente_dni?: string;
+  cliente_active: number;
 }
 
 interface Especialidad {
   especialidad_id: number;
   nombre_especialidad: string;
+  especialidad_active: number;
 }
 
 interface User {
@@ -35,6 +37,11 @@ interface Asignacion {
   profesional_nombre: string;
   especialidad_id: number;
   especialidad_nombre: string;
+}
+
+interface EstadoEspecialidad {
+  id_especialidad: number;
+  estado_especialidad: number;
 }
 
 interface AgendaBloqueada {
@@ -103,9 +110,9 @@ export function useCreateReclamo(isOpen: boolean = false) {
   const [fechasBloqueadas, setFechasBloqueadas] = useState<FechaBloqueada[]>([]);
   const [agendaBloqueada, setAgendaBloqueada] = useState<AgendaBloqueada[]>([]);
 
-  const [loadingClientes, _setLoadingClientes] = useState(false);
-  const [loadingEspecialidades, _setLoadingEspecialidades] = useState(false);
-  const [loadingAsignaciones, _setLoadingAsignaciones] = useState(false);
+  const [loadingClientes] = useState(false);
+  const [loadingEspecialidades] = useState(false);
+  const [loadingAsignaciones] = useState(false);
   const [loadingFechas, setLoadingFechas] = useState(false);
 
   const formDataRef = useRef(formData);
@@ -122,7 +129,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
   staticDataRef.current = {
     clientes: clientesOptions,
     especialidades: especialidadesOptions,
-    asignaciones: asignacionesOriginales, // Usar las asignaciones originales sin filtrar
+    asignaciones: asignacionesOriginales, 
     users: users,
     agendaBloqueada: agendaBloqueada,
     fechasBloqueadas: fechasBloqueadas,
@@ -189,29 +196,43 @@ export function useCreateReclamo(isOpen: boolean = false) {
     try {
       setLoading(true);
 
-      const [clientesRes, usersRes, asignacionesRes, agendaRes] = await Promise.all([
+      const [clientesRes, usersRes, asignacionesRes, agendaRes, especialidadesRes] = await Promise.all([
         apiClient.get(CLIENT_API.GET_CLIENTES),
         apiClient.get(CLIENT_API.GET_USERS),
         apiClient.get(CLIENT_API.GET_ASIGNACIONES),
-        apiClient.get(CLIENT_API.GET_AGENDA_BLOQUEADA)
+        apiClient.get(CLIENT_API.GET_AGENDA_BLOQUEADA),
+        apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
       ]);
 
       const asignaciones = asignacionesRes.data || [];
+      const estadoEspecialidades = especialidadesRes.data || [];
+      
+      const clientesActivos = (clientesRes.data || []).filter(
+        (cliente: ClienteRecurrente) => cliente.cliente_active === 1
+      );
+      
       const especialidadesUnicas = asignaciones.reduce((acc: Especialidad[], asignacion: Asignacion) => {
         if (!acc.find(esp => esp.especialidad_id === asignacion.especialidad_id)) {
-          acc.push({
-            especialidad_id: asignacion.especialidad_id,
-            nombre_especialidad: asignacion.especialidad_nombre,
-          });
+          const especialidadData = (estadoEspecialidades as EstadoEspecialidad[]).find(
+            (esp: EstadoEspecialidad) => esp.id_especialidad === asignacion.especialidad_id
+          );
+          
+          if (especialidadData && especialidadData.estado_especialidad === 1) {
+            acc.push({
+              especialidad_id: asignacion.especialidad_id,
+              nombre_especialidad: asignacion.especialidad_nombre,
+              especialidad_active: especialidadData.estado_especialidad,
+            });
+          }
         }
         return acc;
       }, []);
 
-      setClientesOptions(clientesRes.data || []);
+      setClientesOptions(clientesActivos);
       setEspecialidadesOptions(especialidadesUnicas);
       setUsers(usersRes.data || []);
       setAsignacionesOptions(asignaciones);
-      setAsignacionesOriginales(asignaciones); // Guardar las asignaciones originales
+      setAsignacionesOriginales(asignaciones);  
       setAgendaBloqueada(agendaRes.data || []);
 
     } catch (error) {
@@ -394,7 +415,6 @@ export function useCreateReclamo(isOpen: boolean = false) {
   const profesionalesDisponibles = useMemo(() => {
     if (!formData.especialidad_id) return [];
 
-    // Usar datos estáticos directamente para evitar desfases temporales
     const asignacionesDeEspecialidad = staticDataRef.current.asignaciones.filter(
       (asignacion) => asignacion.especialidad_id === formData.especialidad_id
     );

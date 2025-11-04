@@ -41,7 +41,6 @@ export function SuperadminClientesPage() {
   const [empresasStats, setEmpresasStats] = useState<EmpresaStats[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // configurar cliente api
   const apiClient = axios.create({
     baseURL: config.apiUrl,
     withCredentials: true,
@@ -50,36 +49,55 @@ export function SuperadminClientesPage() {
     },
   })
 
-  // cargar clientes recurrentes
   const loadClientes = async () => {
     try {
       setIsLoading(true)
 
-      // cargar clientes y empresas en paralelo
-      const [clientesResponse, empresasResponse] = await Promise.all([
+      const [clientesResponse, empresasResponse, reclamosResponse] = await Promise.all([
         apiClient.get(SUPER_API.GET_CLIENTES),
-        apiClient.get(SUPER_API.GET_COMPANIES)
+        apiClient.get(SUPER_API.GET_COMPANIES),
+        apiClient.get(SUPER_API.GET_RECLAMOS)
       ])
 
       const clientesData = clientesResponse.data || []
       const empresasData = empresasResponse.data || []
+      const reclamosData = reclamosResponse.data || []
 
+      const reclamosPorCliente = new Map<string, number>()
+      reclamosData.forEach((reclamo: { cliente_complete_name?: string; company_name?: string }) => {
+        if (reclamo.cliente_complete_name) {
+          const nombreCliente = reclamo.cliente_complete_name.trim().toLowerCase()
+          reclamosPorCliente.set(nombreCliente, (reclamosPorCliente.get(nombreCliente) || 0) + 1)
+        }
+      })
 
-      setClientes(clientesData)
+      const reclamosPorEmpresa = new Map<string, number>()
+      reclamosData.forEach((reclamo: { company_name?: string }) => {
+        if (reclamo.company_name) {
+          const nombreEmpresa = reclamo.company_name.trim()
+          reclamosPorEmpresa.set(nombreEmpresa, (reclamosPorEmpresa.get(nombreEmpresa) || 0) + 1)
+        }
+      })
 
-      // crear mapa de empresas por id
+      const clientesConReclamos = clientesData.map((cliente: ClienteRecurrente) => {
+        const nombreCliente = cliente.cliente_complete_name.trim().toLowerCase()
+        const totalReclamos = reclamosPorCliente.get(nombreCliente) || 0
+        return {
+          ...cliente,
+          total_reclamos: totalReclamos
+        }
+      })
+
+      setClientes(clientesConReclamos)
+
       const empresasMap = new Map<number, string>()
       empresasData.forEach((empresa: { company_id: number; company_nombre: string }) => {
         empresasMap.set(empresa.company_id, empresa.company_nombre)
       })
 
-      // agrupar clientes por empresa usando company_id
       const empresaMap = new Map<number, ClienteRecurrente[]>()
 
-      clientesData.forEach((cliente: ClienteRecurrente) => {
-
-
-        // solo incluir clientes que tengan company_id
+      clientesConReclamos.forEach((cliente: ClienteRecurrente) => {
         if (cliente.company_id) {
           if (!empresaMap.has(cliente.company_id)) {
             empresaMap.set(cliente.company_id, [])
@@ -88,15 +106,15 @@ export function SuperadminClientesPage() {
         }
       })
 
-      // calcular estadisticas por empresa
       const statsArray: EmpresaStats[] = Array.from(empresaMap.entries()).map(([companyId, clientesEmpresa]) => {
         const activos = clientesEmpresa.filter(c => c.cliente_active).length
         const inactivos = clientesEmpresa.filter(c => !c.cliente_active).length
-        const totalReclamos = clientesEmpresa.reduce((sum, c) => sum + (c.total_reclamos || 0), 0)
+        const nombreEmpresa = empresasMap.get(companyId) || `Empresa ${companyId}`
+        const totalReclamos = reclamosPorEmpresa.get(nombreEmpresa) || clientesEmpresa.reduce((sum, c) => sum + (c.total_reclamos || 0), 0)
 
         return {
           company_id: companyId,
-          company_name: empresasMap.get(companyId) || `Empresa ${companyId}`,
+          company_name: nombreEmpresa,
           total_clientes: clientesEmpresa.length,
           clientes_activos: activos,
           clientes_inactivos: inactivos,
@@ -105,7 +123,6 @@ export function SuperadminClientesPage() {
         }
       })
 
-      // ordenar por numero de clientes (descendente)
       statsArray.sort((a, b) => b.total_clientes - a.total_clientes)
 
       setEmpresasStats(statsArray)
@@ -119,10 +136,12 @@ export function SuperadminClientesPage() {
     } finally {
       setIsLoading(false)
     }
+
   }
 
   useEffect(() => {
     loadClientes()
+    
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isLoading) {
@@ -138,7 +157,6 @@ export function SuperadminClientesPage() {
 
   return (
     <Card>
-      {/* Estadísticas generales */}
       <CardHeader className="border-b border-border pb-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <CardTitle className="text-2xl">Clientes por empresa</CardTitle>
@@ -147,7 +165,6 @@ export function SuperadminClientesPage() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Estadísticas generales */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -196,7 +213,6 @@ export function SuperadminClientesPage() {
           </Card>
         </div>
 
-        {/* Cards por empresa */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {empresasStats.map((empresa) => (
             <Card key={empresa.company_id} className="relative">
@@ -210,7 +226,6 @@ export function SuperadminClientesPage() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {/* Estadísticas principales */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-500">
@@ -226,7 +241,6 @@ export function SuperadminClientesPage() {
                   </div>
                 </div>
 
-                {/* Barra de progreso */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Proporción activos</span>
@@ -240,7 +254,6 @@ export function SuperadminClientesPage() {
                   </div>
                 </div>
 
-                {/* Información adicional */}
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total clientes:</span>
@@ -252,7 +265,6 @@ export function SuperadminClientesPage() {
                   </div>
                 </div>
 
-                {/* Badge de estado */}
                 <div className="flex justify-center">
                   {empresa.porcentaje_activos >= 80 ? (
                     <Badge variant="default" className="bg-green-500">
@@ -279,7 +291,6 @@ export function SuperadminClientesPage() {
           ))}
         </div>
 
-        {/* Mensaje si no hay datos */}
         {empresasStats.length === 0 && !isLoading && (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-8">

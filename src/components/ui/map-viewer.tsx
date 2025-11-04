@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogTitle } from './dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MapPin, Maximize2, X } from 'lucide-react';
 
-// Declaración de tipos para Leaflet (se carga dinámicamente)
 declare global {
     interface Window {
         L: typeof import('leaflet');
@@ -36,35 +35,28 @@ export function MapViewer({
             if (!mapRef.current || !window.L) return;
 
             try {
-                // Limpiar mapa existente si existe
                 if (mapInstanceRef.current) {
                     mapInstanceRef.current.remove();
                     mapInstanceRef.current = null;
                 }
 
-                // Limpiar el contenedor del mapa
                 if (mapRef.current) {
                     mapRef.current.innerHTML = '';
                 }
 
-                // Geocodificar la dirección para obtener coordenadas
                 geocodeAddress(address).then((coords) => {
                     if (coords) {
-                        // Usar las coordenadas directamente
                         setPosition(coords);
 
-                        // Crear el mapa
                         if (mapRef.current) {
                             const map = window.L.map(mapRef.current).setView(coords, 15);
                             mapInstanceRef.current = map;
 
-                            // Agregar tiles de OpenStreetMap
                             window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                                 attribution: '© OpenStreetMap contributors',
                                 maxZoom: 19,
                             }).addTo(map);
 
-                            // Agregar marcador en la ubicación
                             window.L.marker(coords).addTo(map);
 
                             setIsLoading(false);
@@ -81,7 +73,6 @@ export function MapViewer({
             }
         };
 
-        // Cargar Leaflet si no está cargado
         const loadLeaflet = () => {
             if (window.L) {
                 setTimeout(() => {
@@ -95,19 +86,16 @@ export function MapViewer({
                 return;
             }
 
-            // Cargar CSS
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
             document.head.appendChild(link);
 
-            // Cargar JS
             const script = document.createElement('script');
             script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
             script.onload = () => {
                 setTimeout(() => {
                     if (window.L && typeof window.L.map === 'function') {
-                        // Configuración necesaria para iconos de Leaflet
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         delete (window.L.Icon.Default.prototype as any)._getIconUrl;
                         window.L.Icon.Default.mergeOptions({
@@ -131,7 +119,6 @@ export function MapViewer({
 
         loadLeaflet();
 
-        // Cleanup function
         return () => {
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
@@ -205,14 +192,12 @@ export function MapViewer({
                 </div>
             </div>
 
-            {/* Modal para vista expandida */}
             <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
                 <DialogContent className="max-w-6xl h-[90vh] p-4">
                     <VisuallyHidden>
                         <DialogTitle>Mapa de ubicación: {address}</DialogTitle>
                     </VisuallyHidden>
                     <div className="relative h-full">
-                        {/* Header con información y botón de cerrar */}
                         <div className="absolute top-0 left-0 right-0 z-[1000] bg-background/95 backdrop-blur-sm rounded-lg p-3 shadow-lg mb-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-sm">
@@ -230,7 +215,6 @@ export function MapViewer({
                             </div>
                         </div>
                         
-                        {/* Mapa con margen superior para el header */}
                         <div className="h-full pt-16">
                             <MapViewer 
                                 address={address} 

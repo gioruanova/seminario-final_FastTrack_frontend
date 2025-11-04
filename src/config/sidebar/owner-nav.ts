@@ -20,14 +20,12 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
       title: "Inicio",
       url: "/dashboard/owner",
       icon: House,
-
     },
     {
       title: "Mi Organizacion",
       url: "/dashboard/owner/mi-empresa",
       icon: Landmark,
       disabled: !isCompanyActive,
-
     },
     {
       title: `${config?.plu_heading_reclamos}`,
@@ -53,28 +51,24 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
           disabled: !isCompanyActive,
         },
       ],
-
     },
     {
       title: `${config?.plu_heading_especialidad}`,
       url: "/dashboard/owner/especialidades",
       icon: Wrench,
       disabled: !isCompanyActive,
-
     },
     {
       title: `${config?.plu_heading_profesional}`,
       url: "/dashboard/owner/profesionales",
       icon: ShieldUser,
       disabled: !isCompanyActive,
-
     },
     {
       title: "Usuarios",
       url: "/dashboard/owner/users",
       icon: Users,
       disabled: !isCompanyActive,
-
     },
 
     {
@@ -83,7 +77,6 @@ export const getOwnerNavItems = (config: CompanyConfigData | null): NavItem[] =>
       icon: Briefcase,
       disabled: !isCompanyActive,
     },
-
   ];
 };
 
@@ -97,7 +90,6 @@ export const ownerTeamData = (companyName: string): TeamData[] => [
 ];
 
 export const ownerProjects: ProjectData[] = [
-
   {
     title: "Mensajes",
     url: "/dashboard/owner/mensajes",
@@ -108,8 +100,5 @@ export const ownerProjects: ProjectData[] = [
     url: "/dashboard/owner/tutoriales",
     icon: GraduationCap,
   },
-
-
-
 ];
 

@@ -44,8 +44,7 @@ interface PlatformMessage {
 
 export function ProfessionalPlatformMessagesManagement() {
   const { companyConfig } = useAuth();
-  
-  // Estados para listado de mensajes
+
   const [messages, setMessages] = useState<PlatformMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,9 +53,8 @@ export function ProfessionalPlatformMessagesManagement() {
 
 
 
-  // Funciones para listado de mensajes
+
   const fetchMessages = useCallback(async () => {
-    // Si la compañía está inactiva, no cargar mensajes
     if (companyConfig?.company?.company_estado === 0) {
       setMessages([]);
       setLoading(false);
@@ -87,7 +85,6 @@ export function ProfessionalPlatformMessagesManagement() {
         )
       );
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -111,7 +108,6 @@ export function ProfessionalPlatformMessagesManagement() {
         )
       );
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -131,7 +127,6 @@ export function ProfessionalPlatformMessagesManagement() {
 
       setMessages(prev => prev.filter(msg => msg.id !== messageId));
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -147,7 +142,6 @@ export function ProfessionalPlatformMessagesManagement() {
     fetchMessages();
   }, [fetchMessages]);
 
-  // Resetear página cuando cambien los mensajes
   useEffect(() => {
     setCurrentPage(1);
   }, [messages.length]);
@@ -162,7 +156,6 @@ export function ProfessionalPlatformMessagesManagement() {
     });
   };
 
-  // calcular paginado
   const totalPages = Math.ceil(messages.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -309,7 +302,6 @@ export function ProfessionalPlatformMessagesManagement() {
           </div>
         )}
 
-        {/* Información de paginación y controles */}
         {messages.length > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-muted/30 rounded-lg mt-4">
             <div className="text-sm text-muted-foreground">

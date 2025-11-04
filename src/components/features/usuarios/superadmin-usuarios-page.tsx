@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,25 +70,24 @@ export function SuperadminUsuariosPage() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterCompany, setFilterCompany] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // maximo 10 usuarios por pagina
+  const itemsPerPage = 10;
 
   const [isPasswordSheetOpen, setIsPasswordSheetOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [newPassword, setNewPassword] = useState("");
 
-  // estados para crear/editar usuario
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
-  const [userFormData, setUserFormData] = useState({
-    user_complete_name: "",
-    user_email: "",
-    user_phone: "",
-    user_dni: "",
-    user_role: "",
-    company_id: 0,
-    user_password: ""
-  });
+
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const dniRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("0");
 
   const fetchUsuarios = async () => {
     try {
@@ -98,7 +97,6 @@ export function SuperadminUsuariosPage() {
         apiClient.get(SUPER_API.GET_COMPANIES)
       ]);
 
-      // filtrar superadmin y agregar nombre de empresa
       const usuariosData = usuariosResponse.data
         .filter((user: UserData) => user.user_role !== "superadmin")
         .map((user: UserData) => {
@@ -122,31 +120,59 @@ export function SuperadminUsuariosPage() {
     fetchUsuarios();
   }, []);
 
-  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterRole, filterStatus, filterCompany]);
 
-  const filteredUsuarios = usuarios.filter((user) => {
-    const matchesSearch =
-      user.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.user_dni.includes(searchTerm) ||
-      user.company_nombre?.toLowerCase().includes(searchTerm.toLowerCase());
+  useEffect(() => {
+    if (isUserSheetOpen && editingUser && isEditing) {
+      setTimeout(() => {
+        if (nameRef.current) nameRef.current.value = editingUser.user_complete_name;
+        if (emailRef.current) emailRef.current.value = editingUser.user_email;
+        if (phoneRef.current) phoneRef.current.value = editingUser.user_phone;
+        if (dniRef.current) dniRef.current.value = editingUser.user_dni;
+        if (passwordRef.current) passwordRef.current.value = "";
+        setSelectedRole(editingUser.user_role);
+        setSelectedCompany(editingUser.company_id.toString());
+      }, 0);
+    } else if (isUserSheetOpen && !isEditing) {
+      setTimeout(() => {
+        if (nameRef.current) nameRef.current.value = "";
+        if (emailRef.current) emailRef.current.value = "";
+        if (phoneRef.current) phoneRef.current.value = "";
+        if (dniRef.current) dniRef.current.value = "";
+        if (passwordRef.current) passwordRef.current.value = "";
+        setSelectedRole("");
+        setSelectedCompany("0");
+      }, 0);
+    }
+  }, [isUserSheetOpen, editingUser, isEditing]);
 
-    const matchesRole = filterRole === "all" || user.user_role === filterRole;
-    const matchesStatus = filterStatus === "all" ||
-      (filterStatus === "active" && user.user_status === 1) ||
-      (filterStatus === "inactive" && user.user_status === 0);
-    const matchesCompany = filterCompany === "all" || user.company_nombre === filterCompany;
+  const filteredUsuarios = useMemo(() => {
+    return usuarios.filter((user) => {
+      const matchesSearch =
+        user.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.user_dni.includes(searchTerm) ||
+        user.company_nombre?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesSearch && matchesRole && matchesStatus && matchesCompany;
-  });
+      const matchesRole = filterRole === "all" || user.user_role === filterRole;
+      const matchesStatus = filterStatus === "all" ||
+        (filterStatus === "active" && user.user_status === 1) ||
+        (filterStatus === "inactive" && user.user_status === 0);
+      const matchesCompany = filterCompany === "all" || user.company_nombre === filterCompany;
 
-  const totalPages = Math.ceil(filteredUsuarios.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsuarios = filteredUsuarios.slice(startIndex, endIndex);
+      return matchesSearch && matchesRole && matchesStatus && matchesCompany;
+    });
+  }, [usuarios, searchTerm, filterRole, filterStatus, filterCompany]);
+
+  const { totalPages, startIndex, endIndex, currentUsuarios } = useMemo(() => {
+    const total = Math.ceil(filteredUsuarios.length / itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const current = filteredUsuarios.slice(start, end);
+    return { totalPages: total, startIndex: start, endIndex: end, currentUsuarios: current };
+  }, [filteredUsuarios, currentPage, itemsPerPage]);
 
   const getStatusBadge = (status: number) => {
     return (
@@ -232,58 +258,87 @@ export function SuperadminUsuariosPage() {
   const handleCreateUser = () => {
     setIsEditing(false);
     setEditingUser(null);
-    setUserFormData({
-      user_complete_name: "",
-      user_email: "",
-      user_phone: "",
-      user_dni: "",
-      user_role: "",
-      company_id: 0,
-      user_password: ""
-    });
+    if (nameRef.current) nameRef.current.value = "";
+    if (emailRef.current) emailRef.current.value = "";
+    if (phoneRef.current) phoneRef.current.value = "";
+    if (dniRef.current) dniRef.current.value = "";
+    if (passwordRef.current) passwordRef.current.value = "";
+    setSelectedRole("");
+    setSelectedCompany("0");
     setIsUserSheetOpen(true);
   };
 
   const handleEditUser = (user: UserData) => {
     setIsEditing(true);
     setEditingUser(user);
-    setUserFormData({
-      user_complete_name: user.user_complete_name,
-      user_email: user.user_email,
-      user_phone: user.user_phone,
-      user_dni: user.user_dni,
-      user_role: user.user_role,
-      company_id: user.company_id,
-      user_password: "" // no pre-llenar contraseña por seguridad
-    });
+    if (nameRef.current) nameRef.current.value = user.user_complete_name;
+    if (emailRef.current) emailRef.current.value = user.user_email;
+    if (phoneRef.current) phoneRef.current.value = user.user_phone;
+    if (dniRef.current) dniRef.current.value = user.user_dni;
+    if (passwordRef.current) passwordRef.current.value = "";
+    setSelectedRole(user.user_role);
+    setSelectedCompany(user.company_id.toString());
     setIsUserSheetOpen(true);
   };
 
   const handleSaveUser = async () => {
     try {
+      const formData = {
+        user_complete_name: nameRef.current?.value.trim() || "",
+        user_email: emailRef.current?.value.trim() || "",
+        user_phone: phoneRef.current?.value.trim() || "",
+        user_dni: dniRef.current?.value.trim() || "",
+        user_role: selectedRole || "",
+        company_id: parseInt(selectedCompany) || 0,
+        user_password: passwordRef.current?.value.trim() || ""
+      };
+
+      const camposFaltantes: string[] = [];
+
+      if (!formData.user_complete_name) {
+        camposFaltantes.push("Nombre completo");
+      }
+      if (!formData.user_dni) {
+        camposFaltantes.push("DNI");
+      }
+      if (!formData.user_phone) {
+        camposFaltantes.push("Teléfono");
+      }
+      if (!formData.user_email) {
+        camposFaltantes.push("Email");
+      }
+      if (!formData.user_role) {
+        camposFaltantes.push("Rol");
+      }
+      if (!formData.company_id || formData.company_id === 0) {
+        camposFaltantes.push("Empresa");
+      }
+
+      if (!isEditing && !formData.user_password) {
+        camposFaltantes.push("Contraseña");
+      }
+
+      if (camposFaltantes.length > 0) {
+        toast.error(`Por favor completa los siguientes campos: ${camposFaltantes.join(", ")}`);
+        return;
+      }
+
       if (isEditing && editingUser) {
-        // editar usuario existente
         const url = SUPER_API.USERS_EDIT.replace('{id}', editingUser.user_id.toString());
-        const editData: Record<string, unknown> = { ...userFormData };
-        // solo incluir contraseña si se proporciono
-        if (!editData.user_password) {
+        const editData: Record<string, unknown> = { ...formData };
+        if (!editData.user_password || editData.user_password === "") {
           delete editData.user_password;
         }
         await apiClient.put(url, editData);
         toast.success("Usuario actualizado correctamente");
       } else {
-        // crear nuevo usuario - validar que tenga contraseña
-        if (!userFormData.user_password) {
-          toast.error("La contraseña es obligatoria para crear un usuario");
-          return;
-        }
-        await apiClient.post(SUPER_API.USERS_CREATE, userFormData);
+        await apiClient.post(SUPER_API.USERS_CREATE, formData);
         toast.success("Usuario creado correctamente");
       }
 
       setIsUserSheetOpen(false);
       setEditingUser(null);
-      fetchUsuarios(); // recargar la lista
+      fetchUsuarios();
     } catch (error: unknown) {
       const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
         (error as { message?: string })?.message ||
@@ -296,16 +351,25 @@ export function SuperadminUsuariosPage() {
     setSearchTerm("");
   };
 
-  const handleDniChange = (dni: string) => {
-    setUserFormData(prev => ({ ...prev, user_dni: dni }));
-    // generar contraseña sugerida si no es edicion y hay dni
-    if (!isEditing && dni.length >= 4) {
+  const handleDniChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const dni = e.target.value;
+    if (!isEditing && passwordRef.current && dni.length >= 4) {
       const lastFourDigits = dni.slice(-4);
-      setUserFormData(prev => ({ ...prev, user_password: `Fast${lastFourDigits}` }));
+      passwordRef.current.value = `Fast${lastFourDigits}`;
     }
-  };
+  }, [isEditing]);
 
-  const empresasUnicas = Array.from(new Set(usuarios.map(u => u.company_nombre).filter(Boolean))).sort();
+  const handleRoleChange = useCallback((value: string) => {
+    setSelectedRole(value);
+  }, []);
+
+  const handleCompanyChange = useCallback((value: string) => {
+    setSelectedCompany(value);
+  }, []);
+
+  const empresasUnicas = useMemo(() => {
+    return Array.from(new Set(usuarios.map(u => u.company_nombre).filter(Boolean))).sort();
+  }, [usuarios]);
 
   return (
     <>
@@ -335,9 +399,7 @@ export function SuperadminUsuariosPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Filtros */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            {/* Búsqueda */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -358,7 +420,6 @@ export function SuperadminUsuariosPage() {
               )}
             </div>
 
-            {/* Filtro por Rol */}
             <Select value={filterRole} onValueChange={setFilterRole}>
               <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
                 <SelectValue placeholder="Filtrar por rol" />
@@ -371,7 +432,6 @@ export function SuperadminUsuariosPage() {
               </SelectContent>
             </Select>
 
-            {/* Filtro por Estado */}
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
                 <SelectValue placeholder="Filtrar por estado" />
@@ -383,7 +443,6 @@ export function SuperadminUsuariosPage() {
               </SelectContent>
             </Select>
 
-            {/* Filtro por Empresa */}
             <Select value={filterCompany} onValueChange={setFilterCompany}>
               <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
                 <SelectValue placeholder="Filtrar por empresa" />
@@ -402,7 +461,6 @@ export function SuperadminUsuariosPage() {
             </Select>
           </div>
 
-          {/* Tabla */}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -488,7 +546,6 @@ export function SuperadminUsuariosPage() {
             </div>
           )}
 
-          {/* Paginación */}
           <div className="flex flex-col gap-4">
             <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredUsuarios.length)} de {filteredUsuarios.length} usuarios
@@ -537,8 +594,7 @@ export function SuperadminUsuariosPage() {
         </CardContent>
       </Card>
 
-      {/* Sheet para crear/editar usuario */}
-      <Sheet open={isUserSheetOpen} onOpenChange={setIsUserSheetOpen}>
+      <Sheet open={isUserSheetOpen} onOpenChange={setIsUserSheetOpen} key={`${isEditing}-${editingUser?.user_id || 'new'}`}>
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>
@@ -551,45 +607,54 @@ export function SuperadminUsuariosPage() {
           <Separator />
           <div className="space-y-4 mt-0">
             <div>
-              <label className="text-sm font-medium">Nombre completo</label>
+              <label className="text-sm font-medium">Nombre completo <span className="text-red-500">*</span></label>
               <Input
-                value={userFormData.user_complete_name}
-                onChange={(e) => setUserFormData(prev => ({ ...prev, user_complete_name: e.target.value }))}
+                key={`name-${editingUser?.user_id || 'new'}`}
+                ref={nameRef}
+                defaultValue={isEditing && editingUser ? editingUser.user_complete_name : ""}
                 placeholder="Ingresa el nombre completo"
                 className="mt-1"
+                required
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Email</label>
+              <label className="text-sm font-medium">Email <span className="text-red-500">*</span></label>
               <Input
+                key={`email-${editingUser?.user_id || 'new'}`}
+                ref={emailRef}
                 type="email"
-                value={userFormData.user_email}
-                onChange={(e) => setUserFormData(prev => ({ ...prev, user_email: e.target.value }))}
+                defaultValue={isEditing && editingUser ? editingUser.user_email : ""}
                 placeholder="usuario@empresa.com"
                 className="mt-1"
+                required
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Teléfono</label>
+              <label className="text-sm font-medium">Teléfono <span className="text-red-500">*</span></label>
               <Input
-                value={userFormData.user_phone}
-                onChange={(e) => setUserFormData(prev => ({ ...prev, user_phone: e.target.value }))}
+                key={`phone-${editingUser?.user_id || 'new'}`}
+                ref={phoneRef}
+                defaultValue={isEditing && editingUser ? editingUser.user_phone : ""}
                 placeholder="+54 9 11 1234-5678"
                 className="mt-1"
+                required
               />
             </div>
             <div>
-              <label className="text-sm font-medium">DNI</label>
+              <label className="text-sm font-medium">DNI <span className="text-red-500">*</span></label>
               <Input
-                value={userFormData.user_dni}
-                onChange={(e) => handleDniChange(e.target.value)}
+                key={`dni-${editingUser?.user_id || 'new'}`}
+                ref={dniRef}
+                defaultValue={isEditing && editingUser ? editingUser.user_dni : ""}
+                onChange={handleDniChange}
                 placeholder="12345678"
                 className="mt-1"
+                required
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Rol</label>
-              <Select value={userFormData.user_role} onValueChange={(value) => setUserFormData(prev => ({ ...prev, user_role: value }))}>
+              <label className="text-sm font-medium">Rol <span className="text-red-500">*</span></label>
+              <Select value={selectedRole} onValueChange={handleRoleChange}>
                 <SelectTrigger className="min-w-full cursor-pointer">
                   <SelectValue placeholder="Selecciona un rol" />
                 </SelectTrigger>
@@ -601,8 +666,8 @@ export function SuperadminUsuariosPage() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Empresa</label>
-              <Select value={userFormData.company_id.toString()} onValueChange={(value) => setUserFormData(prev => ({ ...prev, company_id: parseInt(value) }))}>
+              <label className="text-sm font-medium">Empresa <span className="text-red-500">*</span></label>
+              <Select value={selectedCompany} onValueChange={handleCompanyChange}>
                 <SelectTrigger className="min-w-full cursor-pointer">
                   <SelectValue placeholder="Selecciona una empresa" />
                 </SelectTrigger>
@@ -620,14 +685,17 @@ export function SuperadminUsuariosPage() {
             </div>
             <div>
               <label className="text-sm font-medium">
-                Contraseña {isEditing ? "(opcional)" : "(obligatoria)"}
+                Contraseña {isEditing ? "(opcional)" : ""}
+                {!isEditing ? <span className="text-red-500">*</span> : ""}
               </label>
               <Input
+                key={`password-${editingUser?.user_id || 'new'}`}
+                ref={passwordRef}
                 type="text"
-                value={userFormData.user_password}
-                onChange={(e) => setUserFormData(prev => ({ ...prev, user_password: e.target.value }))}
-                placeholder={isEditing ? "Dejar vacío para mantener la actual" : "Ingresa la contraseña"}
+                defaultValue=""
+                placeholder={isEditing ? "Dejar vacío para mantener la contraseña actual" : "Ingresa la contraseña"}
                 className="mt-1"
+                required={!isEditing}
               />
               {!isEditing && (
                 <p className="text-xs text-muted-foreground mt-1">
@@ -652,7 +720,6 @@ export function SuperadminUsuariosPage() {
         </SheetContent>
       </Sheet>
 
-      {/* Sheet para cambio de contraseña */}
       <Sheet open={isPasswordSheetOpen} onOpenChange={setIsPasswordSheetOpen}>
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>

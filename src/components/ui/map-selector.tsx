@@ -6,7 +6,6 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Button } from './button'
 
-// Configuración necesaria para que los iconos de Leaflet funcionen correctamente
 delete (L.Icon.Default.prototype as { _getIconUrl?: string })._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -38,17 +37,15 @@ function LocationMarker({ position, setPosition, readOnly }: LocationMarkerProps
       if (!readOnly) {
         const newPosition: [number, number] = [e.latlng.lat, e.latlng.lng]
         setPosition(newPosition)
-        // Centrar el mapa en la nueva posición
         map.setView(e.latlng, map.getZoom())
       }
     },
   })
 
-  // Crear un marcador personalizado más grande y visible
   const customIcon = new L.Icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconSize: [25, 41], // Tamaño original del icono
-    iconAnchor: [12, 41], // Punto de anclaje correcto
+    iconSize: [25, 41], 
+    iconAnchor: [12, 41], 
     popupAnchor: [0, -41],
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
     shadowSize: [41, 41]
@@ -78,14 +75,12 @@ export function MapSelector({ onLocationSelect, onCancel, initialPosition, initi
     initialPosition || null
   )
   
-  // Si no hay posición inicial, usar la posición por defecto
   const defaultPosition: [number, number] = [-34.6037, -58.3816]
   const currentPosition = position || defaultPosition
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [mapLoaded, setMapLoaded] = useState(false)
 
-  // Geocodificación usando Nominatim (gratuito)
   const geocodeAddress = useCallback(async (address: string) => {
     if (!address.trim()) return
 
@@ -102,7 +97,6 @@ export function MapSelector({ onLocationSelect, onCancel, initialPosition, initi
         const { lat, lon } = data[0]
         const newPosition: [number, number] = [parseFloat(lat), parseFloat(lon)]
         setPosition(newPosition)
-        // NO llamamos onLocationSelect aquí, solo actualizamos la posición
       } else {
         setError('No se pudo encontrar la dirección')
       }
@@ -114,7 +108,6 @@ export function MapSelector({ onLocationSelect, onCancel, initialPosition, initi
     }
   }, [])
 
-  // Si hay una dirección inicial, geocodificar (solo si no es readOnly)
   useEffect(() => {
     if (initialAddress && !initialPosition && !readOnly) {
       geocodeAddress(initialAddress)

@@ -100,7 +100,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
     if (!reclamo || !selectedEstado) return;
 
     if (ESTADOS_REQUIRE_COMMENT.includes(selectedEstado) && !notaCierre.trim()) {
-      toast.error("Por favor ingresa una nota de cierre para esta acción");
+      toast.error("Por favor ingresa una nota de actualización del estado para esta acción");
       return;
     }
 
@@ -142,7 +142,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
         if (status === 400) {
           if (errorMessage?.includes('nota de cierre') || errorMessage?.includes('nota es necesaria')) {
-            toast.error("La nota de cierre es requerida para este estado.");
+            toast.error("La nota de actualización del estado es requerida para este estado.");
           } else if (errorMessage?.includes('ya esta cerrado')) {
             toast.error("Este reclamo ya está cerrado y no puede ser modificado.");
           } else {
@@ -170,8 +170,6 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
       setIsSendingReminder(true);
 
       const endpoint = CLIENT_API.ENVIAR_RECORDATORIO_RECLAMO.replace(":reclamo_id", reclamo.reclamo_id.toString());
-      console.log("Endpoint:", endpoint);
-      console.log("Reclamo ID:", reclamo.reclamo_id);
 
       await apiClient.put(endpoint);
 
@@ -204,7 +202,6 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
   const canChangeEstado = selectedEstado && selectedEstado !== reclamo?.reclamo_estado;
   const requiresComment = ESTADOS_REQUIRE_COMMENT.includes(selectedEstado);
 
-  // Profesionales no pueden gestionar reclamos cerrados o cancelados
   const isReclamoClosed = reclamo && (reclamo.reclamo_estado === "CERRADO" || reclamo.reclamo_estado === "CANCELADO");
   const canProfesionalEdit = userRole === "profesional" ? !isReclamoClosed : true;
 
@@ -269,7 +266,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
           <div className="flex items-start flex-col gap-2 text-sm">
             <div className="flex items-center gap-2 text-sm">
               <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{companyConfig?.sing_heading_profesional || "Profesional"} responsable:</span>
+              <span className="text-muted-foreground">{companyConfig?.sing_heading_profesional || "Profesional"} a cargo:</span>
             </div>
             <span className="font-medium">{reclamo.profesional}</span>
           </div>
@@ -311,7 +308,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                   <span>{isSendingReminder ? "Enviando..." : "Enviar Recordatorio"}</span>
                 </Button>
               )}
-              <Separator />
+
 
               {reclamo.cliente_email && (
                 <div className="flex items-center gap-2 text-sm">
@@ -329,34 +326,40 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 </div>
               )}
 
-              {reclamo.cliente_direccion && (
-                <div className="space-y-3">
-                  <div className="flex items-start flex-col gap-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Dirección:</span>
-                    </div>
-                    <span className="font-medium">{reclamo.cliente_direccion}</span>
-                  </div>
 
-                  <div className="mt-3">
-                    <MapViewer
-                      address={reclamo.cliente_direccion}
-                      height="200px"
-                      showExpandButton={true}
-                    />
+              {reclamo.cliente_direccion && companyConfig?.requiere_domicilio === 1 ? (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <div className="flex items-start flex-col gap-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Dirección:</span>
+                      </div>
+                      <span className="font-medium">{reclamo.cliente_direccion}</span>
+                    </div>
+
+                    <div className="mt-3">
+                      <MapViewer
+                        address={reclamo.cliente_direccion}
+                        height="200px"
+                        showExpandButton={true}
+                      />
+                    </div>
+                    <Button variant="outline" size="sm" className="w-full">
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${reclamo.cliente_lat},${reclamo.cliente_lng}`}
+                        className="w-full flex items-center justify-center gap-2"
+                        target="_blank" rel="noopener noreferrer">
+                        <MapIcon className="w-4 h-4" />
+                        Ver en Google Maps
+                      </a>
+                    </Button>
+                    <span className="text-xs text-muted-foreground flex text-center italic">(Su dispositivo requiere acceso a su ubicacion actual para poder ver la direccion en Google Maps)</span>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full">
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${reclamo.cliente_lat},${reclamo.cliente_lng}`}
-                      className="w-full flex items-center justify-center gap-2"
-                      target="_blank" rel="noopener noreferrer">
-                      <MapIcon className="w-4 h-4" />
-                      Ver en Google Maps
-                    </a>
-                  </Button>
-                  <span className="text-xs text-muted-foreground flex text-center italic">(Su dispositivo requiere acceso a su ubicacion actual para poder ver la direccion en Google Maps)</span>
-                </div>
+                </>
+              ) : (
+                null
               )}
 
               {reclamo.reclamo_url && (
@@ -397,7 +400,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
           </div>
 
 
-          {userRole === "profesional" && (
+          {userRole === "profesional" && reclamo.reclamo_estado !== "CERRADO" && reclamo.reclamo_estado !== "CANCELADO" && (
             <div className="border-t pt-4 space-y-4">
               <div className="flex flex-col items-start gap-0">
                 <span>No dudes en contactar al {companyConfig?.sing_heading_solicitante} para evacuar cualquier duda que tengas</span>
@@ -408,7 +411,6 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
 
           <Separator />
 
-          {/* Mostrar nota de cierre y presupuesto si el reclamo está cerrado/cancelado */}
           {reclamo.reclamo_nota_cierre && (reclamo.reclamo_nota_cierre || reclamo.reclamo_presupuesto) && (
             <>
               <div className="space-y-4">
@@ -416,7 +418,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                 <div className="space-y-3">
                   {reclamo.reclamo_nota_cierre && (
                     <div>
-                      <Label className="text-muted-foreground">Nota de Cierre</Label>
+                      <Label className="text-muted-foreground">Nota de Actualización del Estado</Label>
                       <div className="mt-2 rounded-md border bg-muted/50 p-3 text-sm">
                         {reclamo.reclamo_nota_cierre}
                       </div>
@@ -445,7 +447,6 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
             </div>
           </div>
 
-          {/* Gestión de estado */}
           {userRole !== "superadmin" && (
             <div className="pt-0 space-y-4">
               {!canProfesionalEdit && userRole === "profesional" && (
@@ -488,11 +489,11 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="notaCierre">
-                          Nota de Cierre <span className="text-destructive">*</span>
+                          Nota de Actualización del Estado <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                           id="notaCierre"
-                          placeholder="Ingresa una nota de cierre para esta acción..."
+                          placeholder="Ingresa una nota de actualización del estado para esta acción..."
                           value={notaCierre}
                           onChange={(e) => setNotaCierre(e.target.value)}
                           rows={4}

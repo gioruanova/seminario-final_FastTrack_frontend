@@ -15,7 +15,6 @@ export function NotificationPrompt() {
 
 
   useEffect(() => {
-    // Solo ejecutar si el usuario está completamente cargado y empresa activa
     if (user?.user_id && companyConfig?.company?.company_estado === 1) {
       const userHasDecision = hasNotificationDecision(user.user_id.toString());
 
@@ -28,9 +27,8 @@ export function NotificationPrompt() {
   }, [isSupported, user, companyConfig, hasNotificationDecision]);
 
   const handleAccept = async () => {
-    // Verificar que el usuario esté completamente cargado
     if (!user || !user.user_id) {
-      console.warn('⚠️ User not fully loaded, cannot subscribe to notifications');
+      console.warn(' User not fully loaded, cannot subscribe to notifications');
       return;
     }
 

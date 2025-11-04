@@ -25,7 +25,6 @@ export function TimePicker({
 }: TimePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   
-  // Generar horas del día (00:00 a 23:30 en intervalos de 30 minutos)
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 0; hour < 24; hour++) {

@@ -143,7 +143,6 @@ export function ProfesionalReclamosActivos() {
 
       {!isCollapsed && (
         <CardContent className="space-y-4">
-          {/* Estadísticas */}
           <div className="space-y-3">
             <div className="flex h-3 w-full overflow-hidden rounded-lg border">
               {Object.entries(estadisticasPorEstado).map(([estado, count]) => {
@@ -174,7 +173,6 @@ export function ProfesionalReclamosActivos() {
             </div>
           </div>
 
-          {/* Lista de reclamos */}
           <div className="border-muted">
             <CardContent className="px-0">
               {displayedReclamos.length === 0 ? (
@@ -241,7 +239,6 @@ export function ProfesionalReclamosActivos() {
               )}
             </CardContent>
 
-            {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
               <CardContent className="pt-0 flex justify-center mt-5">
                 <Button

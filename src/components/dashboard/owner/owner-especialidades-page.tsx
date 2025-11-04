@@ -81,13 +81,11 @@ export function OwnerEspecialidadesPage() {
     return matchesSearch && matchesEstado;
   });
 
-  // calcular paginado
   const totalPages = Math.ceil(filteredEspecialidades.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedEspecialidades = filteredEspecialidades.slice(startIndex, endIndex);
 
-  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);
@@ -96,18 +94,15 @@ export function OwnerEspecialidadesPage() {
     try {
       const newEstado = currentEstado === 1 ? 0 : 1;
       
-      // construir urls
       const enableUrl = CLIENT_API.ENABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
       const disableUrl = CLIENT_API.DISABLE_ESPECIALIDADES.replace("{especialidadId}", especialidadId.toString());
       
-      // llamada al endpoint para cambiar el estado
       if (newEstado === 1) {
         await apiClient.put(enableUrl);
       } else {
         await apiClient.put(disableUrl);
       }
       
-      // actualizar estado local
       setEspecialidades(prev => 
         prev.map(esp => 
           esp.id_especialidad === especialidadId 

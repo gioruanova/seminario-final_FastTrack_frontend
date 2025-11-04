@@ -8,7 +8,6 @@ export default function NotFound() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirigir al root inmediatamente
     router.replace("/");
   }, [router]);
 

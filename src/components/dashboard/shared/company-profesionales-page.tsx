@@ -4,21 +4,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, X, ChevronLeft, ChevronRight, Mail, Phone } from "lucide-react";
 import { GestionarAreaSheet } from "./gestionar-area-sheet";
 import { toast } from "sonner";
@@ -76,12 +63,11 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
     try {
       setIsLoading(true);
       const response = await apiClient.get(CLIENT_API.GET_USERS);
-      
-      // filtrar solo profesionales
-      const profesionalesData = response.data.filter((user: ProfesionalData) => 
+
+      const profesionalesData = response.data.filter((user: ProfesionalData) =>
         user.user_role === "profesional"
       );
-      
+
       setProfesionales(profesionalesData);
     } catch {
       toast.error("Error al cargar los profesionales");
@@ -95,7 +81,7 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
   }, []);
 
   const filteredProfesionales = profesionales.filter((prof) => {
-    const matchesSearch = 
+    const matchesSearch =
       prof.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prof.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prof.user_dni.includes(searchTerm);
@@ -107,13 +93,11 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
     return matchesSearch && matchesEstado;
   });
 
-  // calcular paginado
   const totalPages = Math.ceil(filteredProfesionales.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedProfesionales = filteredProfesionales.slice(startIndex, endIndex);
 
-  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);
@@ -215,12 +199,12 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 text-sm">
                             <Mail className="h-4 w-4 text-muted-foreground" />
-                            <span>{profesional.user_email}</span>
+                            <a href={`mailto:${profesional.user_email}`} className="text-primary hover:underline">{profesional.user_email}</a>
                           </div>
                           {profesional.user_phone && (
                             <div className="flex items-center gap-2 text-sm">
                               <Phone className="h-4 w-4 text-muted-foreground" />
-                              <span>{profesional.user_phone}</span>
+                              <a href={`tel:${profesional.user_phone}`} className="text-primary hover:underline">{profesional.user_phone}</a>
                             </div>
                           )}
                         </div>
@@ -242,11 +226,10 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
                       </TableCell>
                       <TableCell className="text-center">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
-                            profesional.user_status === 1
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                          }`}
+                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${profesional.user_status === 1
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                            }`}
                         >
                           {profesional.user_status === 1 ? 'Activo' : 'Inactivo'}
                         </span>
@@ -270,7 +253,7 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
           <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
             Mostrando {startIndex + 1}-{Math.min(endIndex, filteredProfesionales.length)} de {filteredProfesionales.length} {companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales"}
           </div>
-          
+
           {totalPages > 1 && (
             <div className="flex flex-wrap items-center gap-1 md:gap-2 justify-center md:justify-end">
               <Button
@@ -283,7 +266,7 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
                 <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                 <span className="hidden sm:inline ml-1">Anterior</span>
               </Button>
-              
+
               <div className="flex flex-wrap items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -297,7 +280,7 @@ export function CompanyProfesionalesPage({ userRole }: CompanyProfesionalesPageP
                   </Button>
                 ))}
               </div>
-              
+
               <Button
                 variant="outline"
                 size="sm"

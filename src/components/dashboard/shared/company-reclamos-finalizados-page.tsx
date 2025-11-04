@@ -111,13 +111,12 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
     setFilteredReclamos(filtered);
   }, [searchTerm, filterEstado, reclamos]);
 
-  // calcular paginado
   const totalPages = Math.ceil(filteredReclamos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedReclamos = filteredReclamos.slice(startIndex, endIndex);
 
-  // resetear pagina cuando cambien los filtros
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);
@@ -149,7 +148,6 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
         responseType: 'blob',
       });
 
-      // crear url del blob y descargar
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-oficedocument.spreadsheetml.sheet'
       });
@@ -157,7 +155,6 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
       const link = document.createElement('a');
       link.href = url;
 
-      // intentar obtener filename del header content-disposition
       const contentDisposition = response.headers['content-disposition'];
       let filename;
 
@@ -168,7 +165,6 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
         }
       }
 
-      // si no hay header, generar nombre descriptivo
       if (!filename) {
         const fecha = Date.now();
         const empresa = companyConfig?.company?.company_nombre || 'Empresa';
@@ -205,7 +201,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                 Historial de {companyConfig?.plu_heading_reclamos ?? "Reclamos"}
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1 text-balance">
-                Todos los {(companyConfig?.plu_heading_reclamos ?? "Reclamos").toLowerCase()} finalizados
+                Puede ver el detalle de  {(companyConfig?.plu_heading_reclamos ?? "Reclamos").toLowerCase()} en el tiemppo.
               </p>
             </div>
             <div className="flex items-start md:items-center flex-col md:flex-row gap-2 md:gap-1">
@@ -248,7 +244,6 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
           </div>
         </CardHeader>
         <CardContent>
-          {/* Filtros */}
           <div className="flex  mb-6 flex-col md:flex-row gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -288,7 +283,6 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
             </Select>
           </div>
 
-          {/* Tabla */}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -307,11 +301,11 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                     <TableHead className="w-[80px]">ID</TableHead>
                     <TableHead>Título</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Profesional</TableHead>
+                    <TableHead>{companyConfig?.sing_heading_solicitante}</TableHead>
+                    <TableHead>{companyConfig?.sing_heading_profesional}</TableHead>
                     <TableHead>Fecha</TableHead>
-                    <TableHead>Especialidad</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
+                    <TableHead>{companyConfig?.sing_heading_especialidad}</TableHead>
+                    <TableHead className="text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -348,7 +342,7 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
                           {reclamo.nombre_especialidad}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-center">
                         <Button
                           variant="default"
                           size="sm"
@@ -365,7 +359,6 @@ export function CompanyReclamosFinalizadosPage({ userRole }: CompanyReclamosFina
             </div>
           )}
 
-          {/* Información y controles de paginación */}
           <div className="flex flex-col gap-4 mt-6">
             <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredReclamos.length)} de {filteredReclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} ya finalizados/as

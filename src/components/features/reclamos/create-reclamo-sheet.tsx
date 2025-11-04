@@ -11,6 +11,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { useCreateReclamo } from "@/hooks/useCreateReclamo";
 import { useCreateReclamoSubmit } from "@/hooks/useCreateReclamoSubmit";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 interface CreateReclamoSheetProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface CreateReclamoSheetProps {
 }
 
 export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps) {
+  const { user } = useAuth();
   const {
     formData,
     updateField,
@@ -80,7 +82,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
       errors.push("La descripción debe tener al menos 10 caracteres");
     }
 
-    // Validar horarios si están seleccionados
     if (formData.agenda_fecha && formData.agenda_hora_desde && formData.agenda_hora_hasta) {
       if (!isHorarioDisponible(formData.agenda_fecha, formData.agenda_hora_desde, formData.agenda_hora_hasta)) {
         errors.push("El horario seleccionado está bloqueado para el profesional");
@@ -128,17 +129,14 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
   formDataRef.current = formData;
 
   const handleTituloChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // NO actualizar el estado, solo el ref para evitar re-renders
     formDataRef.current.reclamo_titulo = e.target.value;
   }, []);
 
   const handleDetalleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // NO actualizar el estado, solo el ref para evitar re-renders
     formDataRef.current.reclamo_detalle = e.target.value;
   }, []);
 
   const handleEspecialidadChange = useCallback((especialidadId: number) => {
-    // Limpiar campos dependientes cuando cambia la especialidad
     updateField("especialidad_id", especialidadId);
     updateField("profesional_id", null);
     updateField("agenda_fecha", null);
@@ -167,18 +165,15 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
     return options;
   }, []);
 
-  // Convertir hora HH:MM:SS a minutos
   const timeToMinutes = useCallback((time: string): number => {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }, []);
 
-  // Verificar si un horario está bloqueado
   const isTimeBlocked = useCallback((time: string) => {
     const currentFormData = formDataRef.current;
     if (!currentFormData.agenda_fecha || !currentFormData.profesional_id) return false;
 
-    // Usar refs para evitar re-renders
     const bloqueosDia = staticDataRef.current.fechasBloqueadas.filter(
       fb => fb.fecha === currentFormData.agenda_fecha && fb.profesional_id === currentFormData.profesional_id
     );
@@ -193,13 +188,11 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
       const bloqueoDesde = timeToMinutes(bloqueo.hora_desde);
       const bloqueoHasta = timeToMinutes(bloqueo.hora_hasta);
 
-      // Si hora_hasta === "23:59:59", bloquear todo desde hora_desde hasta medianoche
       if (bloqueo.hora_hasta === "23:59:59") {
         if (timeMinutes >= bloqueoDesde) {
           return true;
         }
       } else {
-        // Verificar si el horario está dentro del rango bloqueado
         if (timeMinutes >= bloqueoDesde && timeMinutes < bloqueoHasta) {
           return true;
         }
@@ -207,18 +200,16 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
     }
 
     return false;
-  }, [timeToMinutes, staticDataRef]); // Incluir staticDataRef como dependencia
+  }, [timeToMinutes, staticDataRef]);
 
   const timeOptions = generateTimeOptions();
 
-  // Verificar si hay horarios bloqueados muy cerca del rango seleccionado
   const hasNearbyBlockedTimes = useCallback(() => {
     const currentFormData = formDataRef.current;
     if (!currentFormData.agenda_fecha || !currentFormData.profesional_id || !currentFormData.agenda_hora_desde || !currentFormData.agenda_hora_hasta) {
       return false;
     }
 
-    // Usar refs para evitar re-renders
     const bloqueosDia = staticDataRef.current.fechasBloqueadas.filter(
       fb => fb.fecha === currentFormData.agenda_fecha && fb.profesional_id === currentFormData.profesional_id
     );
@@ -228,52 +219,45 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
     const desdeMinutes = timeToMinutes(currentFormData.agenda_hora_desde);
     const hastaMinutes = timeToMinutes(currentFormData.agenda_hora_hasta);
 
-    // Verificar si algún horario bloqueado está exactamente pegado (sin gap)
     for (const bloqueo of bloqueosDia) {
       if (!bloqueo.hora_desde || !bloqueo.hora_hasta) continue;
 
       const bloqueoDesde = timeToMinutes(bloqueo.hora_desde);
       const bloqueoHasta = timeToMinutes(bloqueo.hora_hasta);
 
-      // Verificar si el inicio del rango seleccionado está pegado al final de un bloqueo
       if (desdeMinutes === bloqueoHasta) {
         return true;
       }
 
-      // Verificar si el fin del rango seleccionado está pegado al inicio de un bloqueo
       if (hastaMinutes === bloqueoDesde) {
         return true;
       }
     }
 
     return false;
-  }, [timeToMinutes, staticDataRef]); // Incluir staticDataRef como dependencia
+  }, [timeToMinutes, staticDataRef]);
 
-  // Obtener fechas bloqueadas (completamente bloqueadas) como funciones disabled
   const getDisabledDays = useCallback((): ((date: Date) => boolean) => {
     const currentFormData = formDataRef.current;
     if (!currentFormData.profesional_id) {
       return () => false;
     }
 
-    // Obtener fechas bloqueadas del ref para evitar re-renders
     const fechasBloqueadas = staticDataRef.current.fechasBloqueadas;
     const profesionalId = currentFormData.profesional_id;
 
     return (date: Date) => {
       const dateString = date.toISOString().split('T')[0];
 
-      // Verificar si la fecha está completamente bloqueada directamente
       const bloqueosDia = fechasBloqueadas.filter(
         fb => fb.fecha === dateString && fb.profesional_id === profesionalId
       );
 
       if (bloqueosDia.length === 0) return false;
 
-      // Si hay un bloqueo con hora_hasta === "23:59:59", el día está completamente bloqueado
       return bloqueosDia.some(bloqueo => bloqueo.hora_hasta === "23:59:59");
     };
-  }, [staticDataRef]); // Incluir staticDataRef como dependencia
+  }, [staticDataRef]);
 
   return (
     <Sheet open={isOpen} onOpenChange={handleClose}>
@@ -287,7 +271,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
-          {/* Cliente */}
           <div className="space-y-2">
             <Label htmlFor="cliente">
               {companyConfig?.sing_heading_solicitante || "Cliente"} <span className="text-destructive">*</span>
@@ -311,7 +294,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
               </SelectContent>
             </Select>
 
-            {/* Información del cliente seleccionado */}
             {selectedCliente && (
               <div className="mt-3 p-3 bg-muted rounded-md space-y-1 text-sm text-muted-foreground">
                 <div><strong>ID:</strong> {selectedCliente.cliente_id}</div>
@@ -326,34 +308,49 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             )}
           </div>
 
-          {/* Especialidad */}
           <div className="space-y-2">
             <Label htmlFor="especialidad">
               {companyConfig?.sing_heading_especialidad || "Especialidad"} <span className="text-destructive">*</span>
             </Label>
-            <Select
-              value={formData.especialidad_id?.toString() || ""}
-              onValueChange={(value) => handleEspecialidadChange(parseInt(value))}
-              disabled={loadingEspecialidades}
-            >
-              <SelectTrigger id="especialidad" className="cursor-pointer w-full">
-                <SelectValue placeholder={loadingEspecialidades ? `Cargando ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...`} />
-              </SelectTrigger>
-              <SelectContent className="cursor-pointer">
-                {especialidadesOptions
-                  .filter((especialidad) => especialidad?.especialidad_id && especialidad?.nombre_especialidad)
-                  .map((especialidad) => (
-                    <SelectItem key={especialidad.especialidad_id} value={especialidad.especialidad_id.toString()} className="cursor-pointer">
-                      {especialidad.nombre_especialidad}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+
+
+            {
+              especialidadesOptions.length <= 0 ? (
+                <>{user?.user_role === "operador" ? (
+                  <span>Contacte a su administrador</span>
+                ) : (
+                  <span>No hay especialidades disponibles. Puede gestionarlas en la sección <a href="/dashboard/owner/especialidades" className="text-primary">{companyConfig?.plu_heading_especialidad}</a>.</span>
+                )}</>
+              ) : (
+                <>
+                  <Select
+                    value={formData.especialidad_id?.toString() || ""}
+                    onValueChange={(value) => handleEspecialidadChange(parseInt(value))}
+                    disabled={loadingEspecialidades}
+                  >
+                    <SelectTrigger id="especialidad" className="cursor-pointer w-full">
+                      <SelectValue placeholder={loadingEspecialidades ? `Cargando ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...`} />
+                    </SelectTrigger>
+                    <SelectContent className="cursor-pointer">
+                      {especialidadesOptions
+                        .filter((especialidad) => especialidad?.especialidad_id && especialidad?.nombre_especialidad)
+                        .map((especialidad) => (
+                          <SelectItem key={especialidad.especialidad_id} value={especialidad.especialidad_id.toString()} className="cursor-pointer">
+                            {especialidad.nombre_especialidad}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+
+                </>
+
+              )
+            }
+
           </div>
 
 
 
-          {/* Profesional */}
           {formData.especialidad_id && (
             <div className="space-y-2">
               <Label htmlFor="profesional">
@@ -389,7 +386,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             </div>
           )}
 
-          {/* URL del Reclamo - Condicional */}
           {companyConfig?.requiere_url === 1 && (
             <div className="space-y-2">
               <Label htmlFor="url">
@@ -405,12 +401,9 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             </div>
           )}
 
-          {/* Fecha y Horarios - Solo si hay profesional seleccionado */}
           {formData.profesional_id && (
             <div className="space-y-4">
-              {/* Grid para Fecha y Horarios */}
               <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                {/* Fecha - Ocupa toda la fila en mobile, 1 columna en desktop */}
                 <div className="space-y-2 md:col-span-1.5 flex flex-col gap-1">
                   <Label htmlFor="fecha">
                     Fecha <span className="text-destructive">*</span>
@@ -424,10 +417,8 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                   />
                 </div>
 
-                {/* Horas - Solo si hay fecha seleccionada, ocupan 2 columnas en desktop */}
                 {formData.agenda_fecha && (
                   <div className="flex items-center justify-center gap-2">
-                    {/* Hora desde */}
                     <div className="space-y-2 flex-1/2 flex flex-col gap-1">
                       <Label htmlFor="hora_desde">
                         Hora desde <span className="text-destructive">*</span>
@@ -447,14 +438,13 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                               className="cursor-pointer"
                               disabled={isTimeBlocked(time)}
                             >
-                              {time.slice(0, 5)} {/* Mostrar solo HH:mm */}
+                              {time.slice(0, 5)}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
-                    {/* Hora hasta - Condicional por companyConfig */}
                     {companyConfig?.requiere_fecha_final === 1 && (
                       <div className="space-y-2 flex-1/2 flex flex-col gap-1">
                         <Label htmlFor="hora_hasta">
@@ -469,14 +459,10 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                           </SelectTrigger>
                           <SelectContent id="horarios-selector" className="cursor-pointer">
                             {timeOptions.map((time) => {
-                              // Filtrar horarios que sean menores o iguales que hora desde
                               const timeMinutes = timeToMinutes(time);
                               const fromMinutes = formData.agenda_hora_desde ? timeToMinutes(formData.agenda_hora_desde) : 0;
                               const isBeforeFrom = !!(formData.agenda_hora_desde && timeMinutes <= fromMinutes);
 
-                              // Para hora_hasta, NO debemos bloquear individualmente
-                              // Solo verificamos que sea después de hora_desde
-                              // La validación de rango se hace en isHorarioDisponible
                               const isDisabled = isBeforeFrom;
 
                               return (
@@ -486,7 +472,7 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                                   className="cursor-pointer"
                                   disabled={isDisabled}
                                 >
-                                  {time.slice(0, 5)} {/* Mostrar solo HH:mm */}
+                                  {time.slice(0, 5)}
                                 </SelectItem>
                               );
                             })}
@@ -498,7 +484,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                 )}
               </div>
 
-              {/* Mensaje de horarios bloqueados */}
               {formData.agenda_fecha && formData.agenda_hora_desde && formData.agenda_hora_hasta &&
                 !isHorarioDisponible(formData.agenda_fecha, formData.agenda_hora_desde, formData.agenda_hora_hasta) && (
                   <p className="text-sm text-destructive">
@@ -506,7 +491,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                   </p>
                 )}
 
-              {/* Mostrar horarios bloqueados de la fecha */}
               {formData.agenda_fecha && getHorariosBloqueados(formData.agenda_fecha).length > 0 && (
                 <div className="p-2 bg-muted rounded-md text-sm">
                   <p className="font-medium text-sm mb-1">Horarios bloqueados en esta fecha:</p>
@@ -520,7 +504,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
                 </div>
               )}
 
-              {/* Mensaje amigable para horarios seguidos */}
               {formData.agenda_fecha && formData.agenda_hora_desde && formData.agenda_hora_hasta && hasNearbyBlockedTimes() && (
                 <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/50 rounded-md">
                   <div className="text-yellow-800 dark:text-yellow-300 text-justify flex flex-col gap-2">
@@ -533,7 +516,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             </div>
           )}
 
-          {/* Título del Reclamo */}
           <div className="space-y-2">
             <Label htmlFor="titulo">
               Título <span className="text-destructive">*</span>
@@ -546,7 +528,6 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             />
           </div>
 
-          {/* Descripción del Reclamo */}
           <div className="space-y-2">
             <Label htmlFor="detalle">
               Descripción <span className="text-destructive">*</span>
@@ -560,14 +541,12 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             />
           </div>
 
-          {/* Mostrar error si existe */}
           {error && (
             <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
               <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
 
-          {/* Botones de Acción */}
           <div className="flex gap-3 pt-4">
             <Button variant="outline" onClick={handleClose} className="flex-1" disabled={isSubmitting}>
               Cancelar

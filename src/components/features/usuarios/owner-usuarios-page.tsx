@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -43,7 +43,6 @@ export function OwnerUsuariosPage() {
   const itemsPerPage = 5
   const { companyConfig, user } = useAuth()
 
-  // estados para sheets
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false)
   const [isPasswordSheetOpen, setIsPasswordSheetOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -51,14 +50,13 @@ export function OwnerUsuariosPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showPassword, setShowPassword] = useState(true)
 
-  const [userFormData, setUserFormData] = useState({
-    user_complete_name: "",
-    user_dni: "",
-    user_phone: "",
-    user_email: "",
-    user_role: "operador",
-    user_password: "",
-  })
+  const nameRef = useRef<HTMLInputElement>(null)
+  const dniRef = useRef<HTMLInputElement>(null)
+  const phoneRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const passwordRef = useRef<HTMLInputElement>(null)
+
+  const [selectedRole, setSelectedRole] = useState<"operador" | "profesional">("operador")
 
   const [newPassword, setNewPassword] = useState("")
 
@@ -85,7 +83,30 @@ export function OwnerUsuariosPage() {
 
   useEffect(() => {
     fetchUsers()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (isUserSheetOpen && editingUser && isEditing) {
+      setTimeout(() => {
+        if (nameRef.current) nameRef.current.value = editingUser.user_complete_name
+        if (dniRef.current) dniRef.current.value = editingUser.user_dni
+        if (phoneRef.current) phoneRef.current.value = editingUser.user_phone
+        if (emailRef.current) emailRef.current.value = editingUser.user_email
+        if (passwordRef.current) passwordRef.current.value = ""
+        setSelectedRole(editingUser.user_role)
+      }, 0)
+    } else if (isUserSheetOpen && !isEditing) {
+      setTimeout(() => {
+        if (nameRef.current) nameRef.current.value = ""
+        if (dniRef.current) dniRef.current.value = ""
+        if (phoneRef.current) phoneRef.current.value = ""
+        if (emailRef.current) emailRef.current.value = ""
+        if (passwordRef.current) passwordRef.current.value = ""
+        setSelectedRole("operador")
+      }, 0)
+    }
+  }, [isUserSheetOpen, editingUser, isEditing])
 
   const handleToggleUserStatus = async (user: User) => {
     try {
@@ -129,47 +150,60 @@ export function OwnerUsuariosPage() {
   const handleCreateUser = () => {
     setIsEditing(false)
     setEditingUser(null)
-    setUserFormData({
-      user_complete_name: "",
-      user_dni: "",
-      user_phone: "",
-      user_email: "",
-      user_role: "operador",
-      user_password: ""
-    })
     setIsUserSheetOpen(true)
   }
 
   const handleEditUser = (user: User) => {
     setIsEditing(true)
     setEditingUser(user)
-    setUserFormData({
-      user_complete_name: user.user_complete_name,
-      user_dni: user.user_dni,
-      user_phone: user.user_phone,
-      user_email: user.user_email,
-      user_role: user.user_role,
-      user_password: ""
-    })
     setIsUserSheetOpen(true)
   }
 
   const handleSaveUser = async () => {
     try {
+      const formData = {
+        user_complete_name: nameRef.current?.value.trim() || "",
+        user_dni: dniRef.current?.value.trim() || "",
+        user_phone: phoneRef.current?.value.trim() || "",
+        user_email: emailRef.current?.value.trim() || "",
+        user_role: selectedRole,
+        user_password: passwordRef.current?.value.trim() || ""
+      }
+
+      const camposFaltantes: string[] = []
+
+      if (!formData.user_complete_name) {
+        camposFaltantes.push("Nombre completo")
+      }
+      if (!formData.user_dni) {
+        camposFaltantes.push("DNI")
+      }
+      if (!formData.user_phone) {
+        camposFaltantes.push("Teléfono")
+      }
+      if (!formData.user_email) {
+        camposFaltantes.push("Email")
+      }
+
+      if (!isEditing && !formData.user_password) {
+        camposFaltantes.push("Contraseña")
+      }
+
+      if (camposFaltantes.length > 0) {
+        toast.error(`Por favor completa los siguientes campos: ${camposFaltantes.join(", ")}`)
+        return
+      }
+
       if (isEditing && editingUser) {
         const url = CLIENT_API.USERS_EDIT.replace('{id}', editingUser.user_id.toString())
-        const editData: Record<string, unknown> = { ...userFormData }
-        if (!editData.user_password) {
+        const editData: Record<string, unknown> = { ...formData }
+        if (!editData.user_password || editData.user_password === "") {
           delete editData.user_password
         }
         await apiClient.put(url, editData)
         toast.success("Usuario actualizado correctamente")
       } else {
-        if (!userFormData.user_password) {
-          toast.error("La contraseña es obligatoria para crear un usuario")
-          return
-        }
-        await apiClient.post(CLIENT_API.USERS_CREATE, userFormData)
+        await apiClient.post(CLIENT_API.USERS_CREATE, formData)
         toast.success("Usuario creado correctamente")
       }
 
@@ -188,36 +222,44 @@ export function OwnerUsuariosPage() {
     setSearchTerm("")
   }
 
-  const handleDniChange = (dni: string) => {
-    setUserFormData(prev => ({ ...prev, user_dni: dni }))
-    if (!isEditing && dni.length >= 4) {
+  const handleDniChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const dni = e.target.value
+    if (!isEditing && passwordRef.current && dni.length >= 4) {
       const lastFourDigits = dni.slice(-4)
-      setUserFormData(prev => ({ ...prev, user_password: `Fast${lastFourDigits}` }))
+      passwordRef.current.value = `Fast${lastFourDigits}`
     }
-  }
+  }, [isEditing])
 
-  const filteredUsers = users.filter(userItem => {
-    // excluir el usuario logueado
-    if (user && userItem.user_id === user.user_id) {
-      return false
-    }
+  const handleRoleChange = useCallback((value: "operador" | "profesional") => {
+    setSelectedRole(value)
+  }, [])
 
-    const matchesSearch = userItem.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      userItem.user_dni.includes(searchTerm)
+  const filteredUsers = useMemo(() => {
+    return users.filter(userItem => {
+      if (user && userItem.user_id === user.user_id) {
+        return false
+      }
 
-    const matchesRole = filterRole === "all" || userItem.user_role === filterRole
-    const matchesStatus = filterStatus === "all" ||
-      (filterStatus === "active" && userItem.user_status === 1) ||
-      (filterStatus === "blocked" && userItem.user_status === 0)
+      const matchesSearch = userItem.user_complete_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        userItem.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        userItem.user_dni.includes(searchTerm)
 
-    return matchesSearch && matchesRole && matchesStatus
-  })
+      const matchesRole = filterRole === "all" || userItem.user_role === filterRole
+      const matchesStatus = filterStatus === "all" ||
+        (filterStatus === "active" && userItem.user_status === 1) ||
+        (filterStatus === "blocked" && userItem.user_status === 0)
 
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex)
+      return matchesSearch && matchesRole && matchesStatus
+    })
+  }, [users, searchTerm, filterRole, filterStatus, user])
+
+  const { totalPages, startIndex, endIndex, paginatedUsers } = useMemo(() => {
+    const total = Math.ceil(filteredUsers.length / itemsPerPage)
+    const start = (currentPage - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    const paginated = filteredUsers.slice(start, end)
+    return { totalPages: total, startIndex: start, endIndex: end, paginatedUsers: paginated }
+  }, [filteredUsers, currentPage, itemsPerPage])
 
   const getStatusBadge = (status: number) => {
     return (
@@ -232,7 +274,6 @@ export function OwnerUsuariosPage() {
     )
   }
 
-  // mapear role a display name
   const getRoleDisplayName = (role: string) => {
     const roleMapping: Record<string, string> = {
       operador: companyConfig?.sing_heading_operador || "Operador",
@@ -290,9 +331,7 @@ export function OwnerUsuariosPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Filtros */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            {/* Búsqueda */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -313,7 +352,6 @@ export function OwnerUsuariosPage() {
               )}
             </div>
 
-            {/* Filtro por rol */}
             <Select value={filterRole} onValueChange={setFilterRole}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Rol" />
@@ -325,7 +363,6 @@ export function OwnerUsuariosPage() {
               </SelectContent>
             </Select>
 
-            {/* Filtro por estado */}
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Estado" />
@@ -338,7 +375,6 @@ export function OwnerUsuariosPage() {
             </Select>
           </div>
 
-          {/* Tabla */}
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="text-center">
@@ -353,8 +389,8 @@ export function OwnerUsuariosPage() {
                   <TableRow>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>DNI</TableHead>
                     <TableHead>Teléfono</TableHead>
+                    <TableHead>DNI</TableHead>
                     <TableHead className="text-center">Rol</TableHead>
                     <TableHead className="text-center">Estado</TableHead>
                     <TableHead className="text-center">Recibiendo?</TableHead>
@@ -367,9 +403,13 @@ export function OwnerUsuariosPage() {
                       <TableCell className="font-medium">
                         {user.user_complete_name}
                       </TableCell>
-                      <TableCell>{user.user_email}</TableCell>
+                      <TableCell>
+                        <a href={`mailto:${user.user_email}`} className="text-primary hover:underline">{user.user_email}</a>
+                      </TableCell>
+                      <TableCell>
+                        <a href={`tel:${user.user_phone}`} className="text-primary hover:underline">{user.user_phone}</a>
+                      </TableCell>
                       <TableCell>{user.user_dni}</TableCell>
-                      <TableCell>{user.user_phone}</TableCell>
                       <TableCell className="text-center">
                         {getRoleBadge(user.user_role)}
                       </TableCell>
@@ -377,7 +417,7 @@ export function OwnerUsuariosPage() {
                         {getStatusBadge(user.user_status)}
                       </TableCell>
                       <TableCell className="text-center">
-                        {user.apto_recibir === 1 ? <Badge variant="default" className="bg-green-700 text-white px-2 py-1 rounded-md uppercase">Si</Badge> : <Badge variant="default" className="bg-red-800 text-white px-2 py-1 rounded-md uppercase">No</Badge>}
+                        {user.apto_recibir === 1 ? (user.user_role !== "operador" ? <Badge variant="default" className="bg-green-500 text-white px-2 py-1 rounded-md">Si</Badge> : "-") : (user.user_role !== "operador" ? <Badge variant="default" className="bg-red-500 text-white px-2 py-1 rounded-md">No</Badge> : "-")}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -389,14 +429,21 @@ export function OwnerUsuariosPage() {
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            title="Restaurar usuario"
-                            onClick={() => handleOpenPasswordSheet(user)}
-                          >
-                            <Key className="h-4 w-4" />
-                          </Button>
+
+                          {
+                            user.user_status === 0 ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                title="Restaurar usuario"
+                                onClick={() => handleOpenPasswordSheet(user)}
+                              >
+                                <Key className="h-4 w-4" />
+                              </Button>
+                            ) : (
+                              null
+                            )
+                          }
                           <Button
                             variant="outline"
                             size="sm"
@@ -417,7 +464,6 @@ export function OwnerUsuariosPage() {
                 </TableBody>
               </Table>
 
-              {/* Paginación */}
               <div className="flex flex-col gap-4 mt-4">
                 <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
                   Mostrando {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} de {filteredUsers.length} usuarios
@@ -468,8 +514,7 @@ export function OwnerUsuariosPage() {
         </CardContent>
       </Card>
 
-      {/* Sheet para crear/editar usuario */}
-      <Sheet open={isUserSheetOpen} onOpenChange={setIsUserSheetOpen}>
+      <Sheet open={isUserSheetOpen} onOpenChange={setIsUserSheetOpen} key={`${isEditing}-${editingUser?.user_id || 'new'}`}>
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>
@@ -482,49 +527,57 @@ export function OwnerUsuariosPage() {
           <Separator />
           <div className="mt-0 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="complete_name">Nombre Completo</Label>
+              <Label htmlFor="complete_name">Nombre Completo <span className="text-red-500">*</span></Label>
               <Input
+                key={`name-${editingUser?.user_id || 'new'}`}
                 id="complete_name"
-                value={userFormData.user_complete_name}
-                onChange={(e) => setUserFormData(prev => ({ ...prev, user_complete_name: e.target.value }))}
+                ref={nameRef}
+                defaultValue={isEditing && editingUser ? editingUser.user_complete_name : ""}
                 placeholder="Nombre completo del usuario"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dni">DNI</Label>
+              <Label htmlFor="dni">DNI <span className="text-red-500">*</span></Label>
               <Input
+                key={`dni-${editingUser?.user_id || 'new'}`}
                 id="dni"
-                value={userFormData.user_dni}
-                onChange={(e) => handleDniChange(e.target.value)}
+                ref={dniRef}
+                defaultValue={isEditing && editingUser ? editingUser.user_dni : ""}
+                onChange={handleDniChange}
                 placeholder="DNI del usuario"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
+              <Label htmlFor="phone">Teléfono <span className="text-red-500">*</span></Label>
               <Input
+                key={`phone-${editingUser?.user_id || 'new'}`}
                 id="phone"
-                value={userFormData.user_phone}
-                onChange={(e) => setUserFormData(prev => ({ ...prev, user_phone: e.target.value }))}
-                placeholder="Teléfono del usuario"
+                ref={phoneRef}
+                defaultValue={isEditing && editingUser ? editingUser.user_phone : ""}
+                placeholder="+54 9 11 1234-5678"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
               <Input
+                key={`email-${editingUser?.user_id || 'new'}`}
                 id="email"
                 type="email"
-                value={userFormData.user_email}
-                onChange={(e) => setUserFormData(prev => ({ ...prev, user_email: e.target.value }))}
-                placeholder="Email del usuario"
+                ref={emailRef}
+                defaultValue={isEditing && editingUser ? editingUser.user_email : ""}
+                placeholder="usuario@empresa.com"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role">Rol</Label>
+              <Label htmlFor="role">Rol <span className="text-red-500">*</span></Label>
               <Select
-                value={userFormData.user_role}
-                onValueChange={(value: "operador" | "profesional") =>
-                  setUserFormData(prev => ({ ...prev, user_role: value }))
-                }
+                value={selectedRole}
+                onValueChange={handleRoleChange}
+                required
               >
                 <SelectTrigger className="min-w-full cursor-pointer">
                   <SelectValue />
@@ -541,14 +594,16 @@ export function OwnerUsuariosPage() {
             </div>
             {!isEditing && (
               <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="password">Contraseña <span className="text-red-500">*</span></Label>
                 <div className="relative">
                   <Input
+                    key={`password-${editingUser?.user_id || 'new'}`}
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    value={userFormData.user_password}
-                    onChange={(e) => setUserFormData(prev => ({ ...prev, user_password: e.target.value }))}
+                    ref={passwordRef}
+                    defaultValue=""
                     placeholder="Contraseña del usuario"
+                    required
                   />
                   <Button
                     type="button"
@@ -564,6 +619,9 @@ export function OwnerUsuariosPage() {
                     )}
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Sugerencia: Fast + últimos 4 dígitos del DNI
+                </p>
               </div>
             )}
             {isEditing && (
@@ -571,11 +629,12 @@ export function OwnerUsuariosPage() {
                 <Label htmlFor="edit_password">Nueva Contraseña (opcional)</Label>
                 <div className="relative">
                   <Input
+                    key={`password-${editingUser?.user_id || 'new'}`}
                     id="edit_password"
                     type={showPassword ? "text" : "password"}
-                    value={userFormData.user_password}
-                    onChange={(e) => setUserFormData(prev => ({ ...prev, user_password: e.target.value }))}
-                    placeholder="Dejar vacío para mantener la actual"
+                    ref={passwordRef}
+                    defaultValue=""
+                    placeholder="Dejar vacío para mantener la contraseña actual"
                   />
                   <Button
                     type="button"
@@ -609,13 +668,13 @@ export function OwnerUsuariosPage() {
         </SheetContent>
       </Sheet>
 
-      {/* Sheet para cambiar contraseña */}
       <Sheet open={isPasswordSheetOpen} onOpenChange={setIsPasswordSheetOpen}>
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
             <SheetTitle>Cambiar Contraseña</SheetTitle>
-            <SheetDescription>
-              Cambia la contraseña del usuario {selectedUser?.user_complete_name}
+            <SheetDescription className="flex flex-col gap-2">
+              <span>Esta opcion es unicamente para cuando el usuario este bloqueado y necesita reestablecerse.</span>
+              <span>Cambia la contraseña del usuario {selectedUser?.user_complete_name}</span>
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-4">

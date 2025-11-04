@@ -16,11 +16,6 @@ export default function LoginPage() {
             <LoginForm />
           </div>
         </div>
-        {/* <div className="flex flex-col justiy-center items-center">
-          <span>owner@gmail.com</span>
-          <span>operador-1@gmail.com</span>
-          <span>profesional-2@gmail.com</span>
-        </div> */}
       </div>
       <div className="bg-muted relative hidden lg:block">
         <Image
@@ -29,10 +24,7 @@ export default function LoginPage() {
           className="absolute inset-0 h-full w-full object-cover"
           width={1920}
           height={1080}
-          priority={true}
-        />
-
-        {/* TODO: Quitar esto para produccion */}
+          priority={true} />
         <h1 className="text-8xl font-bold text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col italic" style={{ textShadow: '2px 2px 8px indigo' }}>
           <span className="font-bold">Fast</span>
           <span className="font-normal">Track</span>

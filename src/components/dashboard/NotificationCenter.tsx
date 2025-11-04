@@ -31,7 +31,7 @@ interface Notification {
   body: string;
   timestamp: number;
   read: boolean;
-  path?: string; // path para redirigir sgun role
+  path?: string;
 }
 
 const NOTIFICATIONS_KEY = 'fasttrack_notifications';
@@ -66,9 +66,8 @@ export function NotificationCenter() {
   }, [isOpen, refreshSubscriptionStatus]);
 
   useEffect(() => {
-    // Escuchar cuando las notificaciones se actualizan (desde NotificationToast)
     const handleNotificationsUpdate = (event: CustomEvent) => {
-      
+
       const updatedNotifications = event.detail;
       setNotifications(updatedNotifications);
     };
@@ -99,29 +98,6 @@ export function NotificationCenter() {
       console.error('Error saving notifications:', error);
     }
   };
-
-  // const addNotification = (title: string, body: string, path?: string) => {
-  //   const newNotification: Notification = {
-  //     id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-  //     title,
-  //     body,
-  //     timestamp: Date.now(),
-  //     read: false,
-  //     path, // va el path solo si existee
-  //   };
-
-  //   setNotifications(prev => {
-  //     const updatedNotifications = [newNotification, ...prev].slice(0, 50); // Máximo 50
-
-  //     try {
-  //       localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(updatedNotifications));
-  //     } catch (error) {
-  //       console.error('Error saving notifications:', error);
-  //     }
-
-  //     return updatedNotifications;
-  //   });
-  // };
 
   const markAsRead = (id: string) => {
     const updatedNotifications = notifications.map(notification =>

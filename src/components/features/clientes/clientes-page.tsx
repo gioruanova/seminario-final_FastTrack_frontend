@@ -35,8 +35,7 @@ interface ClientesPageProps {
   userRole: "owner" | "operador"
 }
 
-export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
-  // userrole se usa para validacion de tipos, la logica de permisos se maneja en el layout
+export function ClientesPage({ userRole }: ClientesPageProps) {
   const { companyConfig } = useAuth()
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -52,7 +51,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
     },
   })
 
-  // estados de modales
   const [isClienteSheetOpen, setIsClienteSheetOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null)
@@ -117,7 +115,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   }
 
   const handleSaveCliente = async () => {
-    // validar campos requeridos
     if (!clienteFormData.cliente_complete_name ||
       !clienteFormData.cliente_dni ||
       !clienteFormData.cliente_phone ||
@@ -126,7 +123,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
       return
     }
 
-    // validar domicilio si es requerido
     if (companyConfig?.requiere_domicilio) {
       if (!clienteFormData.cliente_direccion ||
         clienteFormData.cliente_lat === 0 ||
@@ -138,10 +134,8 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
 
     try {
       if (isEditing && editingCliente) {
-        // solo campos modificados
         const updateData: Partial<typeof clienteFormData> = {}
-        
-        // comparar con datos originales
+
         if (clienteFormData.cliente_complete_name !== editingCliente.cliente_complete_name) {
           updateData.cliente_complete_name = clienteFormData.cliente_complete_name
         }
@@ -164,7 +158,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
           updateData.cliente_lng = clienteFormData.cliente_lng
         }
 
-        // solo enviar si hay cambios
         if (Object.keys(updateData).length > 0) {
           await apiClient.put(CLIENT_API.UPDATE_CLIENTE.replace('{cliente_id}', editingCliente.cliente_id.toString()), updateData)
           toast.success(`${companyConfig?.sing_heading_solicitante} actualizado correctamente`)
@@ -191,16 +184,13 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   const handleToggleClienteStatus = async (cliente: Cliente) => {
     try {
       if (cliente.cliente_active) {
-        // desactivar cliente
         await apiClient.put(CLIENT_API.DESACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString()))
         toast.success(`${companyConfig?.sing_heading_solicitante} desactivado correctamente`)
       } else {
-        // activar cliente
         await apiClient.put(CLIENT_API.ACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString()))
         toast.success(`${companyConfig?.sing_heading_solicitante} activado correctamente`)
       }
-      
-      // recargar la lista de clientes
+
       fetchClientes()
     } catch (error: unknown) {
       const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
@@ -213,11 +203,10 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
   const getStatusBadge = (active: boolean) => {
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${
-          active
-            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-        }`}
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${active
+          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          }`}
       >
         {active ? 'Activo' : 'Inactivo'}
       </span>
@@ -261,12 +250,12 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
 
     try {
       toast.info("Buscando ubicación...")
-      
+
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(clienteFormData.cliente_direccion)}&limit=1`
       )
       const data = await response.json()
-      
+
       if (data && data.length > 0) {
         const { lat, lon } = data[0]
         setClienteFormData(prev => ({
@@ -322,9 +311,7 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Filtros */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            {/* Búsqueda */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -346,7 +333,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
             </div>
           </div>
 
-          {/* Tabla */}
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="text-center">
@@ -361,7 +347,8 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
                   <TableRow>
                     <TableHead>Nombre Completo</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Dirección</TableHead>
+                    <TableHead>Telefono</TableHead>
+                    {companyConfig?.requiere_domicilio === 1 ? <TableHead>Dirección</TableHead> : null}
                     <TableHead className="text-center">Estado</TableHead>
                     <TableHead className="text-center">Acciones</TableHead>
                   </TableRow>
@@ -372,21 +359,30 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
                       <TableCell className="font-medium">
                         {cliente.cliente_complete_name}
                       </TableCell>
+
                       <TableCell>
                         <a
                           href={`mailto:${cliente.cliente_email}`}
-                          className="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
+                          className="text-primary hover:underline flex items-center gap-1"
                         >
                           <Mail className="h-4 w-4" />
                           {cliente.cliente_email}
                         </a>
                       </TableCell>
+                      <TableCell>
+                        <a href={`tel:${cliente.cliente_phone}`} className="text-primary hover:underline">{cliente.cliente_phone}</a>
+                      </TableCell>
+                      {companyConfig?.requiere_domicilio === 1 ? (
                         <TableCell title={cliente.cliente_direccion}>
-                          {cliente.cliente_direccion.length > 20 
-                            ? `${cliente.cliente_direccion.substring(0, 20)}...` 
+                          {cliente.cliente_direccion.length > 20
+                            ? `${cliente.cliente_direccion.substring(0, 20)}...`
                             : cliente.cliente_direccion}
                         </TableCell>
-                        <TableCell className="text-center">{getStatusBadge(cliente.cliente_active)}</TableCell>
+                      ):(
+                        null
+                      )}
+                    
+                      <TableCell className="text-center">{getStatusBadge(cliente.cliente_active)}</TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
                           <Button
@@ -417,7 +413,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
                 </TableBody>
               </Table>
 
-              {/* Paginación */}
               <div className="flex flex-col gap-4 mt-4">
                 <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
                   Mostrando {startIndex + 1}-{Math.min(endIndex, filteredClientes.length)} de {filteredClientes.length} {companyConfig?.plu_heading_solicitante?.toLowerCase()}
@@ -468,7 +463,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
         </CardContent>
       </Card>
 
-      {/* Sheet para crear/editar cliente */}
       <Sheet open={isClienteSheetOpen} onOpenChange={setIsClienteSheetOpen}>
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
           <SheetHeader>
@@ -522,70 +516,82 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="direccion">Dirección {companyConfig?.requiere_domicilio ? <span className="text-red-500">*</span> : ""}</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="direccion"
-                  value={clienteFormData.cliente_direccion}
-                  onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_direccion: e.target.value }))}
-                  placeholder={`Dirección del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
-                  required={!!companyConfig?.requiere_domicilio}
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleGeocodeAddress}
-                  className="shrink-0"
-                  disabled={!clienteFormData.cliente_direccion.trim()}
-                  title="Buscar ubicación en el mapa"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleOpenMap}
-                  className="shrink-0"
-                  title="Abrir mapa para seleccionar ubicación"
-                >
-                  <MapPin className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Haz clic en el botón del mapa para seleccionar la ubicación
-              </p>
-
-              {/* Vista previa del mapa cuando hay coordenadas */}
-              {clienteFormData.cliente_lat !== 0 && clienteFormData.cliente_lng !== 0 && (
-                <div className="mt-3">
-                  <Label className="text-sm font-medium">Ubicación seleccionada:</Label>
-                  <div className="mt-2 w-full h-32 border rounded-lg overflow-hidden">
-                    <OSMMapSelector
-                      key={`${clienteFormData.cliente_lat}-${clienteFormData.cliente_lng}`}
-                      onLocationSelect={() => { }} // no hacer nada, solo mostrar
-                      initialPosition={[clienteFormData.cliente_lat, clienteFormData.cliente_lng]}
-                      readOnly={true}
-                      height="128px"
+            {
+              companyConfig?.requiere_domicilio === 1 ? (
+                <div className="space-y-2">
+                  <Label htmlFor="direccion">
+                    Dirección {companyConfig?.requiere_domicilio ? <span className="text-red-500">*</span> : <span className="text-muted-foreground">(opcional)</span>}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="direccion"
+                      value={clienteFormData.cliente_direccion}
+                      onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_direccion: e.target.value }))}
+                      placeholder={
+                        companyConfig?.requiere_domicilio
+                          ? `Dirección del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`
+                          : `Dirección del ${companyConfig?.sing_heading_solicitante?.toLowerCase()} (opcional)`
+                      }
+                      required={!!companyConfig?.requiere_domicilio}
+                      className="flex-1"
                     />
-                  </div>
-                  <div className="flex justify-between items-center mt-1">
-
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
-                      onClick={handleOpenMap}
-                      className="text-xs"
+                      onClick={handleGeocodeAddress}
+                      className="shrink-0"
+                      disabled={!clienteFormData.cliente_direccion.trim()}
+                      title="Buscar ubicación en el mapa"
                     >
-                      <MapPin className="h-3 w-3 mr-1" />
-                      Cambiar ubicación
+                      <Search className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleOpenMap}
+                      className="shrink-0"
+                      title="Abrir mapa para seleccionar ubicación"
+                    >
+                      <MapPin className="h-4 w-4" />
                     </Button>
                   </div>
+                  {companyConfig?.requiere_domicilio && (
+                    <p className="text-xs text-muted-foreground">
+                      Haz clic en el botón del mapa para seleccionar la ubicación
+                    </p>
+                  )}
+
+                  {clienteFormData.cliente_lat !== 0 && clienteFormData.cliente_lng !== 0 && (
+                    <div className="mt-3">
+                      <Label className="text-sm font-medium">Ubicación seleccionada:</Label>
+                      <div className="mt-2 w-full h-32 border rounded-lg overflow-hidden">
+                        <OSMMapSelector
+                          key={`${clienteFormData.cliente_lat}-${clienteFormData.cliente_lng}`}
+                          onLocationSelect={() => { }}
+                          initialPosition={[clienteFormData.cliente_lat, clienteFormData.cliente_lng]}
+                          readOnly={true}
+                          height="128px"
+                        />
+                      </div>
+                      <div className="flex justify-between items-center mt-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleOpenMap}
+                          className="text-xs"
+                        >
+                          <MapPin className="h-3 w-3 mr-1" />
+                          Cambiar ubicación
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              ) : (
+                null
+              )
+            }
             <div className="flex gap-2 pt-4">
               <Button
                 variant="outline"
@@ -602,7 +608,6 @@ export function ClientesPage({ userRole: _userRole }: ClientesPageProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Modal del Mapa */}
       <Dialog open={isMapModalOpen} onOpenChange={setIsMapModalOpen}>
         <DialogContent className="sm:max-w-4xl">
           <DialogHeader>

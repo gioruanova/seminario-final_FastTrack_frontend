@@ -8,7 +8,6 @@ import axios from "axios";
 import { config } from "@/lib/config";
 import { isSuperAdmin } from "@/types/auth";
 
-// Tipo para errores de Axios
 type AxiosError = {
   response?: {
     status?: number;
@@ -45,7 +44,6 @@ export function useBannerStatus() {
   const { user, companyConfig } = useAuth();
 
   const fetchBannerStatus = useCallback(async () => {
-    // Verificar si la empresa está activa antes de hacer la llamada
     if (companyConfig?.company?.company_estado !== 1) {
       setBanner(null);
       setLoading(false);
@@ -77,7 +75,6 @@ export function useBannerStatus() {
   }, [user, companyConfig?.company?.company_estado]);
 
   useEffect(() => {
-    // Solo cargar banner si hay usuario
     if (user) {
       fetchBannerStatus();
     }

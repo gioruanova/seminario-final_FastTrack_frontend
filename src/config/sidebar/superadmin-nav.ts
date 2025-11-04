@@ -17,25 +17,21 @@ export const superAdminNavItems: NavItem[] = [
         title: "Inicio",
         url: "/dashboard/superadmin",
         icon: House,
-
     },
     {
         title: "Empresas",
         url: "/dashboard/superadmin/empresas",
         icon: Landmark,
-
     },
     {
         title: "Usuarios",
         url: "/dashboard/superadmin/users",
         icon: Users,
-
     },
     {
         title: "Especialidades",
         url: "/dashboard/superadmin/especialidades",
         icon: Wrench,
-
     },
     {
         title: "Reclamos",
@@ -72,7 +68,6 @@ export const superAdminProjects: ProjectData[] = [
         title: "Mensajes Plataforma",
         url: "/dashboard/superadmin/mensajes-plataforma",
         icon: Radio,
-
     },
 
     {

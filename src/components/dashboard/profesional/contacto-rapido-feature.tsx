@@ -58,7 +58,7 @@ export function ContactoRapido({
             description: "Enviar correo electrónico",
             value: companyConfig?.company?.company_email,
             icon: Mail,
-            
+
             href: companyConfig?.company?.company_email ? `mailto:${companyConfig.company.company_email}?subject=${`Asistencia ${companyConfig?.sing_heading_profesional} ${user?.user_name}`}&body=${`Buenas tardes, soy ${companyConfig?.sing_heading_profesional} ${user?.user_name} y requiero asistencia.`}` : null,
             gradient: "from-red-500 to-pink-600",
             hoverGradient: "hover:from-red-600 hover:to-pink-700"
@@ -85,7 +85,6 @@ export function ContactoRapido({
 
     const titleContacto = "Contactos Rápido";
 
-    // Versión compacta para el dashboard principal
     if (variant === "compact") {
         return (
             <Card className={cn("border-2 gap-1", cardClassName)}>
@@ -133,7 +132,6 @@ export function ContactoRapido({
         );
     }
 
-    // Versión completa para la página de contacto con empresa
     return (
         <Card className={cn("border-2 gap-1", cardClassName)}>
             {showHeader && (

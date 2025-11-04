@@ -7,7 +7,6 @@ import { SUPER_API } from '@/lib/superApi/config';
 import { useAuth } from '@/context/AuthContext';
 import { User } from '@/types/auth';
 
-// Función para convertir VAPID key de base64 a Uint8Array
 function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
@@ -30,26 +29,22 @@ export function usePushNotifications() {
   const { user } = useAuth();
 
 
-  // Determinar qué API usar basado en el rol del usuario
   const getApiConfig = (currentUser?: User | null) => {
     const userRole = currentUser?.user_role || user?.user_role;
     return userRole === 'superadmin' ? SUPER_API : CLIENT_API;
   };
 
-  // Verificar si las notificaciones push están soportadas
   const checkSupport = useCallback(() => {
-    const supported = 'serviceWorker' in navigator && 
-                     'PushManager' in window && 
-                     'Notification' in window;
+    const supported = 'serviceWorker' in navigator &&
+      'PushManager' in window &&
+      'Notification' in window;
     setIsSupported(supported);
     return supported;
   }, []);
 
-  // Verificar soporte y suscripción al montar el componente
   useEffect(() => {
     const initializeNotifications = async () => {
       if (checkSupport()) {
-        // Verificar suscripción directamente aquí para evitar dependencia circular
         try {
           const registration = await navigator.serviceWorker.ready;
           const subscription = await registration.pushManager.getSubscription();
@@ -60,11 +55,10 @@ export function usePushNotifications() {
         }
       }
     };
-    
+
     initializeNotifications();
   }, [checkSupport]);
 
-  // Verificar si ya está suscrito
   const checkSubscription = useCallback(async () => {
     if (!checkSupport()) {
       setIsSubscribed(false);
@@ -74,7 +68,7 @@ export function usePushNotifications() {
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
-      
+
       setIsSubscribed(!!subscription);
       return !!subscription;
     } catch (error) {
@@ -84,21 +78,18 @@ export function usePushNotifications() {
     }
   }, [checkSupport]);
 
-  // Verificar si el usuario ya tomó una decisión sobre notificaciones
   const hasNotificationDecision = useCallback((userId?: string) => {
     const key = userId ? `fasttrack_notification_decision_${userId}` : 'fasttrack_notification_decision';
     const decision = localStorage.getItem(key);
     return !!decision;
   }, []);
 
-  // Obtener la decisión del usuario
   const getNotificationDecision = useCallback((userId?: string) => {
     const key = userId ? `fasttrack_notification_decision_${userId}` : 'fasttrack_notification_decision';
     const decision = localStorage.getItem(key);
-    return decision; // 'accepted', 'declined', o null
+    return decision;
   }, []);
 
-  // Obtener clave pública VAPID
   const getVapidPublicKey = async (currentUser?: User | null): Promise<string> => {
     try {
       const apiConfig = getApiConfig(currentUser);
@@ -123,7 +114,6 @@ export function usePushNotifications() {
     }
   };
 
-  // Registrar token en el backend
   const registerToken = async (subscription: PushSubscription, currentUser?: User | null): Promise<void> => {
     try {
       const apiConfig = getApiConfig(currentUser);
@@ -147,7 +137,6 @@ export function usePushNotifications() {
     }
   };
 
-  // Suscribirse a notificaciones push
   const subscribeToPush = useCallback(async (showToasts: boolean = true, _userId?: string, _userRole?: string): Promise<boolean> => {
     if (!checkSupport()) {
       if (showToasts) {
@@ -156,10 +145,8 @@ export function usePushNotifications() {
       return false;
     }
 
-    // Usar el usuario del contexto (no crear objetos parciales)
     const currentUser = user;
-    
-    // Verificar que el usuario esté cargado
+
     if (!currentUser) {
       console.warn('⚠️ User not loaded yet, waiting...');
       if (showToasts) {
@@ -168,7 +155,6 @@ export function usePushNotifications() {
       return false;
     }
 
-    // Verificar que el usuario tenga un rol válido
     if (!currentUser.user_role) {
       console.warn('⚠️ User role not available');
       if (showToasts) {
@@ -180,7 +166,6 @@ export function usePushNotifications() {
     setIsLoading(true);
 
     try {
-      // Verificar permisos
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
         if (showToasts) {
@@ -189,14 +174,11 @@ export function usePushNotifications() {
         return false;
       }
 
-      // Obtener clave VAPID
       const vapidPublicKey = await getVapidPublicKey(currentUser);
       const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
-      // Obtener registro del service worker y esperar a que esté activo
       const registration = await navigator.serviceWorker.ready;
-      
-      // Verificar que el SW esté activo
+
       if (!registration.active || registration.active.state !== 'activated') {
         await new Promise((resolve) => {
           const checkState = () => {
@@ -210,16 +192,13 @@ export function usePushNotifications() {
         });
       }
 
-      // Crear suscripción
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: applicationServerKey,
       });
 
-      // Registrar token en el backend
       await registerToken(subscription, currentUser);
 
-      // Actualizar localStorage - marcar como aceptado para este usuario
       if (_userId) {
         localStorage.setItem(`fasttrack_notification_decision_${_userId}`, 'accepted');
       }
@@ -241,7 +220,6 @@ export function usePushNotifications() {
     }
   }, [checkSupport, getVapidPublicKey, registerToken, user]);
 
-  // Desuscribirse de notificaciones push (solo dispositivo actual)
   const unsubscribeFromPush = useCallback(async (userId?: string): Promise<boolean> => {
     setIsLoading(true);
 
@@ -250,15 +228,12 @@ export function usePushNotifications() {
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription) {
-        // Desuscribirse localmente
         await subscription.unsubscribe();
-        
-        // Actualizar localStorage - marcar como declinado para este usuario
+
         if (userId) {
           localStorage.setItem(`fasttrack_notification_decision_${userId}`, 'declined');
         }
-        
-        // Notificar al backend que se desuscribió
+
         try {
           const apiConfig = getApiConfig();
           await fetch(apiConfig.NOTIFICATION_UNSUBSCRIBE, {
@@ -290,26 +265,22 @@ export function usePushNotifications() {
     }
   }, [getApiConfig]);
 
-  // Cancelar notificaciones en todos los dispositivos
   const unsubscribeFromAllDevices = useCallback(async (userId?: string): Promise<boolean> => {
 
     setIsLoading(true);
 
     try {
-      // Desuscribirse localmente primero
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
-      
+
       if (subscription) {
         await subscription.unsubscribe();
       }
 
-      // Actualizar localStorage - marcar como declinado para este usuario
       if (userId) {
         localStorage.setItem(`fasttrack_notification_decision_${userId}`, 'declined');
       }
 
-      // Notificar al backend para cancelar en todos los dispositivos
       const apiConfig = getApiConfig();
       const response = await fetch(apiConfig.NOTIFICATION_UNSUBSCRIBE_ALL_DEVICES, {
         method: 'DELETE',
@@ -336,7 +307,6 @@ export function usePushNotifications() {
     }
   }, [getApiConfig]);
 
-  // Limpiar suscripción local (forzar nueva suscripción)
   const clearLocalSubscription = useCallback(async (): Promise<boolean> => {
     try {
       const registration = await navigator.serviceWorker.ready;
@@ -355,7 +325,6 @@ export function usePushNotifications() {
     }
   }, []);
 
-  // Función para forzar verificación de suscripción
   const refreshSubscriptionStatus = useCallback(async () => {
     await checkSubscription();
   }, [checkSubscription]);

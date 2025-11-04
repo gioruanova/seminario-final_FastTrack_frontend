@@ -59,7 +59,6 @@ export function PublicMessagesManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Estados para categorías
   const [categories, setCategories] = useState<MessageCategory[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
@@ -101,7 +100,6 @@ export function PublicMessagesManagement() {
         )
       );
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -125,7 +123,6 @@ export function PublicMessagesManagement() {
         )
       );
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -145,7 +142,6 @@ export function PublicMessagesManagement() {
 
       setMessages(prev => prev.filter(msg => msg.message_id !== messageId));
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -157,7 +153,6 @@ export function PublicMessagesManagement() {
     }
   };
 
-  // Funciones para categorías
   const fetchCategories = async () => {
     try {
       setCategoriesLoading(true);
@@ -266,7 +261,6 @@ export function PublicMessagesManagement() {
     fetchCategories();
   }, []);
 
-  // Resetear página cuando cambien los mensajes
   useEffect(() => {
     setCurrentPage(1);
   }, [messages.length]);
@@ -281,12 +275,10 @@ export function PublicMessagesManagement() {
     });
   };
 
-  // Ordenar mensajes por fecha (más recientes primero)
   const sortedMessages = [...messages].sort((a, b) => {
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
-  // calcular paginado
   const totalPages = Math.ceil(sortedMessages.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -466,7 +458,6 @@ export function PublicMessagesManagement() {
             </div>
           )}
 
-          {/* Información de paginación y controles */}
           {messages.length > 0 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-muted/30 rounded-lg mt-4">
               <div className="text-sm text-muted-foreground">
@@ -517,7 +508,6 @@ export function PublicMessagesManagement() {
         </CardContent>
       </Card>
 
-      {/* Sección de Categorías */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -654,7 +644,6 @@ export function PublicMessagesManagement() {
       </Card>
 
 
-      {/* Dialog para editar categoría */}
       <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
         <DialogContent>
           <DialogHeader>

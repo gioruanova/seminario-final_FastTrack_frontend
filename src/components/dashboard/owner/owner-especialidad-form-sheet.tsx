@@ -75,7 +75,6 @@ export function OwnerEspecialidadFormSheet({
       setIsLoading(true);
 
       if (isEditing) {
-        // Editar especialidad existente
         await apiClient.put(
           CLIENT_API.EDIT_ESPECIALIDADES.replace("{id_especialidad}", especialidad.id_especialidad.toString()),
           {
@@ -84,7 +83,6 @@ export function OwnerEspecialidadFormSheet({
         );
         toast.success("Especialidad actualizada correctamente");
       } else {
-        // Crear nueva especialidad
         await apiClient.post(CLIENT_API.CREATE_ESPECIALIDADES, {
           nombre_especialidad: formData.nombre_especialidad,
         });

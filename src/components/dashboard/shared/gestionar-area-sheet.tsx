@@ -1,22 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Settings, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -90,22 +77,22 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
 
   const handleCrearAsignacion = async () => {
     if (!selectedEspecialidad) {
-        toast.error(`Selecciona una ${companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}`);
+      toast.error(`Selecciona una ${companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}`);
       return;
     }
 
     try {
       setIsSubmitting(true);
-      
+
       const payload = {
         profesional_id: profesional.user_id,
         especialidad_id: parseInt(selectedEspecialidad)
       };
-      
-      
+
+
       await apiClient.post(CLIENT_API.CREAR_ASIGNACION_ESPECIALIDAD, payload);
-      
-      
+
+
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} asignada correctamente`);
       onUpdate();
       setIsOpen(false);
@@ -115,7 +102,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string };
       console.error("Error response:", axiosError.response?.data);
       console.error("Error status:", axiosError.response?.status);
-      
+
       if (axiosError.response?.status === 400) {
         const errorMessage = axiosError.response?.data?.error || "Datos inválidos";
         toast.error(errorMessage);
@@ -140,17 +127,17 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
 
     try {
       setIsSubmitting(true);
-      
+
       const payload = {
         especialidad_id: parseInt(selectedEditEspecialidad)
       };
-      
+
       const url = CLIENT_API.EDITAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
-      
-      
+
+
       await apiClient.put(url, payload);
-      
-      
+
+
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} actualizada correctamente`);
       onUpdate();
       setEditingAsignacion(null);
@@ -160,7 +147,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string };
       console.error("Error response:", axiosError.response?.data);
       console.error("Error status:", axiosError.response?.status);
-      
+
       if (axiosError.response?.status === 400) {
         const errorMessage = axiosError.response?.data?.error || "Datos inválidos";
         toast.error(errorMessage);
@@ -180,13 +167,13 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
   const handleEliminarAsignacion = async (idAsignacion: string) => {
     try {
       setIsSubmitting(true);
-      
+
       const url = CLIENT_API.ELIMINAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
-      
-      
+
+
       await apiClient.delete(url);
-      
-      
+
+
       toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} eliminada correctamente`);
       onUpdate();
       setDeletingAsignacion(null);
@@ -195,7 +182,7 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
       const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string };
       console.error("Error response:", axiosError.response?.data);
       console.error("Error status:", axiosError.response?.status);
-      
+
       if (axiosError.response?.status === 404) {
         const errorMessage = axiosError.response?.data?.error || "Asignación no encontrada";
         toast.error(errorMessage);
@@ -208,8 +195,8 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
   };
 
 
-  const especialidadesDisponibles = especialidades.filter(esp => 
-    esp.estado_especialidad === 1 && 
+  const especialidadesDisponibles = especialidades.filter(esp =>
+    esp.estado_especialidad === 1 &&
     !profesional.especialidades?.some(profEsp => profEsp.id_especialidad === esp.id_especialidad)
   );
 
@@ -237,7 +224,6 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
         </SheetHeader>
 
         <div className="space-y-4 mt-6">
-          {/* Especialidades actuales */}
           <div>
             <h4 className="text-sm font-medium mb-2">{companyConfig?.plu_heading_especialidad || "Especialidades"} asignadas:</h4>
             {profesional.especialidades && profesional.especialidades.length > 0 ? (
@@ -278,7 +264,6 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
             )}
           </div>
 
-          {/* Asignar nueva especialidad */}
           <div>
             <h4 className="text-sm font-medium mb-2">Agregar {companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}:</h4>
             <div className="space-y-2">
@@ -315,7 +300,6 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
             </div>
           </div>
 
-          {/* Editar asignación existente */}
           {editingAsignacion && (
             <div>
               <h4 className="text-sm font-medium mb-2">Editar {companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}:</h4>
@@ -364,7 +348,6 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
             </div>
           )}
 
-          {/* Confirmar eliminación */}
           {deletingAsignacion && (
             <div>
               <h4 className="text-sm font-medium mb-2 text-red-600">Eliminar {companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}:</h4>
@@ -395,13 +378,12 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
             </div>
           )}
 
-          {/* Especialidades disponibles - más muted */}
           <div>
             <h4 className="text-sm font-medium mb-2 text-muted-foreground">{companyConfig?.plu_heading_especialidad || "Especialidades"} en la empresa:</h4>
             <div className="flex flex-wrap gap-1">
               {especialidades.map((esp) => (
-                <Badge 
-                  key={esp.id_especialidad} 
+                <Badge
+                  key={esp.id_especialidad}
                   variant="outline"
                   className="text-xs text-muted-foreground"
                 >

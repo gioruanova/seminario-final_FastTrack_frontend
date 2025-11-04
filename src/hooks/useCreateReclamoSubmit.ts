@@ -79,7 +79,6 @@ export function useCreateReclamoSubmit() {
         agenda_hora_desde: data.agenda_hora_desde,
       };
 
-      // Agregar campos opcionales si están presentes
       if (data.reclamo_url?.trim()) {
         payload.reclamo_url = data.reclamo_url.trim();
       }
@@ -87,7 +86,6 @@ export function useCreateReclamoSubmit() {
         payload.agenda_hora_hasta = data.agenda_hora_hasta.trim();
       }
 
-      // Llamar al endpoint
       const response = await apiClient.post(CLIENT_API.CREAR_RECLAMO, payload);
 
       return {

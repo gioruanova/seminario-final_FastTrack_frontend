@@ -54,10 +54,10 @@ export function OwnerCompanySettingsCard() {
   }), [companyConfig]);
 
   const handleToggle = async (key: keyof typeof togglesState, next: boolean) => {
-    // Evitar concurrencia y no enviar si no hay cambio real
     if (isUpdatingToggle !== null) return;
     const current = togglesState[key];
     if (current === next) return;
+
 
     try {
       setIsUpdatingToggle(key);
@@ -65,12 +65,15 @@ export function OwnerCompanySettingsCard() {
       await apiClient.put(CLIENT_API.UPDATE_COMPANY_CONFIG, payload);
       toast.success("Configuración actualizada");
       await refreshCompanyConfig();
+
     } catch {
       toast.error("No se pudo actualizar. Intente nuevamente");
     } finally {
       setIsUpdatingToggle(null);
     }
   };
+
+
 
   return (
     <React.Fragment>
@@ -80,7 +83,6 @@ export function OwnerCompanySettingsCard() {
           <CardDescription>Datos de la organización y contacto</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Sección fija (no colapsable) */}
           <div className="pb-4 mb-5">
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
@@ -157,7 +159,6 @@ export function OwnerCompanySettingsCard() {
             </div>
           </div>
 
-          {/* Sección colapsable: Información de contacto */}
           <div className="flex items-center justify-between mt-5 pb-5">
             <div>
               <CardTitle className="text-2xl">Información de contacto</CardTitle>
@@ -211,7 +212,6 @@ export function OwnerCompanySettingsCard() {
 
           <Separator />
 
-          {/* Gestión de actividades */}
           <div className="flex items-center justify-between mt-5 pb-5">
             <div>
               <CardTitle className="text-2xl">Gestión de actividades</CardTitle>
@@ -232,8 +232,8 @@ export function OwnerCompanySettingsCard() {
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
                     <div>
                       <p className="text-sm font-medium">Requiere domicilio</p>
-                      <p className="text-xs text-muted-foreground">En caso de estar encendido, para crear cada {companyConfig?.sing_heading_solicitante?.toLowerCase() || "cliente"}
-                        se exigira un domicilio y sera compartido con tus {companyConfig?.plu_heading_profesional || "profesionales"} al momento de generar una actividad.</p>
+                      <p className="text-xs text-muted-foreground">
+                        En caso de estar encendido, el sistema va a exigir un domicilio fisico  al momento de generar cualquier {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} y se compartira con tus {companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales"} que se asignen a dicha actividad.</p>
                     </div>
                     <Switch
                       checked={togglesState.requiere_domicilio}
@@ -245,7 +245,7 @@ export function OwnerCompanySettingsCard() {
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
                     <div>
                       <p className="text-sm font-medium">Requiere URL</p>
-                      <p className="text-xs text-muted-foreground">En cada {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} En caso de estar encendido, se podra agregar un enlace asociado a cada {companyConfig?.sing_heading_reclamos || "reclamo"} que inicies.</p>
+                      <p className="text-xs text-muted-foreground">En caso de estar encendido,el sistema va a exigir que para cada  {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} se agregue una URL asociada para esa actividad.</p>
                     </div>
                     <Switch
                       checked={togglesState.requiere_url}
@@ -256,9 +256,13 @@ export function OwnerCompanySettingsCard() {
 
                   <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
                     <div>
-                      <p className="text-sm font-medium">Requiere fecha de finalización</p>
-                      <p className="text-xs text-muted-foreground">En caso de <u><strong>NO</strong></u> estar seleccionado, cada {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} se agendara (en horario) durante todo el dia seleccionado.</p>
-                      <p className="text-xs text-muted-foreground">Caso contrario, vas a poder elegir el horario de finalizacion de tu actividad.</p>
+                      <p className="text-sm font-medium">Requiere hora de finalización</p>
+                      <p className="text-xs text-muted-foreground">En caso de estar encendida, cada {companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} va a requerir un horario de finalizacion exacto.</p>
+                      <p className="text-xs text-muted-foreground">
+                      <strong>Importante: </strong>de no estar encendida esta opcion, el sistema bloqueara la agenda para todo ese dia del {companyConfig?.sing_heading_profesional?.toLowerCase() || "reclamo"} que se selecciono.
+                      </p>
+                      
+                      
                     </div>
                     <Switch
                       checked={togglesState.requiere_fecha_final}
@@ -273,7 +277,6 @@ export function OwnerCompanySettingsCard() {
 
           <Separator />
 
-          {/* Personalización de etiquetas y mensajes */}
           <div className="flex items-center justify-between mt-5 pb-5">
             <div>
               <CardTitle className="text-2xl">Personalización de etiquetas y mensajes</CardTitle>
@@ -290,7 +293,6 @@ export function OwnerCompanySettingsCard() {
           <Collapsible open={openLabels}>
             <CollapsibleContent>
               <div className="pt-2 pb-5">
-                {/* Grupos de etiquetas */}
                 <CardDescription className="pb-4">Titulos personalizados</CardDescription>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
@@ -370,18 +372,16 @@ export function OwnerCompanySettingsCard() {
                   })}
                 </div>
 
-                {/* Mensajes largos, 1 por fila */}
                 <CardDescription className="pt-4">Notificaciones personalizadas</CardDescription>
                 <div className="grid grid-cols-1 gap-4 mt-4">
                   {([
-                    // { key: "string_inicio_reclamo_solicitante", label: "Mensaje inicio: Solicitante", desc: "Mensaje enviado al solicitante al iniciar la gestión." },
-                    // { key: "string_actualizacion_reclamo_solicitante", label: "Mensaje actualización: Solicitante", desc: "Mensaje de actualización para el solicitante." },
-                    // { key: "string_recordatorio_reclamo_solicitante", label: "Mensaje recordatorio: Solicitante", desc: "Mensaje de recordatorio para el solicitante." },
-                    // { key: "string_cierre_reclamo_solicitante", label: "Mensaje cierre: Solicitante", desc: "Mensaje al solicitante cuando finaliza la gestión." },
                     { key: "string_inicio_reclamo_profesional", label: "Mensaje inicio: Profesional", desc: "Mensaje enviado al profesional al asignar una actividad." },
                     { key: "string_actualizacion_reclamo_profesional", label: "Mensaje actualización: Profesional", desc: "Mensaje de actualización para el profesional." },
-                    { key: "string_recordatorio_reclamo_profesional", label: "Mensaje recordatorio: Profesional", desc: "Mensaje de recordatorio para el profesional." },
-                    // { key: "string_cierre_reclamo_profesional", label: "Mensaje cierre: Profesional", desc: "Mensaje al profesional cuando se cierra la actividad." },
+                    ...(companyConfig?.company?.reminder_manual == 1 ? [{
+                      key: "string_recordatorio_reclamo_profesional",
+                      label: "Mensaje recordatorio: Profesional",
+                      desc: "Mensaje de recordatorio para el profesional."
+                    }] : []),
                   ] as Array<{ key: string; label: string; desc: string }>).map((item) => {
                     const value = companyConfig?.[item.key as keyof typeof companyConfig] ?? "";
                     return (

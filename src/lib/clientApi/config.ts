@@ -50,8 +50,8 @@ export const CLIENT_API = {
   DESACTIVAR_CLIENTE: `${config.apiUrl}/${slugs.customersApi}/clientes-recurrentes/block/{cliente_id}`,
 
 
-  GET_AGENDA_BLOQUEADA: `${config.apiUrl}/${slugs.customersApi}/reclamos/agendaReclamo`, // GET
-  CREAR_RECLAMO: `${config.apiUrl}/${slugs.customersApi}/reclamo`, // POST
+  GET_AGENDA_BLOQUEADA: `${config.apiUrl}/${slugs.customersApi}/reclamos/agendaReclamo`, 
+  CREAR_RECLAMO: `${config.apiUrl}/${slugs.customersApi}/reclamo`, 
   RECLAMO_GESTION_ADMIN: `${config.apiUrl}/${slugs.customersApi}/reclamos/gestion/{id}`,
 
 
@@ -64,7 +64,7 @@ export const CLIENT_API = {
   GET_RECLAMOS_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional`,
   GET_RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
   RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
-  ENVIAR_RECORDATORIO_RECLAMO: `${config.apiUrl}/${slugs.customersApi}/reclamos/reminder/:reclamo_id`, // PUT 
+  ENVIAR_RECORDATORIO_RECLAMO: `${config.apiUrl}/${slugs.customersApi}/reclamos/reminder/:reclamo_id`, 
 
 
   UPDATE_COMPANY: `${config.apiUrl}/${slugs.customersApi}/company`, 
@@ -86,6 +86,6 @@ export const CLIENT_API = {
 
 
   // gestion de banner
-  GET_BANNER_CLIENT: `${config.apiUrl}/${slugs.customersApi}/active-banner`, // GET trae el banner activo para el sitio
+  GET_BANNER_CLIENT: `${config.apiUrl}/${slugs.customersApi}/active-banner`, 
 
 };

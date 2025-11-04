@@ -105,13 +105,11 @@ export function ProfesionalReclamosFinalizadosPage() {
     setFilteredReclamos(filtered);
   }, [searchTerm, filterEstado, reclamos]);
 
-  // calcular paginado
   const totalPages = Math.ceil(filteredReclamos.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedReclamos = filteredReclamos.slice(startIndex, endIndex);
 
-  // resetear pagina cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);
@@ -160,7 +158,6 @@ export function ProfesionalReclamosFinalizadosPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Filtros */}
           <div className="flex gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -200,7 +197,6 @@ export function ProfesionalReclamosFinalizadosPage() {
             </Select>
           </div>
 
-          {/* Tabla */}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -209,7 +205,7 @@ export function ProfesionalReclamosFinalizadosPage() {
             <div className="text-center py-12 text-muted-foreground">
               {searchTerm || filterEstado !== "all"
                 ? `No se encontraron ${companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} que coincidan con los filtros`
-                : `No se encontro historial de {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}`}
+                : `No se encontro historial de ${companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"}`}
             </div>
           ) : (
             <div className="border rounded-lg">
@@ -219,10 +215,10 @@ export function ProfesionalReclamosFinalizadosPage() {
                     <TableHead className="w-[80px]">ID</TableHead>
                     <TableHead>Título</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Cliente</TableHead>
+                    <TableHead>{companyConfig?.sing_heading_solicitante}</TableHead>
                     <TableHead>Fecha</TableHead>
-                    <TableHead>Especialidad</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
+                    <TableHead>{companyConfig?.sing_heading_especialidad}</TableHead>
+                    <TableHead className="text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -258,7 +254,7 @@ export function ProfesionalReclamosFinalizadosPage() {
                           {reclamo.nombre_especialidad}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-center">
                         <Button
                           variant="default"
                           size="sm"
@@ -275,7 +271,6 @@ export function ProfesionalReclamosFinalizadosPage() {
             </div>
           )}
 
-          {/* Información y controles de paginación */}
           <div className="flex flex-col gap-4 mt-6">
             <div className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
               Mostrando {startIndex + 1}-{Math.min(endIndex, filteredReclamos.length)} de {filteredReclamos.length} {companyConfig?.plu_heading_reclamos?.toLowerCase() || "reclamos"} sin actividades pendientes

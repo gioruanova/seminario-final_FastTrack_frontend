@@ -30,12 +30,20 @@ const apiClient = axios.create({
   },
 });
 
-export function FeedbackSheet() {
-  const [isOpen, setIsOpen] = useState(false);
+interface FeedbackSheetProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function FeedbackSheet({ open: controlledOpen, onOpenChange: controlledOnOpenChange }: FeedbackSheetProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const isControlled = controlledOpen !== undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +64,11 @@ export function FeedbackSheet() {
 
       toast.success("Feedback enviado correctamente");
       setMessage("");
-      setIsOpen(false);
+      if (isControlled && controlledOnOpenChange) {
+        controlledOnOpenChange(false);
+      } else {
+        setInternalOpen(false);
+      }
     } catch (err) {
       const error = err as { response?: { data?: { error?: string } } };
       const errorMessage = error.response?.data?.error || "Error al enviar feedback";
@@ -67,7 +79,11 @@ export function FeedbackSheet() {
   };
 
   const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
+    if (isControlled && controlledOnOpenChange) {
+      controlledOnOpenChange(open);
+    } else {
+      setInternalOpen(open);
+    }
     if (!open) {
       setMessage("");
       setError(null);
@@ -77,26 +93,26 @@ export function FeedbackSheet() {
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SidebarGroup>
-
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SheetTrigger asChild>
-              <SidebarMenuButton tooltip="Enviar Feedback" className="cursor-pointer">
-                <MessageCircleHeartIcon />
-                <span>Enviar Feedback</span>
-              </SidebarMenuButton>
-            </SheetTrigger>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
+      {!isControlled && (
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SheetTrigger asChild>
+                <SidebarMenuButton tooltip="Enviar Feedback" className="cursor-pointer">
+                  <MessageCircleHeartIcon />
+                  <span>Enviar Feedback</span>
+                </SidebarMenuButton>
+              </SheetTrigger>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      )}
 
       <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto md:max-w-[500px]">
         <SheetHeader>
-          <SheetTitle>FasTrack quiere leerte...</SheetTitle>
-          <SheetDescription>Tu retroalimentacion es super importante para nosotros.
-            Construimos esta aplicacion a traves de tu opinión y mejoramos el sistema en base
-            a tus necesidades e inquietudes.</SheetDescription>
+          <SheetTitle>FasTrack quiere conocer tu opinión...</SheetTitle>
+          <SheetDescription>Tu retroalimentacion es de suma importancia para nosotros.
+            Construimos esta aplicación a través de tu opinión y mejoramos el sistema según tus necesidades e inquietudes.</SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">

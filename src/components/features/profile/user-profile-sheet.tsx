@@ -40,7 +40,7 @@ interface UserProfileSheetProps {
 }
 
 export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSheetProps) {
-  const { user, companyConfig } = useAuth()
+  const { user, companyConfig, isLoading: authLoading } = useAuth()
   const [internalOpen, setInternalOpen] = useState(false)
 
   const isOpen = open !== undefined ? open : internalOpen
@@ -55,12 +55,10 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
     confirmPassword: ""
   })
 
-  if (!user) return null
-
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!isSuperAdmin(user)) {
+    if (!user || !isSuperAdmin(user)) {
       toast.error("Solo los super administradores pueden cambiar contraseñas")
       return
     }
@@ -75,11 +73,15 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
       return
     }
 
-    // Mostrar diálogo de confirmación
     setShowPasswordChangeDialog(true)
   }
 
   const handleConfirmPasswordChange = async () => {
+    if (!user) {
+      toast.error("Usuario no encontrado")
+      return
+    }
+
     setShowPasswordChangeDialog(false)
 
     try {
@@ -99,10 +101,8 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
         user_password: passwordData.newPassword
       })
 
-      // Cerrar el Sheet
       setIsOpen(false)
       
-      // Mostrar overlay y redirigir después de 4 segundos
       setShowLogoutOverlay(true)
       setTimeout(() => {
         window.location.href = '/login'
@@ -125,6 +125,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
   }
 
   const getRoleDisplay = () => {
+    if (!user) return "Usuario"
     if (isSuperAdmin(user)) {
       return "Super Administrador"
     }
@@ -136,6 +137,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
   }
 
   const getRoleColor = () => {
+    if (!user) return "bg-gray-100 text-gray-800"
     if (isSuperAdmin(user)) {
       return "bg-red-100 text-red-800"
     }
@@ -169,13 +171,20 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
 
         <Separator />
 
-        <div className="mt-0 space-y-6">
-          {/* Información del Usuario */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="font-medium text-lg">
-                {user.user_name || user.user_email.split('@')[0]}
-              </h3>
+                 {(authLoading || !user) ? (
+           <div className="flex items-center justify-center py-8">
+             <div className="text-center">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+               <p className="text-muted-foreground">Cargando información del perfil...</p>
+             </div>
+           </div>
+         ) : (
+          <div className="mt-0 space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h3 className="font-medium text-lg">
+                  {user.user_name || user.user_email.split('@')[0]}
+                </h3>
 
             </div>
 
@@ -186,7 +195,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
                 <span className="text-sm">{user.user_email}</span>
               </div>
 
-              {isCompanyUser(user) && (
+              {user && isCompanyUser(user) && (
                 <div className="flex items-center gap-2">
                   <Building className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Empresa:</span>
@@ -206,7 +215,6 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
 
           <Separator />
 
-          {/* Botón de Editar Perfil - Para todos los usuarios */}
           <div className="space-y-4">
             <EditProfileSheet>
               <Button className="w-full" variant="outline">
@@ -218,8 +226,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
 
           <Separator />
 
-          {/* Cambio de Contraseña - Solo para SuperAdmin */}
-          {isSuperAdmin(user) && (
+          {user && isSuperAdmin(user) && (
             <div className="space-y-4">
               <h4 className="font-medium">Cambiar Contraseña</h4>
               <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -290,8 +297,7 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
             </div>
           )}
 
-          {/* Información adicional para usuarios de empresa */}
-          {isCompanyUser(user) && (
+          {user && isCompanyUser(user) && (
             <div className="space-y-4">
               <div className="rounded-lg border p-4">
                 <h4 className="font-medium mb-2">Información de la Empresa</h4>
@@ -310,10 +316,10 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
               </div>
             </div>
           )}
-        </div>
+          </div>
+        )}
       </SheetContent>
 
-      {/* Diálogo de Confirmación de Cambio de Contraseña */}
       <AlertDialog open={showPasswordChangeDialog} onOpenChange={setShowPasswordChangeDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -358,7 +364,6 @@ export function UserProfileSheet({ children, open, onOpenChange }: UserProfileSh
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Overlay de cierre de sesión */}
       {showLogoutOverlay && (
         <div className="fixed inset-0 z-[9999] bg-background/95 backdrop-blur-sm flex items-center justify-center">
           <div className="text-center space-y-6">

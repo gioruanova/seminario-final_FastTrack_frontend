@@ -107,7 +107,6 @@ export function EspecialidadFormSheet({
       setIsLoading(true);
 
       if (isEditing) {
-        // Editar especialidad existente
         await apiClient.put(
           SUPER_API.EDIT_ESPECIALIDADES.replace("{id_especialidad}", especialidad.id_especialidad.toString()),
           {
@@ -116,7 +115,6 @@ export function EspecialidadFormSheet({
         );
         toast.success("Especialidad actualizada correctamente");
       } else {
-        // Crear nueva especialidad
         await apiClient.post(SUPER_API.CREATE_ESPECIALIDADES, {
           company_id: formData.company_id,
           nombre_especialidad: formData.nombre_especialidad,
@@ -188,7 +186,7 @@ export function EspecialidadFormSheet({
               <Select
                 value={formData.company_id > 0 ? formData.company_id.toString() : ""}
                 onValueChange={(value) => handleChange("company_id", parseInt(value))}
-                disabled={isEditing} // No permitir cambiar empresa al editar
+                disabled={isEditing}
               >
                 <SelectTrigger className="w-full cursor-pointer">
                   <SelectValue placeholder="Seleccione empresa" />

@@ -56,28 +56,24 @@ type MessageType = 'company' | 'user';
 
 export function CompanyPlatformMessagesManagement() {
   const { companyConfig } = useAuth();
-  
-  // Estados para mensajes de plataforma
+
   const [messageType, setMessageType] = useState<MessageType>('company');
   const [users, setUsers] = useState<User[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [platformMessageTitle, setPlatformMessageTitle] = useState("");
   const [platformMessageContent, setPlatformMessageContent] = useState("");
   const [isSendingMessage, setIsSendingMessage] = useState(false);
 
-  // Estados para listado de mensajes
   const [messages, setMessages] = useState<PlatformMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [openDialogId, setOpenDialogId] = useState<number | null>(null);
 
-  // Funciones para mensajes de plataforma
   const fetchUsers = useCallback(async () => {
     try {
       const response = await apiClient.get(CLIENT_API.GET_USERS);
-      // Filtrar el usuario actual de la lista
       const filteredUsers = response.data.filter((user: User) => user.user_id !== currentUserId);
       setUsers(filteredUsers);
     } catch (error) {
@@ -130,13 +126,11 @@ export function CompanyPlatformMessagesManagement() {
         platform_message_content: platformMessageContent.trim()
       });
 
-      // Reset form
       setPlatformMessageTitle("");
       setPlatformMessageContent("");
       setSelectedUser(null);
       setMessageType('company');
 
-      // Recargar mensajes
       await fetchMessages();
       toast.success('Mensaje enviado correctamente');
     } catch (error) {
@@ -147,9 +141,7 @@ export function CompanyPlatformMessagesManagement() {
     }
   };
 
-  // Funciones para listado de mensajes
   const fetchMessages = useCallback(async () => {
-    // Si la compañía está inactiva, no cargar mensajes
     if (companyConfig?.company?.company_estado === 0) {
       setMessages([]);
       setLoading(false);
@@ -180,7 +172,6 @@ export function CompanyPlatformMessagesManagement() {
         )
       );
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -204,7 +195,6 @@ export function CompanyPlatformMessagesManagement() {
         )
       );
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -224,7 +214,6 @@ export function CompanyPlatformMessagesManagement() {
 
       setMessages(prev => prev.filter(msg => msg.id !== messageId));
 
-      // Refrescar el contador del sidebar
       if (typeof window !== 'undefined' && window.refreshUnreadCount) {
         window.refreshUnreadCount();
       }
@@ -241,7 +230,6 @@ export function CompanyPlatformMessagesManagement() {
     fetchMessages();
   }, [getCurrentUser, fetchMessages]);
 
-  // Resetear página cuando cambien los mensajes
   useEffect(() => {
     setCurrentPage(1);
   }, [messages.length]);
@@ -256,7 +244,6 @@ export function CompanyPlatformMessagesManagement() {
     });
   };
 
-  // calcular paginado
   const totalPages = Math.ceil(messages.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -266,7 +253,6 @@ export function CompanyPlatformMessagesManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Listado de mensajes */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -324,7 +310,7 @@ export function CompanyPlatformMessagesManagement() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                          <Dialog open={openDialogId === message.id} onOpenChange={(open) => setOpenDialogId(open ? message.id : null)}>
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm">
                                 <ExternalLink className="h-4 w-4" />
@@ -341,17 +327,17 @@ export function CompanyPlatformMessagesManagement() {
                                 <div>
                                   <h4 className="font-medium mb-2">Mensaje:</h4>
                                   <div className="bg-muted p-4 rounded-lg">
-                                  <div
-                                    className="whitespace-pre-wrap max-h-[300px] overflow-y-auto prose prose-sm max-w-none"
-                                    dangerouslySetInnerHTML={{
-                                      __html: message.platformMessage.platform_message_content
-                                    }}
-                                  />
-                                </div>
+                                    <div
+                                      className="whitespace-pre-wrap max-h-[300px] overflow-y-auto prose prose-sm max-w-none"
+                                      dangerouslySetInnerHTML={{
+                                        __html: message.platformMessage.platform_message_content
+                                      }}
+                                    />
+                                  </div>
                                 </div>
                               </div>
                               <DialogFooter>
-                                <Button variant="outline" onClick={() => { setIsDialogOpen(false) }}>
+                                <Button variant="outline" onClick={() => { setOpenDialogId(null) }}>
                                   Cerrar
                                 </Button>
                               </DialogFooter>
@@ -407,7 +393,6 @@ export function CompanyPlatformMessagesManagement() {
             </div>
           )}
 
-          {/* Información de paginación y controles */}
           {messages.length > 0 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-muted/30 rounded-lg mt-4">
               <div className="text-sm text-muted-foreground">
@@ -458,7 +443,6 @@ export function CompanyPlatformMessagesManagement() {
         </CardContent>
       </Card>
 
-      {/* Formulario para enviar mensajes */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-bold">Enviar Mensaje</CardTitle>
@@ -466,7 +450,6 @@ export function CompanyPlatformMessagesManagement() {
         </CardHeader>
         <CardContent>
           <div className="space-y-6 w-full">
-            {/* Selector de tipo de mensaje */}
             <div className="space-y-2 w-full">
               <Label htmlFor="messageType">Tipo de mensaje</Label>
               <Select value={messageType} onValueChange={handleMessageTypeChange}>
@@ -480,7 +463,6 @@ export function CompanyPlatformMessagesManagement() {
               </Select>
             </div>
 
-            {/* Dropdown para usuarios */}
             {messageType === 'user' && (
               <div className="space-y-2 w-full">
                 <Label htmlFor="user">Usuario</Label>
@@ -499,7 +481,6 @@ export function CompanyPlatformMessagesManagement() {
               </div>
             )}
 
-            {/* Formulario de mensaje */}
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="messageTitle">Título del mensaje</Label>

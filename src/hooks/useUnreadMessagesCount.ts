@@ -27,7 +27,6 @@ export function useUnreadMessagesCount() {
   const { user, companyConfig } = useAuth();
 
   const fetchUnreadCount = useCallback(async () => {
-    // Si la compañía está inactiva, no cargar mensajes
     if (companyConfig?.company?.company_estado === 0) {
       setUnreadCount(0);
       setLoading(false);

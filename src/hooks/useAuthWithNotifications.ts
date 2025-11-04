@@ -23,14 +23,13 @@ export function useAuthWithNotifications({
 }: UseAuthWithNotificationsProps) {
   const router = useRouter();
 
-  // Configurar cliente API con autenticación
   const apiClient = axios.create({
     baseURL: config.apiUrl,
     withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
     },
-    timeout: 10000, // 10 segundos de timeout
+    timeout: 10000, 
   });
 
   apiClient.interceptors.response.use(

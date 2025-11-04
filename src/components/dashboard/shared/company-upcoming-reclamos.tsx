@@ -252,7 +252,6 @@ export function CompanyUpcomingReclamos({ userRole = "owner" }: CompanyUpcomingR
               )}
             </CardContent>
 
-            {/* Botón Ver Más */}
             {hasMoreReclamos && displayedReclamos.length > 0 && (
               <CardContent className="pt-0 flex justify-center mt-5">
                 <Button

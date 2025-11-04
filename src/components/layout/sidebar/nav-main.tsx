@@ -49,7 +49,7 @@ export function NavMain({
 
   const handleNavigation = (url: string, isCreateAction?: boolean, disabled?: boolean) => {
     if (disabled) {
-      return; // No hacer nada si está desactivado
+      return;
     }
     
     if (isCreateAction) {
@@ -74,8 +74,6 @@ export function NavMain({
           const isMessagesItem = item.title.toLowerCase().includes('mensaje') || item.url.includes('mensaje');
           const isPlatformMessagesItem = item.title.toLowerCase().includes('plataforma') || item.url.includes('plataforma');
           
-          // Para superadmin: solo mostrar badge en "Mensajes publicos", no en "Mensajes Plataforma"
-          // Para otros roles: mostrar badge en cualquier mensaje
           const shouldShowBadge = isMessagesItem && unreadCount > 0 && !isPlatformMessagesItem;
 
           if (!hasSubItems) {

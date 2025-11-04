@@ -11,7 +11,7 @@ type BeforeInstallPromptEvent = Event & {
 
 declare global {
   interface Navigator {
-    standalone?: boolean; // solo ios
+    standalone?: boolean;
   }
 }
 
@@ -36,9 +36,8 @@ export const InstallButton = () => {
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches || isIOSStandalone();
 
-    if (isStandalone) return; // si ya esta instalada, no mostrar nada
+    if (isStandalone) return;
 
-    // android / windows / chrome
     const handler = (e: BeforeInstallPromptEvent) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -46,7 +45,6 @@ export const InstallButton = () => {
     };
     window.addEventListener("beforeinstallprompt", handler as EventListener);
 
-    // ios / macos safari: mostrar boton siempre
     if (ios || macSafari) {
       setShowButton(true);
     }

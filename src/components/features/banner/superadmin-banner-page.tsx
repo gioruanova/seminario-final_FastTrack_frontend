@@ -505,7 +505,6 @@ export function SuperadminBannerPage() {
         </CardContent>
       </Card>
 
-      {/* Sheet para crear/editar banner */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="w-[90%] sm:max-w-2xl overflow-y-auto">
           <SheetHeader>
@@ -558,7 +557,6 @@ export function SuperadminBannerPage() {
         </SheetContent>
       </Sheet>
 
-      {/* Diálogo de confirmación para eliminar */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -576,7 +574,6 @@ export function SuperadminBannerPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Diálogo de confirmación para cambiar estado */}
       <AlertDialog open={showToggleDialog} onOpenChange={setShowToggleDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

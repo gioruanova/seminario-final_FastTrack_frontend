@@ -101,12 +101,10 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
     if (!user) return
 
     try {
-      // Seleccionar endpoint según tipo de usuario
       const endpoint = isSuperAdmin(user) ? SUPER_API.GET_USERS : CLIENT_API.GET_USERS
       const response = await apiClient.get(endpoint)
       const users: UserData[] = response.data
 
-      // Encontrar usuario actual
       const userInfo = users.find(u => u.user_id === user.user_id)
 
       if (!userInfo) {
@@ -153,7 +151,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
     try {
       setIsLoading(true)
 
-      // Validar datos
       if (!profileData.user_complete_name.trim()) {
         toast.error("El nombre completo es requerido")
         return
@@ -174,14 +171,12 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         return
       }
 
-      // Si hay cambio de contraseña, mostrar diálogo de confirmación
       if (profileData.user_password) {
         setIsLoading(false)
         setShowPasswordChangeDialog(true)
         return
       }
 
-      // Si no hay cambio de contraseña, proceder normalmente
       await saveProfileChanges()
     } catch (error) {
       console.error("Error al actualizar perfil:", error)
@@ -199,7 +194,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
 
       const updateData: Record<string, string> = {}
 
-      // Solo campos modificados
       if (profileData.user_complete_name !== originalData.user_complete_name) {
         updateData.user_complete_name = profileData.user_complete_name
       }
@@ -212,18 +206,15 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         updateData.user_email = profileData.user_email
       }
 
-      // Incluir contraseña solo si se proporcionó
       if (profileData.user_password) {
         updateData.user_password = profileData.user_password
       }
 
-      // Sin cambios, salir
       if (Object.keys(updateData).length === 0) {
         toast.info("No hay cambios para guardar")
         return
       }
 
-      // Seleccionar endpoint según tipo de usuario
       const endpoint = isSuperAdmin(user) ? SUPER_API.USERS_EDIT : CLIENT_API.USERS_EDIT
       const url = endpoint.replace("{id}", user.user_id.toString())
       await apiClient.put(url, updateData)
@@ -236,13 +227,10 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         })
       }
 
-      // Cerrar el Sheet
       handleOpen(false)
 
-      // Si hubo cambio de contraseña, mostrar overlay y redirigir
       if (profileData.user_password) {
         setShowLogoutOverlay(true)
-        // Redirigir después de 4 segundos
         setTimeout(() => {
           window.location.href = '/login'
         }, 4000)
@@ -281,10 +269,8 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         <Separator />
 
         <div className="mt-0 space-y-6">
-          {/* Información Personal */}
           <div className="space-y-4">
 
-            {/* User ID - Solo lectura */}
             <div className="space-y-2">
               <Label htmlFor="user_id">ID Unico</Label>
               <div className="p-2 bg-muted rounded-md "
@@ -293,7 +279,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
               >{profileData.user_id}</div>
             </div>
 
-            {/* DNI - Solo lectura */}
             <div className="space-y-2">
               <Label>DNI</Label>
               <div className="p-2 bg-muted rounded-md ">
@@ -303,7 +288,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
 
             <Separator />
 
-            {/* Nombre Completo */}
             <div className="space-y-2">
               <Label htmlFor="complete_name">Nombre Completo</Label>
               <Input
@@ -314,7 +298,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
               />
             </div>
 
-            {/* Teléfono */}
             <div className="space-y-2">
               <Label htmlFor="phone">Teléfono</Label>
               <Input
@@ -325,7 +308,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
               />
             </div>
 
-            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -348,7 +330,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
 
           <Separator />
 
-          {/* Cambio de Contraseña */}
           <div className="space-y-4">
             <h4 className="font-medium">Cambio de Contraseña</h4>
             <p className="text-sm text-muted-foreground">
@@ -385,7 +366,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
             </div>
           </div>
 
-          {/* Botones */}
           <div className="flex gap-2 pt-4">
             <Button
               variant="outline"
@@ -406,7 +386,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         </div>
       </SheetContent>
 
-      {/* Diálogo de Confirmación de Cambio de Contraseña */}
       <AlertDialog open={showPasswordChangeDialog} onOpenChange={setShowPasswordChangeDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -451,7 +430,6 @@ export function EditProfileSheet({ children, onOpenChange }: EditProfileSheetPro
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Overlay de cierre de sesión */}
       {showLogoutOverlay && (
         <div className="fixed inset-0 z-[9999] bg-background/95 backdrop-blur-sm flex items-center justify-center">
           <div className="text-center space-y-6">

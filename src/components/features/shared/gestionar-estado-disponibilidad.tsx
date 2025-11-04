@@ -28,8 +28,7 @@ export function GestionarEstadoDisponibilidad() {
             setEstado(response.data === true);
         } catch (error) {
             console.error("Error obteniendo estado:", error);
-            // Silenciar los toasts de error inicial - el toggle se mostrará de todas formas
-            setEstado(false); // Estado por defecto en caso de error
+            setEstado(false);
         } finally {
             setIsLoading(false);
         }

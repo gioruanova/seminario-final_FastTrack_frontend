@@ -12,7 +12,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [companyConfig, setCompanyConfig] = useState<CompanyConfigData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // notificaciones
   const {
     refreshCompanyConfig,
     checkAuth,
@@ -36,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     refreshCompanyConfig,
     isLoading,
-    error: null, // solo usamos toasts para errores
+    error: null,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

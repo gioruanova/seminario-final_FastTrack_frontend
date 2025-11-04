@@ -75,7 +75,6 @@ export function EmpresasPage() {
     try {
       setIsLoading(true);
       
-      // Crear cliente API dentro del callback para evitar dependencias
       const apiClient = axios.create({
         baseURL: config.apiUrl,
         withCredentials: true,
@@ -116,7 +115,6 @@ export function EmpresasPage() {
       const counts: Record<number, UserCounts> = {};
       
       usersRes.data.forEach((user: { company_id: number; user_role: string }) => {
-        // Solo contar usuarios que tienen company_id y no son superadmin
         if (user.company_id && user.user_role !== "superadmin") {
           if (!counts[user.company_id]) {
             counts[user.company_id] = { owners: 0, operadores: 0, profesionales: 0 };
@@ -138,7 +136,6 @@ export function EmpresasPage() {
       
       setUserCounts(counts);
 
-      // Contar especialidades por empresa
       const especialidadesCounts: Record<number, number> = {};
       especialidadesRes.data.forEach((especialidad: { company_id: number }) => {
         if (especialidad.company_id) {
@@ -170,13 +167,11 @@ export function EmpresasPage() {
     return matchesSearch && matchesEstado;
   });
 
-  // Calcular paginado
   const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedCompanies = filteredCompanies.slice(startIndex, endIndex);
 
-  // Resetear página cuando cambien los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterEstado]);
@@ -193,7 +188,6 @@ export function EmpresasPage() {
       const endpoint = SUPER_API.COMPANY_EDIT.replace("{id}", companyToToggle.id.toString());
       const newEstado = companyToToggle.estado === 1 ? false : true;
 
-      // Crear cliente API dentro de la función
       const apiClient = axios.create({
         baseURL: config.apiUrl,
         withCredentials: true,

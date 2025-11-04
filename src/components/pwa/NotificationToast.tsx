@@ -12,7 +12,7 @@ interface NotificationData {
   icon?: string;
   tag?: string;
   data?: Record<string, unknown>;
-  path?: string; // redirect segun rol
+  path?: string;
 }
 
 export function NotificationToast() {
@@ -34,8 +34,6 @@ export function NotificationToast() {
 
         setIsVisible(true);
 
-        // Guardar la notificación en localStorage y actualizar el contador
-        // Esto debe hacerlo el componente que muestra la notificación
         const newNotification = {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           title: notificationData.title,
@@ -53,7 +51,6 @@ export function NotificationToast() {
           localStorage.setItem('fasttrack_notifications', JSON.stringify(updatedNotifications));
           
           
-          // Disparar evento para que el NotificationCenter actualice su estado
           const updateEvent = new CustomEvent('notificationsUpdated', {
             detail: updatedNotifications
           });
@@ -116,7 +113,7 @@ export function NotificationToast() {
     return null;
   }
 
-  const latestNotification = notifications[0]; // ultima notif
+  const latestNotification = notifications[0]; 
 
   return (
     <div className={`fixed top-4 right-4 z-50 max-w-sm transition-all duration-300 ${isAnimatingOut
