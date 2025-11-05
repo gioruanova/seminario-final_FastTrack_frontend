@@ -156,7 +156,6 @@ export function SuperadminBannerPage() {
       banner_limit: banner.banner_limit,
       banner_active: banner.banner_active
     });
-    // Convertir la fecha del backend a formato YYYY-MM-DD para el input de fecha
     if (banner.banner_limit) {
       const date = new Date(banner.banner_limit);
       const year = date.getFullYear();
@@ -171,29 +170,23 @@ export function SuperadminBannerPage() {
 
   const handleSaveBanner = async () => {
     try {
-      // Validar que si se envía un campo, no esté vacío
       const textToSend = bannerFormData.banner_text.trim();
       const dateToSend = dateInputValue.trim();
 
-      // Validar que si hay texto escrito, no esté vacío después de trim
       if (bannerFormData.banner_text && textToSend === "") {
         toast.error("El texto del banner no puede estar vacío");
         return;
       }
 
-      // Preparar los datos a enviar
       const dataToSend: { banner_text?: string; banner_limit?: string; banner_active: number } = {
         banner_active: bannerFormData.banner_active
       };
 
-      // Solo incluir campos que tienen valor
       if (textToSend) {
         dataToSend.banner_text = textToSend;
       }
 
-      // Validar y convertir fecha si se envía
       if (dateToSend) {
-        // Convertir fecha a datetime con medianoche (00:00:00)
         const date = new Date(dateToSend);
         date.setHours(0, 0, 0, 0);
         
@@ -205,7 +198,6 @@ export function SuperadminBannerPage() {
           return;
         }
 
-        // Formatear como ISO string para el backend
         dataToSend.banner_limit = date.toISOString();
       }
 
