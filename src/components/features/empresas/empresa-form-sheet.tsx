@@ -300,7 +300,7 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
                   id="company_whatsapp"
                   value={formData.company_whatsapp}
                   onChange={(e) => handleChange("company_whatsapp", e.target.value)}
-                  placeholder="123456789"
+                  placeholder="+5491133334444"
                 />
               </div>
 
@@ -310,7 +310,7 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
                   id="company_telegram"
                   value={formData.company_telegram}
                   onChange={(e) => handleChange("company_telegram", e.target.value)}
-                  placeholder="@empresa"
+                  placeholder="+5491133334444"
                 />
               </div>
             </div>

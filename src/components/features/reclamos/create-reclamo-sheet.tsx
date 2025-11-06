@@ -525,6 +525,7 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
               placeholder={tituloPlaceholder}
               defaultValue={formData.reclamo_titulo}
               onChange={handleTituloChange}
+              disabled={especialidadesOptions.length <= 0}
             />
           </div>
 
@@ -538,6 +539,7 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
               defaultValue={formData.reclamo_detalle}
               onChange={handleDetalleChange}
               rows={4}
+              disabled={especialidadesOptions.length <= 0}
             />
           </div>
 
@@ -553,7 +555,7 @@ export function CreateReclamoSheet({ isOpen, onClose }: CreateReclamoSheetProps)
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || especialidadesOptions.length <= 0}
               className="flex-1"
             >
               {isSubmitting ? (
