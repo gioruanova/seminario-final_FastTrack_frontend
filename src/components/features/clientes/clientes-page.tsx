@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +33,14 @@ interface ClientesPageProps {
   userRole: "owner" | "operador"
 }
 
+const apiClient = axios.create({
+  baseURL: config.apiUrl,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 export function ClientesPage({}: ClientesPageProps) {
   const { companyConfig } = useAuth()
   const [clientes, setClientes] = useState<Cliente[]>([])
@@ -40,14 +48,6 @@ export function ClientesPage({}: ClientesPageProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
-
-  const apiClient = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
 
   const [isClienteSheetOpen, setIsClienteSheetOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -61,7 +61,7 @@ export function ClientesPage({}: ClientesPageProps) {
     cliente_direccion: ""
   })
 
-const fetchClientes = async () => {
+const fetchClientes = useCallback(async () => {
     try {
       setIsLoading(true)
       const response = await apiClient.get(CLIENT_API.GET_CLIENTES)
@@ -72,11 +72,11 @@ const fetchClientes = async () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchClientes()
-  }, []) 
+  }, [fetchClientes]) 
 
   const handleCreateCliente = () => {
     setIsEditing(false)

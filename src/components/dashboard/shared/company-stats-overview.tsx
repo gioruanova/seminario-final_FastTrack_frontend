@@ -28,11 +28,6 @@ interface ClienteData {
   cliente_id: number;
 }
 
-interface ReclamoData {
-  reclamo_id: number;
-  reclamo_estado: string;
-}
-
 const CHART_COLORS = [
   "#8b5cf6",
   "#10b981",

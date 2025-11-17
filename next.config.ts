@@ -1,16 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configuración para paquetes externos en server components
   serverExternalPackages: ['axios'],
-  // Configuración para evitar problemas de hidratación
   transpilePackages: [],
   
-  // Optimizaciones de rendimiento
-  compress: true, // Habilitar compresión gzip
-  poweredByHeader: false, // Remover header X-Powered-By para seguridad
+  compress: true,
+  poweredByHeader: false,
   
-  // Optimizaciones de imágenes
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -18,7 +14,6 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60,
   },
   
-  // Configuración de headers para evitar problemas de CORS
   async headers() {
     return [
       {

@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
@@ -35,20 +35,20 @@ interface EmpresaStats {
   total_reclamos: number
 }
 
+const apiClient = axios.create({
+  baseURL: config.apiUrl,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 export function SuperadminClientesPage() {
   const [clientes, setClientes] = useState<ClienteRecurrente[]>([])
   const [empresasStats, setEmpresasStats] = useState<EmpresaStats[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  const apiClient = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-
-  const loadClientes = async () => {
+  const loadClientes = useCallback(async () => {
     try {
       setIsLoading(true)
 
@@ -136,12 +136,11 @@ export function SuperadminClientesPage() {
       setIsLoading(false)
     }
 
-  }
+  }, [])
 
   useEffect(() => {
     loadClientes()
-    
-  }, []) 
+  }, [loadClientes]) 
 
   if (isLoading) {
     return (

@@ -1,25 +1,16 @@
 ﻿"use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingScreen } from "@/components/ui/loading-screen";
-import { getDashboardRoute } from "@/hooks/useRoleRouting";
+import { AuthRedirect } from "@/components/auth/auth-redirect";
 
 export default function Home() {
-  const { user, isLoading } = useAuth();
-  const router = useRouter();
+  const { isLoading } = useAuth();
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (user) {
-        const dashboardRoute = getDashboardRoute(user.user_role);
-        router.replace(dashboardRoute);
-      } else {
-        router.replace("/login");
-      }
-    }
-  }, [user, isLoading, router]);
-
-  return <LoadingScreen message="Cargando..." />;
+  return (
+    <>
+      <AuthRedirect />
+      {isLoading && <LoadingScreen message="Cargando..." />}
+    </>
+  );
 }

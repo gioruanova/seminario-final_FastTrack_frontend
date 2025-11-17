@@ -33,6 +33,14 @@ interface User {
   apto_recibir?: boolean | number
 }
 
+const apiClient = axios.create({
+  baseURL: config.apiUrl,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 export function OwnerUsuariosPage() {
   const [users, setUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -60,15 +68,7 @@ export function OwnerUsuariosPage() {
 
   const [newPassword, setNewPassword] = useState("")
 
-  const apiClient = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true)
       const response = await apiClient.get(CLIENT_API.GET_USERS)
@@ -79,12 +79,11 @@ export function OwnerUsuariosPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchUsers()
-    
-  }, [])
+  }, [fetchUsers])
 
   useEffect(() => {
     if (isUserSheetOpen && editingUser && isEditing) {

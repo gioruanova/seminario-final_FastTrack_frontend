@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { config } from '@/lib/config';
@@ -9,7 +8,6 @@ import { PUBLIC_API } from '@/lib/publicApi/config';
 import { CLIENT_API } from '@/lib/clientApi/config';
 import { User, isCompanyUser } from '@/types/auth';
 import { CompanyConfigData } from '@/types/company';
-import { getDashboardRoute } from '@/hooks/useRoleRouting';
 
 interface UseAuthProps {
   setUser: (user: User | null) => void;
@@ -22,7 +20,6 @@ export function useAuth({
   setCompanyConfig,
   setIsLoading
 }: UseAuthProps) {
-  const router = useRouter();
 
   const apiClient = useMemo(() => {
     const client = axios.create({
@@ -202,7 +199,6 @@ export function useAuth({
 
           if (profileResponse.data?.user_id) {
             await handleProfileResponse(profileResponse.data);
-            router.push(getDashboardRoute(profileResponse.data.user_role));
           } else {
             throw new Error("Ha habido un error. Póngase en contacto con su administrador");
           }
@@ -221,20 +217,18 @@ export function useAuth({
     } finally {
       setIsLoading(false);
     }
-  }, [apiClient, handleProfileResponse, setIsLoading, getErrorMessage, router]);
+  }, [apiClient, handleProfileResponse, setIsLoading, getErrorMessage]);
 
   const logout = useCallback(async () => {
     try {
       await apiClient.get(PUBLIC_API.LOGOUT);
       setUser(null);
       setCompanyConfig(null);
-      router.push("/login");
     } catch {
       setUser(null);
       setCompanyConfig(null);
-      router.push("/login");
     }
-  }, [apiClient, setUser, setCompanyConfig, router]);
+  }, [apiClient, setUser, setCompanyConfig]);
 
   return {
     apiClient,

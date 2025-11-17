@@ -93,7 +93,7 @@ export function SuperadminUsuariosPage() {
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("0");
 
-  const fetchUsuarios = async () => {
+  const fetchUsuarios = useCallback(async () => {
     try {
       setIsLoading(true);
       const [usuariosResponse, companiesResponse] = await Promise.all([
@@ -124,14 +124,13 @@ export function SuperadminUsuariosPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     if (currentUser) {
       fetchUsuarios();
     }
-    
-  }, [currentUser]);
+  }, [currentUser, fetchUsuarios]);
 
   useEffect(() => {
     setCurrentPage(1);

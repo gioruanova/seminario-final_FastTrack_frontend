@@ -38,7 +38,7 @@ export function useReclamos() {
     const now = Date.now();
     const isCacheValid = cachedReclamos !== null && (now - cacheTimestamp) < CACHE_DURATION;
 
-    if (isCacheValid && !forceRefresh) {
+    if (isCacheValid && !forceRefresh && cachedReclamos !== null) {
       setReclamos(cachedReclamos);
       setIsLoading(false);
       return;

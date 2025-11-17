@@ -123,7 +123,6 @@
   }
 }
 
-/* Estilos personalizados para toasts de error */
 [data-sonner-toast][data-type="error"] {
   background-color: #fca5a5 !important;
   color: #7f1d1d !important;
@@ -134,7 +133,6 @@
   color: #7f1d1d !important;
 }
 
-/* Estilos personalizados para toasts de success */
 [data-sonner-toast][data-type="success"] {
   background-color: #86efac !important;
   color: #14532d !important;
@@ -145,41 +143,6 @@
   color: #14532d !important;
 }
 
-/* Estilos para Leaflet */
-.leaflet-container {
-  background: transparent !important;
-  font-family: inherit !important;
-}
-
-.leaflet-control-container {
-  font-family: inherit !important;
-}
-
-.leaflet-popup-content-wrapper {
-  border-radius: 8px !important;
-}
-
-.leaflet-popup-content {
-  margin: 8px 12px !important;
-  line-height: 1.4 !important;
-}
-
-.leaflet-popup-tip {
-  background: white !important;
-}
-
-/* Estilos para el icono del calendario */
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  cursor: pointer !important;
-  opacity: 1 !important;
-  filter: invert(0.3) sepia(1) saturate(5) hue-rotate(200deg) !important;
-}
-
-input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-  filter: invert(0.2) sepia(1) saturate(5) hue-rotate(200deg) !important;
-}
-
-/* Estilos para react-day-picker (DatePicker) */
 .rdp {
   --rdp-cell-size: 40px;
   --rdp-accent-color: hsl(var(--primary));
@@ -188,7 +151,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   --rdp-today-color: hsl(var(--primary));
 }
 
-/* Día actual - destacado con borde */
 .rdp-day_today:not(.rdp-day_outside) {
   font-weight: bold;
   border: 2px solid hsl(var(--primary));
@@ -229,7 +191,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-/* Día seleccionado */
 .rdp-day_selected,
 .rdp-day_selected:focus-visible,
 .rdp-day_selected:hover {
@@ -238,7 +199,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   font-weight: bold;
 }
 
-/* Día deshabilitado - más apagado */
 .rdp-day_disabled,
 .rdp-day_disabled:hover {
   color: hsl(var(--muted-foreground)) !important;
@@ -247,7 +207,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   background-color: transparent !important;
 }
 
-/* Hover en días disponibles */
 .rdp-button:not(.rdp-day_disabled):hover {
   background-color: hsl(var(--accent));
   color: hsl(var(--accent-foreground));
@@ -259,13 +218,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   color: white;
 }
 
-/* Nombre del mes */
 .rdp-caption_label {
   font-weight: 600;
   font-size: 1rem;
 }
 
-/* Botones de navegación - flechas con color primary */
 .rdp-button_previous svg,
 .rdp-button_next svg {
   fill: var(--primary);
@@ -281,7 +238,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   background-color: hsl(var(--primary) / 0.1);
 }
 
-/* Iconos de navegación - forzar color */
 .rdp-button_previous svg,
 .rdp-button_next svg {
   width: 1.25rem;
@@ -289,7 +245,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   color: hsl(var(--primary)) !important;
 }
 
-/* Día en rango fuera del mes actual - deshabilitar completamente */
 .rdp-day_outside {
   opacity: 0.3;
 }
@@ -298,7 +253,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
   background-color: transparent;
 }
 
-/* Estilos para SelectItem deshabilitado en selector de horarios */
 #horarios-selector [data-slot="select-item"][data-disabled] {
   opacity: 0.25 !important;
   cursor: not-allowed !important;

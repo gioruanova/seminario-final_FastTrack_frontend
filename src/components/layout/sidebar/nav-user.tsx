@@ -40,8 +40,6 @@ export function NavUser() {
     [companyConfig?.company?.company_estado]
   );
 
-  if (!user) return null
-
   const handleLogout = useCallback(async () => {
     try {
       await logout()
@@ -50,7 +48,7 @@ export function NavUser() {
     }
   }, [logout])
 
-  const getInitials = useCallback((name?: string) => {
+  const getInitials = (name?: string) => {
     if (!name) return "U"
     return name
       .split(" ")
@@ -58,7 +56,7 @@ export function NavUser() {
       .join("")
       .toUpperCase()
       .slice(0, 2)
-  }, [])
+  }
 
   const displayName = useMemo(() => {
     if (!user) return "Usuario"
@@ -79,6 +77,8 @@ export function NavUser() {
     }
     return "Usuario"
   }, [user])
+
+  if (!user) return null
 
   return (
     <>
