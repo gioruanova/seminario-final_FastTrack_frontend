@@ -24,7 +24,7 @@ export const SUPER_API = {
   ENABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/unblock/{especialidadId}`,
   DISABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/block/{especialidadId}`,
 
-  GET_FEEDBACKS: `${config.apiUrl}/${slugs.superApi}/platform/feedbacks`, // GET
-  DELETE_FEEDBACK: `${config.apiUrl}/${slugs.superApi}/platform/feedbacks/{feedback_id}`, // DELETE
+  GET_FEEDBACKS: `${config.apiUrl}/${slugs.superApi}/platform/feedbacks`,
+  DELETE_FEEDBACK: `${config.apiUrl}/${slugs.superApi}/platform/feedbacks/{feedback_id}`,
 
 };
