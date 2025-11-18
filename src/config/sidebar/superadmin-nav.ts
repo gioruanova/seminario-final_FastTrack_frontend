@@ -5,7 +5,8 @@
     Wrench,
     House,
     Briefcase,
-    Landmark
+    Landmark,
+    MessageSquare
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 
@@ -39,6 +40,11 @@ export const superAdminNavItems: NavItem[] = [
         title: "Clientes Recurrentes",
         url: "/dashboard/superadmin/clientes",
         icon: Briefcase,
+    },
+    {
+        title: "Feedbacks",
+        url: "/dashboard/superadmin/feedback",
+        icon: MessageSquare,
     },
 
 ];
