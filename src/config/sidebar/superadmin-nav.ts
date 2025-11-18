@@ -1,13 +1,11 @@
 ﻿import {
     Users,
-    Mail,
     Shield,
     SquareCheck,
     Wrench,
     House,
     Briefcase,
-    Landmark,
-    Radio
+    Landmark
 } from "lucide-react";
 import { NavItem, TeamData, ProjectData } from "./types";
 
@@ -54,16 +52,5 @@ export const superAdminTeamData: TeamData[] = [
     },
 ];
 
-export const superAdminProjects: ProjectData[] = [
-    {
-        title: "Mensajes publicos",
-        url: "/dashboard/superadmin/mensajes",
-        icon: Mail,
-    },
-    {
-        title: "Mensajes Plataforma",
-        url: "/dashboard/superadmin/mensajes-plataforma",
-        icon: Radio,
-    },
-];
+export const superAdminProjects: ProjectData[] = [];
 

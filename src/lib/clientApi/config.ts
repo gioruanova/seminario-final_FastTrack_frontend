@@ -42,14 +42,6 @@ export const CLIENT_API = {
   FEEDBACK: `${config.apiUrl}/${slugs.customersApi}/platform/feedback`,
   COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
 
-  CREATE_MENSAJE_PLATFORM_FOR_COMPANY: `${config.apiUrl}/${slugs.customersApi}/platform/messages`,
-  CREATE_MENSAJE_PLATFORM_FOR_USER: `${config.apiUrl}/${slugs.customersApi}/platform/messages/user/{user_id}`,
-
-  GET_MESSAGES_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/messages`,
-  DELETE_MESSAGE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/single-message/{platform_message_id}`,
-  MARK_AS_READ_MESSAGE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/message/read/{specific_message_id}`,
-  MARK_AS_UNREAD_MESSAGE_PLATFORM: `${config.apiUrl}/${slugs.customersApi}/platform/message/unread/{specific_message_id}`,
-
   PROFILE_MANAGE: `${config.apiUrl}/${slugs.customersApi}/profile/manage`,
 
 };

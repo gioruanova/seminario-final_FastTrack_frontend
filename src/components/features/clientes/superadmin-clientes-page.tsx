@@ -16,6 +16,7 @@ interface ClienteRecurrente {
   cliente_phone: string
   cliente_email: string
   cliente_direccion: string
+  // Latitud y longitud son campos opcionales - no son obligatorios
   cliente_lat?: number
   cliente_lng?: number
   cliente_active: boolean

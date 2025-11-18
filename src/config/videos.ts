@@ -25,22 +25,6 @@ export const videosConfig: VideoConfig[] = [
     fil_tag: false
   },
   {
-    file_id: 3,
-    file_name: "sample-1.mp4",
-    file_title: "Ver mis mensajes",
-    file_duration: 58,
-    file_role: ["operador", "owner"],
-    fil_tag: false
-  },
-  {
-    file_id: 4,
-    file_name: "sample-1.mp4",
-    file_title: "Ver mis mensajes",
-    file_duration: 58,
-    file_role: ["profesional"],
-    fil_tag: false
-  },
-  {
     file_id: 5,
     file_name: "sample-1.mp4",
     file_title: "Gestionar mi empresa",

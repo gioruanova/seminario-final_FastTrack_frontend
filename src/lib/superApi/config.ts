@@ -23,20 +23,4 @@ export const SUPER_API = {
   EDIT_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/{id_especialidad}`,
   ENABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/unblock/{especialidadId}`,
   DISABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.superApi}/especialidades/block/{especialidadId}`,
-
-  GET_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages`,
-  READ_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages/read/{message_id}`,
-  UNREAD_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages/unread/{message_id}`,
-  DELETE_PUBLIC_MESSAGES: `${config.apiUrl}/${slugs.superApi}/messages/{message_id}`,
-
-  GET_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories`,
-  CREATE_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories`,
-  EDIT_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories/{category_id}`,
-  DISABLE_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories/disable/{category_id}`,
-  ENABLE_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories/enable/{category_id}`,
-  DELETE_PUBLIC_MESSAGES_CATEGORIES: `${config.apiUrl}/${slugs.superApi}/messageCategories/{category_id}`,
-
-  PLAT_MESSAGE_ALL: `${config.apiUrl}/${slugs.superApi}/platform/messages`,
-  PLAT_MESSAGE_COMPANY: `${config.apiUrl}/${slugs.superApi}/platform/messages/company/{company_id}`,
-  PLAT_MESSAGE_USER: `${config.apiUrl}/${slugs.superApi}/platform/messages/user/{user_id}`,
 };

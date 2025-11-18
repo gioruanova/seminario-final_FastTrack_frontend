@@ -4,7 +4,6 @@ import {
   Briefcase,
   SquareCheck,
   House,
-  Mail,
   GraduationCap,
   Landmark,
   ShieldUser
@@ -82,11 +81,6 @@ export const operadorTeamData = (companyName: string): TeamData[] => [
 ];
 
 export const operadorProjects: ProjectData[] = [
-  {
-    title: "Mensajes",
-    url: "/dashboard/operador/mensajes",
-    icon: Mail,
-  },
   {
     title: "Tutoriales",
     url: "/dashboard/operador/tutoriales",

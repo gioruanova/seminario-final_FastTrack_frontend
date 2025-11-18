@@ -1,7 +1,6 @@
 import {
   Briefcase,
   Users,
-  Mail,
   Wrench,
   SquareCheck,
   House,
@@ -89,11 +88,6 @@ export const ownerTeamData = (companyName: string): TeamData[] => [
 ];
 
 export const ownerProjects: ProjectData[] = [
-  {
-    title: "Mensajes",
-    url: "/dashboard/owner/mensajes",
-    icon: Mail,
-  },
   {
     title: "Tutoriales",
     url: "/dashboard/owner/tutoriales",
