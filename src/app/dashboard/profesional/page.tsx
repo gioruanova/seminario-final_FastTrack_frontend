@@ -44,7 +44,7 @@ export default function ProfesionalDashboardPage() {
             <div className="text-white flex flex-col items-center justify-center gap-4 w-full">
               <p className="text-center">
                 Ingresa en este {" "}
-                <Link href="https://fastrack-portal.vercel.app/dashboard/owner/trabajar-reclamos" className="text-primary underline font-bold">
+                <Link href="https://drive.google.com/drive/folders/1U6qSSSZhiyiNJRt5JrurekYMlQWkUX1C?usp=sharing" className="text-primary underline font-bold">
                   link
                 </Link>{" "}
                 para descargar la aplicacion.
