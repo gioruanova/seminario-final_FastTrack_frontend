@@ -11,10 +11,13 @@ import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { Search, Plus, Edit, X, ChevronLeft, ChevronRight, Mail, UserX, UserCheck } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import axios from "axios"
 import { config } from "@/lib/config"
 import { CLIENT_API } from "@/lib/clientApi/config"
 import { useAuth } from "@/context/AuthContext"
+import { ARGENTINA_PROVINCIAS } from "@/lib/constants"
+import { geocodeAddress } from "@/lib/geocoding"
 
 interface Cliente {
   cliente_id: number
@@ -23,7 +26,6 @@ interface Cliente {
   cliente_phone: string
   cliente_email: string
   cliente_direccion: string
-  // Latitud y longitud - no son obligatorios > a implementar en proximos relesases
   cliente_lat?: number
   cliente_lng?: number
   cliente_active: boolean
@@ -62,13 +64,20 @@ export function ClientesPage({}: ClientesPageProps) {
     cliente_direccion: ""
   })
 
+  const [direccionFields, setDireccionFields] = useState({
+    calle: "",
+    numero: "",
+    ciudad: "",
+    provincia: "",
+    codigo_postal: ""
+  })
+
 const fetchClientes = useCallback(async () => {
     try {
       setIsLoading(true)
       const response = await apiClient.get(CLIENT_API.GET_CLIENTES)
       setClientes(response.data || [])
-    } catch (error) {
-      console.error("Error al cargar clientes:", error)
+    } catch {
       toast.error("Error al cargar clientes")
     } finally {
       setIsLoading(false)
@@ -79,6 +88,29 @@ const fetchClientes = useCallback(async () => {
     fetchClientes()
   }, [fetchClientes]) 
 
+  const buildDireccion = useCallback((fields: typeof direccionFields) => {
+    const partes: string[] = []
+    
+    if (fields.calle.trim() && fields.numero.trim()) {
+      partes.push(`${fields.calle.trim()} ${fields.numero.trim()}`)
+    } else if (fields.calle.trim()) {
+      partes.push(fields.calle.trim())
+    }
+    
+    if (fields.ciudad.trim()) partes.push(fields.ciudad.trim())
+    
+    if (fields.provincia.trim()) {
+      let provinciaNormalizada = fields.provincia.trim()
+      if (provinciaNormalizada.includes("Ciudad Autonoma") || provinciaNormalizada.includes("Bs As")) {
+        provinciaNormalizada = "Buenos Aires"
+      }
+      partes.push(provinciaNormalizada)
+    }
+    
+    return partes.join(", ")
+  }, [])
+
+
   const handleCreateCliente = () => {
     setIsEditing(false)
     setEditingCliente(null)
@@ -88,6 +120,13 @@ const fetchClientes = useCallback(async () => {
       cliente_phone: "",
       cliente_email: "",
       cliente_direccion: ""
+    })
+    setDireccionFields({
+      calle: "",
+      numero: "",
+      ciudad: "",
+      provincia: "",
+      codigo_postal: ""
     })
     setIsClienteSheetOpen(true)
   }
@@ -105,50 +144,114 @@ const fetchClientes = useCallback(async () => {
     setIsClienteSheetOpen(true)
   }
 
-  const handleSaveCliente = async () => {
+  const validateFormData = useCallback((): string | null => {
     if (!clienteFormData.cliente_complete_name ||
       !clienteFormData.cliente_dni ||
       !clienteFormData.cliente_phone ||
       !clienteFormData.cliente_email) {
-      toast.error("Los campos nombre, DNI, teléfono y email son obligatorios")
-      return
+      return "Los campos nombre, DNI, teléfono y email son obligatorios"
     }
 
     if (companyConfig?.requiere_domicilio) {
-      if (!clienteFormData.cliente_direccion.trim()) {
-        toast.error("La dirección es obligatoria")
-        return
+      if (isEditing) {
+        if (!clienteFormData.cliente_direccion.trim()) {
+          return "La dirección es obligatoria"
+        }
+      } else {
+        if (!direccionFields.calle.trim() ||
+          !direccionFields.numero.trim() ||
+          !direccionFields.ciudad.trim() ||
+          !direccionFields.provincia.trim()) {
+          return "Los campos calle, número, ciudad y provincia son obligatorios"
+        }
       }
+    }
+
+    return null
+  }, [clienteFormData, direccionFields, companyConfig, isEditing])
+
+  const buildUpdateData = useCallback((formData: typeof clienteFormData) => {
+    if (!editingCliente) return {}
+
+    const updateData: Record<string, unknown> = {}
+
+    if (formData.cliente_complete_name !== editingCliente.cliente_complete_name) {
+      updateData.cliente_complete_name = formData.cliente_complete_name
+    }
+    if (formData.cliente_dni !== editingCliente.cliente_dni) {
+      updateData.cliente_dni = formData.cliente_dni
+    }
+    if (formData.cliente_phone !== editingCliente.cliente_phone) {
+      updateData.cliente_phone = formData.cliente_phone
+    }
+    if (formData.cliente_email !== editingCliente.cliente_email) {
+      updateData.cliente_email = formData.cliente_email
+    }
+    if (formData.cliente_direccion !== editingCliente.cliente_direccion) {
+      updateData.cliente_direccion = formData.cliente_direccion
+    }
+
+    return updateData
+  }, [editingCliente])
+
+  const getErrorMessage = useCallback((error: unknown): string => {
+    const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string }
+    return axiosError?.response?.data?.error ||
+      axiosError?.message ||
+      `Error al guardar el ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`
+  }, [companyConfig])
+
+  const handleSaveCliente = async () => {
+    const validationError = validateFormData()
+    if (validationError) {
+      toast.error(validationError)
+      return
+    }
+
+    const direccionCompleta = isEditing
+      ? clienteFormData.cliente_direccion.trim()
+      : buildDireccion(direccionFields) + ", Argentina"
+    
+    let coordenadas: { lat: number; lng: number } | null = null
+    if (companyConfig?.requiere_domicilio === 1) {
+      try {
+        coordenadas = await geocodeAddress(direccionCompleta)
+      } catch {
+        
+      }
+    }
+    
+    const formDataToSend: typeof clienteFormData & { cliente_lat?: number; cliente_lng?: number } = {
+      ...clienteFormData,
+      cliente_direccion: direccionCompleta
+    }
+    
+    if (coordenadas) {
+      formDataToSend.cliente_lat = coordenadas.lat
+      formDataToSend.cliente_lng = coordenadas.lng
     }
 
     try {
       if (isEditing && editingCliente) {
-        const updateData: Partial<typeof clienteFormData> = {}
-
-        if (clienteFormData.cliente_complete_name !== editingCliente.cliente_complete_name) {
-          updateData.cliente_complete_name = clienteFormData.cliente_complete_name
+        const updateData = buildUpdateData(formDataToSend)
+        
+        if (coordenadas) {
+          updateData.cliente_lat = coordenadas.lat
+          updateData.cliente_lng = coordenadas.lng
         }
-        if (clienteFormData.cliente_dni !== editingCliente.cliente_dni) {
-          updateData.cliente_dni = clienteFormData.cliente_dni
-        }
-        if (clienteFormData.cliente_phone !== editingCliente.cliente_phone) {
-          updateData.cliente_phone = clienteFormData.cliente_phone
-        }
-        if (clienteFormData.cliente_email !== editingCliente.cliente_email) {
-          updateData.cliente_email = clienteFormData.cliente_email
-        }
-        if (clienteFormData.cliente_direccion !== editingCliente.cliente_direccion) {
-          updateData.cliente_direccion = clienteFormData.cliente_direccion
-        }
-
-        if (Object.keys(updateData).length > 0) {
-          await apiClient.put(CLIENT_API.UPDATE_CLIENTE.replace('{cliente_id}', editingCliente.cliente_id.toString()), updateData)
-          toast.success(`${companyConfig?.sing_heading_solicitante} actualizado correctamente`)
-        } else {
+        
+        if (Object.keys(updateData).length === 0) {
           toast.info("No se detectaron cambios para actualizar")
+          return
         }
+
+        await apiClient.put(
+          CLIENT_API.UPDATE_CLIENTE.replace('{cliente_id}', editingCliente.cliente_id.toString()),
+          updateData
+        )
+        toast.success(`${companyConfig?.sing_heading_solicitante} actualizado correctamente`)
       } else {
-        await apiClient.post(CLIENT_API.CREATE_CLIENTE, clienteFormData)
+        await apiClient.post(CLIENT_API.CREATE_CLIENTE, formDataToSend)
         toast.success(`${companyConfig?.sing_heading_solicitante} creado correctamente`)
       }
 
@@ -157,29 +260,25 @@ const fetchClientes = useCallback(async () => {
       setIsEditing(false)
       fetchClientes()
     } catch (error: unknown) {
-      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
-        (error as { message?: string })?.message ||
-        `Error al guardar el ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`
-      toast.error(errorMessage)
+      toast.error(getErrorMessage(error))
     }
   }
 
   const handleToggleClienteStatus = async (cliente: Cliente) => {
     try {
-      if (cliente.cliente_active) {
-        await apiClient.put(CLIENT_API.DESACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString()))
-        toast.success(`${companyConfig?.sing_heading_solicitante} desactivado correctamente`)
-      } else {
-        await apiClient.put(CLIENT_API.ACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString()))
-        toast.success(`${companyConfig?.sing_heading_solicitante} activado correctamente`)
-      }
+      const endpoint = cliente.cliente_active
+        ? CLIENT_API.DESACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString())
+        : CLIENT_API.ACTIVAR_CLIENTE.replace('{cliente_id}', cliente.cliente_id.toString())
+      
+      const message = cliente.cliente_active
+        ? `${companyConfig?.sing_heading_solicitante} desactivado correctamente`
+        : `${companyConfig?.sing_heading_solicitante} activado correctamente`
 
+      await apiClient.put(endpoint)
+      toast.success(message)
       fetchClientes()
     } catch (error: unknown) {
-      const errorMessage = (error as { response?: { data?: { error?: string }; status?: number }; message?: string })?.response?.data?.error ||
-        (error as { message?: string })?.message ||
-        `Error al cambiar el estado del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`
-      toast.error(errorMessage)
+      toast.error(getErrorMessage(error))
     }
   }
 
@@ -299,14 +398,12 @@ const fetchClientes = useCallback(async () => {
                       <TableCell>
                         <a href={`tel:${cliente.cliente_phone}`} className="text-primary hover:underline">{cliente.cliente_phone}</a>
                       </TableCell>
-                      {companyConfig?.requiere_domicilio === 1 ? (
+                      {companyConfig?.requiere_domicilio === 1 && (
                         <TableCell title={cliente.cliente_direccion}>
                           {cliente.cliente_direccion.length > 20
                             ? `${cliente.cliente_direccion.substring(0, 20)}...`
                             : cliente.cliente_direccion}
                         </TableCell>
-                      ):(
-                        null
                       )}
                     
                       <TableCell className="text-center">{getStatusBadge(cliente.cliente_active)}</TableCell>
@@ -443,28 +540,103 @@ const fetchClientes = useCallback(async () => {
                 required
               />
             </div>
-            {
-              companyConfig?.requiere_domicilio === 1 ? (
-                <div className="space-y-2">
-                  <Label htmlFor="direccion">
-                    Dirección {companyConfig?.requiere_domicilio ? <span className="text-red-500">*</span> : <span className="text-muted-foreground">(opcional)</span>}
-                  </Label>
-                  <Input
-                    id="direccion"
-                    value={clienteFormData.cliente_direccion}
-                    onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_direccion: e.target.value }))}
-                    placeholder={
-                      companyConfig?.requiere_domicilio
-                        ? `Dirección del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`
-                        : `Dirección del ${companyConfig?.sing_heading_solicitante?.toLowerCase()} (opcional)`
-                    }
-                    required={!!companyConfig?.requiere_domicilio}
-                  />
-                </div>
-              ) : (
-                null
-              )
-            }
+            {companyConfig?.requiere_domicilio === 1 && (
+              <div className="space-y-4 border-t pt-4">
+                <Label className="text-base font-semibold">
+                  Dirección <span className="text-red-500">*</span>
+                </Label>
+                
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <Input
+                      id="direccion"
+                      value={clienteFormData.cliente_direccion}
+                      onChange={(e) => setClienteFormData(prev => ({ ...prev, cliente_direccion: e.target.value }))}
+                      placeholder={`Dirección del ${companyConfig?.sing_heading_solicitante?.toLowerCase()}`}
+                      required
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="calle">
+                          Calle <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="calle"
+                          value={direccionFields.calle}
+                          onChange={(e) => setDireccionFields(prev => ({ ...prev, calle: e.target.value }))}
+                          placeholder="Ej: Av. Corrientes"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="numero">
+                          Número <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="numero"
+                          value={direccionFields.numero}
+                          onChange={(e) => setDireccionFields(prev => ({ ...prev, numero: e.target.value }))}
+                          placeholder="Ej: 1234"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="ciudad">
+                          Ciudad <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="ciudad"
+                          value={direccionFields.ciudad}
+                          onChange={(e) => setDireccionFields(prev => ({ ...prev, ciudad: e.target.value }))}
+                          placeholder="Ej: Buenos Aires"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="codigo_postal">
+                          Código Postal <span className="text-muted-foreground text-xs">(opcional)</span>
+                        </Label>
+                        <Input
+                          id="codigo_postal"
+                          value={direccionFields.codigo_postal}
+                          onChange={(e) => setDireccionFields(prev => ({ ...prev, codigo_postal: e.target.value }))}
+                          placeholder="Ej: C1000"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="provincia">
+                        Provincia <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        value={direccionFields.provincia || undefined}
+                        onValueChange={(value) => setDireccionFields(prev => ({ ...prev, provincia: value }))}
+                      >
+                        <SelectTrigger id="provincia" className="cursor-pointer w-full">
+                          <SelectValue placeholder="Seleccionar Provincia" />
+                        </SelectTrigger>
+                        <SelectContent className="cursor-pointer">
+                          {ARGENTINA_PROVINCIAS.map((provincia) => (
+                            <SelectItem key={provincia.value} value={provincia.label} className="cursor-pointer">
+                              {provincia.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
             <div className="flex gap-2 pt-4">
               <Button
                 variant="outline"

@@ -127,11 +127,21 @@ export function EmpresaFormSheet({ isOpen, onClose, company, onSuccess }: Empres
     }
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.company_nombre.trim() || !formData.company_email.trim() || !formData.company_phone.trim()) {
       toast.error("Por favor completa los campos obligatorios");
+      return;
+    }
+
+    if (!validateEmail(formData.company_email.trim())) {
+      toast.error("Por favor ingresa un email válido");
       return;
     }
 

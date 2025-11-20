@@ -159,6 +159,11 @@ export function OperadorUsuariosPage() {
     setIsUserSheetOpen(true)
   }
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
   const handleSaveUser = async () => {
     try {
       const formData = {
@@ -183,6 +188,9 @@ export function OperadorUsuariosPage() {
       }
       if (!formData.user_email) {
         camposFaltantes.push("Email")
+      } else if (!validateEmail(formData.user_email)) {
+        toast.error("Por favor ingresa un email válido")
+        return
       }
 
       if (!isEditing && !formData.user_password) {

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -294,6 +294,11 @@ const handleCreateUser = () => {
     setIsUserSheetOpen(true);
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSaveUser = async () => {
     try {
       const isSuperAdmin = selectedRole === "superadmin";
@@ -320,6 +325,9 @@ const handleCreateUser = () => {
       }
       if (!formData.user_email) {
         camposFaltantes.push("Email");
+      } else if (!validateEmail(formData.user_email)) {
+        toast.error("Por favor ingresa un email válido");
+        return;
       }
       if (!formData.user_role) {
         camposFaltantes.push("Rol");
@@ -674,7 +682,9 @@ const handleCreateUser = () => {
                   <SelectValue placeholder="Selecciona un rol" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="superadmin" className="cursor-pointer">Superadmin</SelectItem>
+                  {!isEditing && (
+                    <SelectItem value="superadmin" className="cursor-pointer">Superadmin</SelectItem>
+                  )}
                   <SelectItem value="owner" className="cursor-pointer">Owner</SelectItem>
                   <SelectItem value="operador" className="cursor-pointer">Operador</SelectItem>
                   <SelectItem value="profesional" className="cursor-pointer">Profesional</SelectItem>

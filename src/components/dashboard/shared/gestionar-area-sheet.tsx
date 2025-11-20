@@ -53,8 +53,6 @@ export function GestionarAreaSheet({ profesional, onUpdate }: GestionarAreaSheet
   const [isLoading, setIsLoading] = useState(false);
   const [selectedEspecialidad, setSelectedEspecialidad] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editingAsignacion, setEditingAsignacion] = useState<string | null>(null);
-  const [selectedEditEspecialidad, setSelectedEditEspecialidad] = useState<string>("");
   const [deletingAsignacion, setDeletingAsignacion] = useState<string | null>(null);
 
   const fetchEspecialidades = async () => {
@@ -111,49 +109,6 @@ toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} asi
         toast.error("La especialidad ya está asignada al profesional");
       } else {
         toast.error(`Error al asignar la especialidad: ${axiosError.response?.data?.error || axiosError.message}`);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleEditarAsignacion = async (idAsignacion: string) => {
-    if (!selectedEditEspecialidad) {
-      toast.error(`Selecciona una ${companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}`);
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
-      const payload = {
-        especialidad_id: parseInt(selectedEditEspecialidad)
-      };
-
-      const url = CLIENT_API.EDITAR_ASIGNACION_ESPECIALIDAD.replace('{id_asignacion}', idAsignacion);
-
-await apiClient.put(url, payload);
-
-toast.success(`${companyConfig?.sing_heading_especialidad || "Especialidad"} actualizada correctamente`);
-      onUpdate();
-      setEditingAsignacion(null);
-      setSelectedEditEspecialidad("");
-    } catch (error: unknown) {
-      console.error("Error completo:", error);
-      const axiosError = error as { response?: { data?: { error?: string }; status?: number }; message?: string };
-      console.error("Error response:", axiosError.response?.data);
-      console.error("Error status:", axiosError.response?.status);
-
-      if (axiosError.response?.status === 400) {
-        const errorMessage = axiosError.response?.data?.error || "Datos inválidos";
-        toast.error(errorMessage);
-      } else if (axiosError.response?.status === 404) {
-        const errorMessage = axiosError.response?.data?.error || "Asignación no encontrada";
-        toast.error(errorMessage);
-      } else if (axiosError.response?.status === 409) {
-        toast.error("La especialidad ya está asignada al profesional");
-      } else {
-        toast.error(`Error al actualizar la especialidad: ${axiosError.response?.data?.error || axiosError.message}`);
       }
     } finally {
       setIsSubmitting(false);
@@ -232,17 +187,6 @@ const especialidadesDisponibles = especialidades.filter(esp =>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          setEditingAsignacion(esp.id_asignacion.toString());
-                          setSelectedEditEspecialidad(esp.id_especialidad.toString());
-                        }}
-                        className="h-6 px-2 text-xs"
-                      >
-                        <Settings className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
                         onClick={() => setDeletingAsignacion(esp.id_asignacion.toString())}
                         className="h-6 px-2 text-xs text-red-600 hover:text-red-700"
                       >
@@ -292,64 +236,6 @@ const especialidadesDisponibles = especialidades.filter(esp =>
               )}
             </div>
           </div>
-
-          {editingAsignacion && (
-            <div>
-              <h4 className="text-sm font-medium mb-2">Editar {companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}:</h4>
-              <div className="space-y-2">
-                <Select value={selectedEditEspecialidad} onValueChange={setSelectedEditEspecialidad}>
-                  <SelectTrigger className="w-full cursor-pointer">
-                    <SelectValue placeholder={`Selecciona una ${companyConfig?.sing_heading_especialidad?.toLowerCase() || "especialidad"}`} />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <span>asas</span>
-                    {isLoading ? (
-                      <SelectItem value="loading" disabled>Cargando...</SelectItem>
-                    ) : especialidades.length > 0 ? (
-                      especialidades.map((esp) => (
-                        <SelectItem key={esp.id_especialidad} value={esp.id_especialidad.toString()} className="cursor-pointer">
-                          {esp.nombre_especialidad}
-                        </SelectItem>
-
-                      ))
-
-                    ) : (
-                      <SelectItem value="no-available" disabled>No hay {companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"} disponibles</SelectItem>
-                    )}
-
-                  </SelectContent>
-                </Select>
-                <ul>
-                  <li className="text-xs text-red-400 list-disc ml-4 mb-2">Tenga en cuenta que al hacer el actualizacion, cualquier {companyConfig?.sing_heading_reclamos.toLowerCase()} con el nombre actual, no se vera afectado</li>
-                  <li className="text-xs text-red-400 list-disc ml-4">Cualquier {companyConfig?.sing_heading_profesional.toLowerCase()} que actualmente tenga {companyConfig?.plu_heading_reclamos.toLowerCase()} con este nombre, tampoco veran el cambio</li>
-                </ul>
-                <div className="flex gap-2">
-
-                  <Button
-                    onClick={() => handleEditarAsignacion(editingAsignacion)}
-                    disabled={isSubmitting}
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <Settings className="h-4 w-4 mr-1" />
-                    {isSubmitting ? "Actualizando..." : "Actualizar"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setEditingAsignacion(null);
-                      setSelectedEditEspecialidad("");
-                    }}
-                    size="sm"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-
-              </div>
-            </div>
-          )}
 
           {deletingAsignacion && (
             <div>
