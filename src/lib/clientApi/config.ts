@@ -4,13 +4,6 @@ export const CLIENT_API = {
 
   GET_RECLAMOS: `${config.apiUrl}/${slugs.customersApi}/reclamos`,
 
-  GET_USERS: `${config.apiUrl}/${slugs.customersApi}/users`,
-  USERS_CREATE: `${config.apiUrl}/${slugs.customersApi}/users`,
-  USERS_EDIT: `${config.apiUrl}/${slugs.customersApi}/users/{id}`,
-  USER_BLOCK: `${config.apiUrl}/${slugs.customersApi}/users/block/{id}`,
-  USER_UNBLOCK: `${config.apiUrl}/${slugs.customersApi}/users/unblock/{id}`,
-  USER_RESTORE: `${config.apiUrl}/${slugs.customersApi}/users/restore/{id}`,
-
   GET_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades`,
   CREATE_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades`,
   EDIT_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades/{id_especialidad}`,
@@ -36,12 +29,5 @@ export const CLIENT_API = {
 
   RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/${slugs.customersApi}/reclamos/profesional/gestion/{id}`,
   ENVIAR_RECORDATORIO_RECLAMO: `${config.apiUrl}/${slugs.customersApi}/reclamos/recordatorio/:reclamo_id`,
-
-  UPDATE_COMPANY: `${config.apiUrl}/${slugs.customersApi}/company`,
-  UPDATE_COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
-  FEEDBACK: `${config.apiUrl}/${slugs.customersApi}/platform/feedback`,
-  COMPANY_CONFIG: `${config.apiUrl}/${slugs.customersApi}/company/config`,
-
-  PROFILE_MANAGE: `${config.apiUrl}/${slugs.customersApi}/profile/manage`,
 
 };

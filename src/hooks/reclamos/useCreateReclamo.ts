@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { useAuth } from "@/context/AuthContext";
 import { apiClient } from "@/lib/apiClient";
 
@@ -169,7 +170,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
 
       const [clientesRes, usersRes, asignacionesRes, especialidadesRes] = await Promise.all([
         apiClient.get(CLIENT_API.GET_CLIENTES),
-        apiClient.get(CLIENT_API.GET_USERS),
+        apiClient.get(API_ROUTES.GET_USERS),
         apiClient.get(CLIENT_API.GET_ASIGNACIONES),
         apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
       ]);

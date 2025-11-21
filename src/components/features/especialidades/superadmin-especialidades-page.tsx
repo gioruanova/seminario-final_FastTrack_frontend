@@ -24,6 +24,7 @@ import { EspecialidadFormSheet } from "@/components/features/especialidades/espe
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { SUPER_API } from "@/lib/superApi/config";
 
 const apiClient = axios.create({
@@ -66,7 +67,7 @@ export function SuperadminEspecialidadesPage() {
       setIsLoading(true);
       const [especialidadesRes, companiesRes] = await Promise.all([
         apiClient.get(SUPER_API.GET_ESPECIALIDADES),
-        apiClient.get(SUPER_API.GET_COMPANIES),
+        apiClient.get(API_ROUTES.GET_COMPANIES),
       ]);
 
       const especialidadesData = especialidadesRes.data.map((esp: unknown) => {

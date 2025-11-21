@@ -46,6 +46,8 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   refreshCompanyConfig: () => Promise<void>;
   isLoading: boolean;
+  isRedirecting: boolean;
+  setIsRedirecting: (value: boolean) => void;
   error: string | null;
 }
 

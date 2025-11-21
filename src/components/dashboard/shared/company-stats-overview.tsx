@@ -8,9 +8,11 @@ import { ChevronDown, ChevronUp, BriefcaseBusiness, SquareCheck } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/context/DashboardContext";
 import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { useAuth } from "@/context/AuthContext";
-import { useReclamos } from "@/hooks/useReclamos";
+import { useReclamos } from "@/hooks/reclamos/useReclamos";
 import { apiClient } from "@/lib/apiClient";
+import { USER_STATUS } from "@/types/users";
 
 interface UserData {
   user_id: number;
@@ -53,7 +55,7 @@ export function CompanyStatsOverview() {
     const fetchData = async () => {
       try {
         const [usersRes, especialidadesRes, clientesRes] = await Promise.all([
-          apiClient.get(CLIENT_API.GET_USERS),
+          apiClient.get(API_ROUTES.GET_USERS),
           apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
           apiClient.get(CLIENT_API.GET_CLIENTES),
         ]);
@@ -71,8 +73,8 @@ export function CompanyStatsOverview() {
     fetchData();
   }, [refreshTrigger]);
 
-  const activeUsers = users.filter(u => u.user_status === 1).length;
-  const inactiveUsers = users.filter(u => u.user_status === 0).length;
+  const activeUsers = users.filter(u => u.user_status === USER_STATUS.ACTIVO).length;
+  const inactiveUsers = users.filter(u => u.user_status === USER_STATUS.BLOQUEADO).length;
   const totalUsers = users.length;
 
   const ownerUsers = users.filter(u => u.user_role === "owner").length;

@@ -7,8 +7,10 @@ import { Pie, PieChart, Cell, Label } from "recharts";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/context/DashboardContext";
+import { API_ROUTES } from "@/lib/api_routes";
 import { SUPER_API } from "@/lib/superApi/config";
 import { apiClient } from "@/lib/apiClient";
+import { USER_STATUS } from "@/types/users";
 
 interface UserData {
   user_id: number;
@@ -51,8 +53,8 @@ export function StatsOverview() {
     const fetchData = async () => {
       try {
         const [usersRes, companiesRes, especialidadesRes] = await Promise.all([
-          apiClient.get(SUPER_API.GET_USERS),
-          apiClient.get(SUPER_API.GET_COMPANIES),
+          apiClient.get(API_ROUTES.GET_USERS),
+          apiClient.get(API_ROUTES.GET_COMPANIES),
           apiClient.get(SUPER_API.GET_ESPECIALIDADES),
         ]);
 
@@ -75,8 +77,8 @@ export function StatsOverview() {
 
   const nonSuperAdminUsers = users.filter(u => u.user_role !== "superadmin");
 
-  const activeUsers = nonSuperAdminUsers.filter(u => u.user_status === 1).length;
-  const inactiveUsers = nonSuperAdminUsers.filter(u => u.user_status === 0).length;
+  const activeUsers = nonSuperAdminUsers.filter(u => u.user_status === USER_STATUS.ACTIVO).length;
+  const inactiveUsers = nonSuperAdminUsers.filter(u => u.user_status === USER_STATUS.BLOQUEADO).length;
   const totalUsers = nonSuperAdminUsers.length;
 
   const ownerUsers = nonSuperAdminUsers.filter(u => u.user_role === "owner").length;

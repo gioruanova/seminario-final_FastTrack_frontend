@@ -1,48 +1,39 @@
-﻿"use client"
+﻿"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { Building, Users, UserCheck, UserX, TrendingUp, TrendingDown } from "lucide-react"
-import axios from "axios"
-import { config } from "@/lib/config"
-import { SUPER_API } from "@/lib/superApi/config"
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { Building, Users, UserCheck, UserX, TrendingUp, TrendingDown } from "lucide-react";
+import { API_ROUTES } from "@/lib/api_routes";
+import { SUPER_API } from "@/lib/superApi/config";
+import { apiClient } from "@/lib/apiClient";
 
 interface ClienteRecurrente {
-  cliente_id: number
-  cliente_complete_name: string
-  cliente_dni: string
-  cliente_phone: string
-  cliente_email: string
-  cliente_direccion: string
-  // Latitud y longitud - no son obligatorios > a implementar en proximos relesases
-  cliente_lat?: number
-  cliente_lng?: number
-  cliente_active: boolean
-  company_name?: string
-  company_id?: number
-  total_reclamos?: number
-  ultimo_reclamo?: string
+  cliente_id: number;
+  cliente_complete_name: string;
+  cliente_dni: string;
+  cliente_phone: string;
+  cliente_email: string;
+  cliente_direccion: string;
+  cliente_lat?: number;
+  cliente_lng?: number;
+  cliente_active: boolean;
+  company_name?: string;
+  company_id?: number;
+  total_reclamos?: number;
+  ultimo_reclamo?: string;
 }
 
 interface EmpresaStats {
-  company_id: number
-  company_name: string
-  total_clientes: number
-  clientes_activos: number
-  clientes_inactivos: number
-  porcentaje_activos: number
-  total_reclamos: number
+  company_id: number;
+  company_name: string;
+  total_clientes: number;
+  clientes_activos: number;
+  clientes_inactivos: number;
+  porcentaje_activos: number;
+  total_reclamos: number;
 }
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
 
 export function SuperadminClientesPage() {
   const [clientes, setClientes] = useState<ClienteRecurrente[]>([])
@@ -55,7 +46,7 @@ export function SuperadminClientesPage() {
 
       const [clientesResponse, empresasResponse, reclamosResponse] = await Promise.all([
         apiClient.get(SUPER_API.GET_CLIENTES),
-        apiClient.get(SUPER_API.GET_COMPANIES),
+        apiClient.get(API_ROUTES.GET_COMPANIES),
         apiClient.get(SUPER_API.GET_RECLAMOS)
       ])
 

@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCreateReclamo } from "@/hooks/useCreateReclamo";
-import { useCreateReclamoSubmit } from "@/hooks/useCreateReclamoSubmit";
+import { useCreateReclamo } from "@/hooks/reclamos/useCreateReclamo";
+import { useCreateReclamoSubmit } from "@/hooks/reclamos/useCreateReclamoSubmit";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 

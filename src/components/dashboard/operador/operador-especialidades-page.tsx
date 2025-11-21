@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
 import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 
@@ -74,7 +75,7 @@ export function OperadorEspecialidadesPage() {
       setIsLoading(true);
       const [especialidadesResponse, profesionalesResponse] = await Promise.all([
         apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
-        apiClient.get(CLIENT_API.GET_USERS)
+        apiClient.get(API_ROUTES.GET_USERS)
       ]);
 
       const especialidadesData = especialidadesResponse.data;

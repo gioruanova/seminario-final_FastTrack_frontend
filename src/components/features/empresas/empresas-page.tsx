@@ -33,8 +33,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import axios from "axios";
-import { config } from "@/lib/config";
+import { API_ROUTES } from "@/lib/api_routes";
+import { getCompanyUpdateEndpoint } from "@/lib/apiHelpers";
 import { SUPER_API } from "@/lib/superApi/config";
+import { apiClient } from "@/lib/apiClient";
 
 interface CompanyData {
   company_id: number;
@@ -75,17 +77,9 @@ export function EmpresasPage() {
     try {
       setIsLoading(true);
       
-      const apiClient = axios.create({
-        baseURL: config.apiUrl,
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
       const [companiesRes, usersRes, especialidadesRes] = await Promise.all([
-        apiClient.get(SUPER_API.GET_COMPANIES),
-        apiClient.get(SUPER_API.GET_USERS),
+        apiClient.get(API_ROUTES.GET_COMPANIES),
+        apiClient.get(API_ROUTES.GET_USERS),
         apiClient.get(SUPER_API.GET_ESPECIALIDADES),
       ]);
 
@@ -185,16 +179,8 @@ export function EmpresasPage() {
     if (!companyToToggle) return;
 
     try {
-      const endpoint = SUPER_API.COMPANY_EDIT.replace("{id}", companyToToggle.id.toString());
+      const endpoint = getCompanyUpdateEndpoint(companyToToggle.id);
       const newEstado = companyToToggle.estado === 1 ? false : true;
-
-      const apiClient = axios.create({
-        baseURL: config.apiUrl,
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
       await apiClient.put(endpoint, {
         company_estado: newEstado,

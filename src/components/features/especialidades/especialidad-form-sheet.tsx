@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { config } from "@/lib/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { SUPER_API } from "@/lib/superApi/config";
 
 const apiClient = axios.create({
@@ -88,7 +89,7 @@ export function EspecialidadFormSheet({
 
   const fetchCompanies = async () => {
     try {
-      const response = await apiClient.get(SUPER_API.GET_COMPANIES);
+      const response = await apiClient.get(API_ROUTES.GET_COMPANIES);
       setCompanies(response.data);
     } catch {
       toast.error("Error al cargar las empresas");
