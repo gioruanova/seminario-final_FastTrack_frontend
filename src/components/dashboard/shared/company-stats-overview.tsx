@@ -20,11 +20,7 @@ interface UserData {
   user_status: number;
 }
 
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  estado_especialidad: number;
-}
+import { Especialidad } from "@/types/especialidades";
 
 interface ClienteData {
   cliente_id: number;
@@ -46,7 +42,7 @@ export function CompanyStatsOverview() {
   const { companyConfig } = useAuth();
   const { reclamos: reclamosData } = useReclamos();
   const [users, setUsers] = useState<UserData[]>([]);
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
+  const [especialidades, setEspecialidades] = useState<Especialidad[]>([]);
   const [clientes, setClientes] = useState<ClienteData[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +52,7 @@ export function CompanyStatsOverview() {
       try {
         const [usersRes, especialidadesRes, clientesRes] = await Promise.all([
           apiClient.get(API_ROUTES.GET_USERS),
-          apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
+          apiClient.get(API_ROUTES.GET_ESPECIALIDADES),
           apiClient.get(CLIENT_API.GET_CLIENTES),
         ]);
 

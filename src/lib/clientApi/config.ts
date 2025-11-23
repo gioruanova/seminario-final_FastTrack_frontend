@@ -4,17 +4,6 @@ export const CLIENT_API = {
 
   GET_RECLAMOS: `${config.apiUrl}/${slugs.customersApi}/reclamos`,
 
-  GET_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades`,
-  CREATE_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades`,
-  EDIT_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades/{id_especialidad}`,
-  ENABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades/unblock/{especialidadId}`,
-  DISABLE_ESPECIALIDADES: `${config.apiUrl}/${slugs.customersApi}/especialidades/block/{especialidadId}`,
-
-  CREAR_ASIGNACION_ESPECIALIDAD: `${config.apiUrl}/${slugs.customersApi}/profesionalEspecialidad`,
-  GET_ASIGNACIONES: `${config.apiUrl}/${slugs.customersApi}/asignaciones`,
-  EDITAR_ASIGNACION_ESPECIALIDAD: `${config.apiUrl}/${slugs.customersApi}/profesionalEspecialidad/{id_asignacion}`,
-  ELIMINAR_ASIGNACION_ESPECIALIDAD: `${config.apiUrl}/${slugs.customersApi}/profesionalEspecialidad/{id_asignacion}`,
-
   RECLAMO_DESCARGA: `${config.apiUrl}/${slugs.customersApi}/vistas/reclamos/{type}`,
 
   GET_CLIENTES: `${config.apiUrl}/${slugs.customersApi}/clientes-recurrentes`,

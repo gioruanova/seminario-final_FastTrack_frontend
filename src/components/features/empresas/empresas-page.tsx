@@ -35,7 +35,6 @@ import { toast } from "sonner";
 import axios from "axios";
 import { API_ROUTES } from "@/lib/api_routes";
 import { getCompanyUpdateEndpoint } from "@/lib/apiHelpers";
-import { SUPER_API } from "@/lib/superApi/config";
 import { apiClient } from "@/lib/apiClient";
 
 interface CompanyData {
@@ -80,7 +79,7 @@ export function EmpresasPage() {
       const [companiesRes, usersRes, especialidadesRes] = await Promise.all([
         apiClient.get(API_ROUTES.GET_COMPANIES),
         apiClient.get(API_ROUTES.GET_USERS),
-        apiClient.get(SUPER_API.GET_ESPECIALIDADES),
+        apiClient.get(API_ROUTES.GET_ESPECIALIDADES),
       ]);
 
       interface CompanyApiResponse {

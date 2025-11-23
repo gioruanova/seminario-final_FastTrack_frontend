@@ -9,13 +9,9 @@ import { API_ROUTES } from "@/lib/api_routes";
 import { SUPER_API } from "@/lib/superApi/config";
 import { apiClient } from "@/lib/apiClient";
 
-interface ClienteRecurrente {
-  cliente_id: number;
-  cliente_complete_name: string;
-  cliente_dni: string;
-  cliente_phone: string;
-  cliente_email: string;
-  cliente_direccion: string;
+import { ClienteRecurrente } from "@/types/clientes";
+
+interface ClienteRecurrenteWithStats extends Omit<ClienteRecurrente, "cliente_active"> {
   cliente_lat?: number;
   cliente_lng?: number;
   cliente_active: boolean;
@@ -36,7 +32,7 @@ interface EmpresaStats {
 }
 
 export function SuperadminClientesPage() {
-  const [clientes, setClientes] = useState<ClienteRecurrente[]>([])
+  const [clientes, setClientes] = useState<ClienteRecurrenteWithStats[]>([])
   const [empresasStats, setEmpresasStats] = useState<EmpresaStats[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -70,7 +66,7 @@ export function SuperadminClientesPage() {
         }
       })
 
-      const clientesConReclamos = clientesData.map((cliente: ClienteRecurrente) => {
+      const clientesConReclamos = clientesData.map((cliente: ClienteRecurrenteWithStats) => {
         const nombreCliente = cliente.cliente_complete_name.trim().toLowerCase()
         const totalReclamos = reclamosPorCliente.get(nombreCliente) || 0
         return {
@@ -86,9 +82,9 @@ export function SuperadminClientesPage() {
         empresasMap.set(empresa.company_id, empresa.company_nombre)
       })
 
-      const empresaMap = new Map<number, ClienteRecurrente[]>()
+      const empresaMap = new Map<number, ClienteRecurrenteWithStats[]>()
 
-      clientesConReclamos.forEach((cliente: ClienteRecurrente) => {
+      clientesConReclamos.forEach((cliente: ClienteRecurrenteWithStats) => {
         if (cliente.company_id) {
           if (!empresaMap.has(cliente.company_id)) {
             empresaMap.set(cliente.company_id, [])

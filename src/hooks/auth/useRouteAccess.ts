@@ -17,22 +17,6 @@ interface UseRouteAccessResult {
   companyConfig: ReturnType<typeof useAuth>["companyConfig"];
 }
 
-/**
- * Hook para validar acceso a rutas
- * 
- * Valida que el usuario tenga el rol correcto y opcionalmente requiere companyConfig.
- * 
- * @example
- * ```tsx
- * const { hasAccess, isLoading } = useRouteAccess({
- *   allowedRoles: ["owner"],
- *   requireCompanyConfig: true
- * });
- * 
- * if (isLoading) return <Loading />;
- * if (!hasAccess) return <Unauthorized />;
- * ```
- */
 export function useRouteAccess({
   allowedRoles,
   requireCompanyConfig = false,

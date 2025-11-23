@@ -5,75 +5,22 @@ import { CLIENT_API } from "@/lib/clientApi/config";
 import { API_ROUTES } from "@/lib/api_routes";
 import { useAuth } from "@/context/AuthContext";
 import { apiClient } from "@/lib/apiClient";
+import { ProfesionalEspecialidad } from "@/types/profesional-especialidad";
+import { User } from "@/types/users";
+import { useProfesionalEspecialidad } from "@/hooks/profesional-especialidad/useProfesionalEspecialidad";
+import { ClienteRecurrente } from "@/types/clientes";
+import {
+  ReclamoFormData,
+  AgendaBloqueada,
+  FechaBloqueada,
+  AsignacionReclamo,
+} from "@/types/reclamos";
+import {
+  EspecialidadSimple,
+  Especialidad,
+} from "@/types/especialidades";
 
-interface ClienteRecurrente {
-  cliente_id: number;
-  cliente_complete_name: string;
-  cliente_email?: string;
-  cliente_phone?: string;
-  cliente_direccion?: string;
-  cliente_dni?: string;
-  cliente_active: number;
-}
-
-interface Especialidad {
-  especialidad_id: number;
-  nombre_especialidad: string;
-  especialidad_active: number;
-}
-
-interface User {
-  user_id: number;
-  user_complete_name: string;
-  user_email: string;
-  user_role: string;
-  user_status: number;
-  apto_recibir?: boolean | number;
-}
-
-interface Asignacion {
-  asignacion_id?: number;
-  profesional_id: number;
-  profesional_nombre: string;
-  especialidad_id: number;
-  especialidad_nombre: string;
-}
-
-interface EstadoEspecialidad {
-  id_especialidad: number;
-  estado_especialidad: number;
-}
-
-interface AgendaBloqueada {
-  profesional_id: number;
-  especialidad_id: number;
-  agenda_fecha: string;
-  agenda_hora_desde: string;
-  agenda_hora_hasta: string;
-}
-
-interface FechaBloqueada {
-  fecha: string;
-  hora_desde?: string;
-  hora_hasta?: string;
-  profesional_id: number;
-}
-
-export interface ReclamoFormData {
-  cliente_id: number | null;
-  especialidad_id: number | null;
-  asignacion_id: number | null;
-  profesional_id: number | null;
-  reclamo_titulo: string;
-  reclamo_detalle: string;
-  agenda_fecha: string;
-  agenda_hora_desde: string;
-  agenda_hora_hasta: string;
-  cliente_direccion?: string;
-  cliente_url?: string;
-  cliente_email?: string;
-  cliente_phone?: string;
-}
+export type { ReclamoFormData };
 
 
 export function useCreateReclamo(isOpen: boolean = false) {
@@ -97,20 +44,52 @@ export function useCreateReclamo(isOpen: boolean = false) {
   });
 
   const [clientesOptions, setClientesOptions] = useState<ClienteRecurrente[]>([]);
-  const [especialidadesOptions, setEspecialidadesOptions] = useState<Especialidad[]>([]);
-  const [asignacionesOptions, setAsignacionesOptions] = useState<Asignacion[]>([]);
-  const [asignacionesOriginales, setAsignacionesOriginales] = useState<Asignacion[]>([]);
+  const [especialidadesOptions, setEspecialidadesOptions] = useState<EspecialidadSimple[]>([]);
+  const [asignacionesOptions, setAsignacionesOptions] = useState<AsignacionReclamo[]>([]);
+  const [asignacionesOriginales, setAsignacionesOriginales] = useState<AsignacionReclamo[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [fechasBloqueadas, setFechasBloqueadas] = useState<FechaBloqueada[]>([]);
   const [agendaBloqueada, setAgendaBloqueada] = useState<AgendaBloqueada[]>([]);
 
   const [loadingClientes] = useState(false);
   const [loadingEspecialidades] = useState(false);
-  const [loadingAsignaciones] = useState(false);
   const [loadingFechas, setLoadingFechas] = useState(false);
 
+  const {
+    isLoading: loadingAsignaciones,
+    fetchAsignaciones,
+  } = useProfesionalEspecialidad({ autoFetch: false });
+
+  const transformAsignaciones = useCallback(
+    (
+      asignaciones: ProfesionalEspecialidad[],
+      users: User[]
+    ): AsignacionReclamo[] => {
+      return asignaciones.map((asig: ProfesionalEspecialidad) => {
+        const profesional = users.find(
+          (u: User) => u.user_id === asig.profesional_id
+        );
+        return {
+          asignacion_id: asig.asignacion_id || asig.id_asignacion,
+          profesional_id: asig.profesional_id,
+          profesional_nombre: profesional?.user_complete_name || "",
+          especialidad_id: asig.especialidad_id,
+          especialidad_nombre: asig.Especialidad?.nombre_especialidad || "",
+        };
+      });
+    },
+    []
+  );
+
   const formDataRef = useRef(formData);
-  const staticDataRef = useRef({
+  const staticDataRef = useRef<{
+    clientes: ClienteRecurrente[];
+    especialidades: EspecialidadSimple[];
+    asignaciones: AsignacionReclamo[];
+    users: User[];
+    agendaBloqueada: AgendaBloqueada[];
+    fechasBloqueadas: FechaBloqueada[];
+  }>({
     clientes: clientesOptions,
     especialidades: especialidadesOptions,
     asignaciones: asignacionesOptions,
@@ -168,30 +147,35 @@ export function useCreateReclamo(isOpen: boolean = false) {
     try {
       setLoading(true);
 
-      const [clientesRes, usersRes, asignacionesRes, especialidadesRes] = await Promise.all([
+      const [clientesRes, usersRes, especialidadesRes] = await Promise.all([
         apiClient.get(CLIENT_API.GET_CLIENTES),
         apiClient.get(API_ROUTES.GET_USERS),
-        apiClient.get(CLIENT_API.GET_ASIGNACIONES),
-        apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
+        apiClient.get(API_ROUTES.GET_ESPECIALIDADES),
       ]);
 
-      const asignaciones = asignacionesRes.data || [];
-      const estadoEspecialidades = especialidadesRes.data || [];
+      const asignacionesRaw = await fetchAsignaciones();
+      const especialidadesData = (especialidadesRes.data || []) as Especialidad[];
+      const usersData = (usersRes.data || []) as User[];
       
       const clientesActivos = (clientesRes.data || []).filter(
         (cliente: ClienteRecurrente) => cliente.cliente_active === 1
       );
       
-      const especialidadesUnicas = asignaciones.reduce((acc: Especialidad[], asignacion: Asignacion) => {
+      const asignacionesTransformadas = transformAsignaciones(
+        asignacionesRaw,
+        usersData
+      );
+      
+      const especialidadesUnicas = asignacionesTransformadas.reduce((acc: EspecialidadSimple[], asignacion: AsignacionReclamo) => {
         if (!acc.find(esp => esp.especialidad_id === asignacion.especialidad_id)) {
-          const especialidadData = (estadoEspecialidades as EstadoEspecialidad[]).find(
-            (esp: EstadoEspecialidad) => esp.id_especialidad === asignacion.especialidad_id
+          const especialidadData = especialidadesData.find(
+            (esp: Especialidad) => esp.id_especialidad === asignacion.especialidad_id
           );
           
           if (especialidadData && especialidadData.estado_especialidad === 1) {
             acc.push({
               especialidad_id: asignacion.especialidad_id,
-              nombre_especialidad: asignacion.especialidad_nombre,
+              nombre_especialidad: especialidadData.nombre_especialidad || asignacion.especialidad_nombre,
               especialidad_active: especialidadData.estado_especialidad,
             });
           }
@@ -201,16 +185,15 @@ export function useCreateReclamo(isOpen: boolean = false) {
 
       setClientesOptions(clientesActivos);
       setEspecialidadesOptions(especialidadesUnicas);
-      setUsers(usersRes.data || []);
-      setAsignacionesOptions(asignaciones);
-      setAsignacionesOriginales(asignaciones);
-
+      setUsers(usersData);
+      setAsignacionesOptions(asignacionesTransformadas);
+      setAsignacionesOriginales(asignacionesTransformadas);
     } catch (error) {
       console.error("Error loading initial data:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchAsignaciones, transformAsignaciones]);
 
   useEffect(() => {
     if (isOpen) {
@@ -245,7 +228,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
   useEffect(() => {
     if (formData.especialidad_id) {
       const asignacionesFiltradas = staticDataRef.current.asignaciones.filter(
-        (asignacion: Asignacion) => asignacion.especialidad_id === formData.especialidad_id
+        (asignacion: AsignacionReclamo) => asignacion.especialidad_id === formData.especialidad_id
       );
       setAsignacionesOptions(asignacionesFiltradas);
     } else {
@@ -253,7 +236,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
     }
   }, [formData.especialidad_id]);
 
-  const asignacionesRef = useRef<Asignacion[]>([]);
+  const asignacionesRef = useRef<AsignacionReclamo[]>([]);
   asignacionesRef.current = asignacionesOptions;
 
   useEffect(() => {
@@ -388,8 +371,10 @@ await new Promise(resolve => setTimeout(resolve, 1000));
     );
 
     const profesionalesAptos = asignacionesDeEspecialidad.filter((asignacion) => {
-      const user = staticDataRef.current.users.find(u => u.user_id === asignacion.profesional_id);
-      return user?.apto_recibir === true || user?.apto_recibir === 1;
+      const user = staticDataRef.current.users.find(
+        (u) => u.user_id === asignacion.profesional_id
+      );
+      return user?.apto_recibir === 1;
     });
 
     const profesionalCounts = profesionalesAptos.map((asignacion) => {

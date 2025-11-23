@@ -23,13 +23,20 @@ export const API_ROUTES = {
   COMPANY_CONFIG: `${config.apiUrl}/companies/config`,
   COMPANY_CONFIG_UPDATE: `${config.apiUrl}/companies/config`,
 
+  GET_ESPECIALIDADES: `${config.apiUrl}/especialidades`,
+  GET_ESPECIALIDADES_BY_COMPANY: `${config.apiUrl}/especialidades/{company_id}`,
+  CREATE_ESPECIALIDADES: `${config.apiUrl}/especialidades`,
+  EDIT_ESPECIALIDADES: `${config.apiUrl}/especialidades/{especialidad_id}`,
+  ESPECIALIDADES_BLOCK: `${config.apiUrl}/especialidades/{especialidad_id}/block`,
+  ESPECIALIDADES_UNBLOCK: `${config.apiUrl}/especialidades/{especialidad_id}/unblock`,
 
-
-
-
-  
   GET_FEEDBACKS: `${config.apiUrl}/feedback`,
   FEEDBACK_CREATE: `${config.apiUrl}/feedback`,
   FEEDBACK_DELETE: `${config.apiUrl}/feedback/{feedback_id}`,
+
+  GET_PROFESIONAL_ESPECIALIDAD: `${config.apiUrl}/profesional-especialidad`,
+  CREATE_PROFESIONAL_ESPECIALIDAD: `${config.apiUrl}/profesional-especialidad`,
+  UPDATE_PROFESIONAL_ESPECIALIDAD: `${config.apiUrl}/profesional-especialidad/{asignacion_id}`,
+  DELETE_PROFESIONAL_ESPECIALIDAD: `${config.apiUrl}/profesional-especialidad/{asignacion_id}`,
 };
 

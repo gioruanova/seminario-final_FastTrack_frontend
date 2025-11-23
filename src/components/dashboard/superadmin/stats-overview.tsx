@@ -8,7 +8,6 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDashboard } from "@/context/DashboardContext";
 import { API_ROUTES } from "@/lib/api_routes";
-import { SUPER_API } from "@/lib/superApi/config";
 import { apiClient } from "@/lib/apiClient";
 import { USER_STATUS } from "@/types/users";
 
@@ -24,11 +23,7 @@ interface CompanyData {
   company_estado: number;
 }
 
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  estado_especialidad: number;
-}
+import { Especialidad } from "@/types/especialidades";
 
 const CHART_COLORS = [
   "#8b5cf6",
@@ -45,7 +40,7 @@ export function StatsOverview() {
   const { refreshTrigger } = useDashboard();
   const [users, setUsers] = useState<UserData[]>([]);
   const [companies, setCompanies] = useState<CompanyData[]>([]);
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
+  const [especialidades, setEspecialidades] = useState<Especialidad[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -55,7 +50,7 @@ export function StatsOverview() {
         const [usersRes, companiesRes, especialidadesRes] = await Promise.all([
           apiClient.get(API_ROUTES.GET_USERS),
           apiClient.get(API_ROUTES.GET_COMPANIES),
-          apiClient.get(SUPER_API.GET_ESPECIALIDADES),
+          apiClient.get(API_ROUTES.GET_ESPECIALIDADES),
         ]);
 
         setUsers(usersRes.data);

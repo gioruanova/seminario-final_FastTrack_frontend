@@ -1,41 +1,34 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, X, ChevronLeft, ChevronRight, Wrench, Users, CheckCircle, XCircle, AlertCircle, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
-import axios from "axios";
-import { config } from "@/lib/config";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Search,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Wrench,
+  Users,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import { API_ROUTES } from "@/lib/api_routes";
+import { apiClient } from "@/lib/apiClient";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
-
-const apiClient = axios.create({
-  baseURL: config.apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-interface EspecialidadData {
-  id_especialidad: number;
-  nombre_especialidad: string;
-  estado_especialidad: number;
-  created_at: string;
-  updated_at: string;
-  profesionales_count?: number;
-  profesionales?: Array<{
-    user_id: number;
-    user_complete_name: string;
-    user_email: string;
-    user_status: number;
-  }>;
-}
+import { useEspecialidades } from "@/hooks/especialidades/useEspecialidades";
+import { Especialidad } from "@/types/especialidades";
 
 interface ProfesionalData {
   user_id: number;
@@ -60,73 +53,93 @@ interface ProfesionalData {
   }>;
 }
 
+interface EspecialidadWithProfesionales extends Especialidad {
+  profesionales_count?: number;
+  profesionales?: Array<{
+    user_id: number;
+    user_complete_name: string;
+    user_email: string;
+    user_status: number;
+  }>;
+}
+
 export function OperadorEspecialidadesPage() {
   const { companyConfig } = useAuth();
-  const [especialidades, setEspecialidades] = useState<EspecialidadData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterEstado, setFilterEstado] = useState<string>("all");
   const [filterProfesionales, setFilterProfesionales] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const fetchData = useCallback(async () => {
+  const {
+    especialidades,
+    isLoading: especialidadesLoading,
+    fetchEspecialidades,
+  } = useEspecialidades({ autoFetch: true });
+
+  const [profesionales, setProfesionales] = useState<ProfesionalData[]>([]);
+  const [isLoadingProfesionales, setIsLoadingProfesionales] = useState(true);
+
+  const fetchProfesionales = useCallback(async () => {
     try {
-      setIsLoading(true);
-      const [especialidadesResponse, profesionalesResponse] = await Promise.all([
-        apiClient.get(CLIENT_API.GET_ESPECIALIDADES),
-        apiClient.get(API_ROUTES.GET_USERS)
-      ]);
-
-      const especialidadesData = especialidadesResponse.data;
-      const profesionalesData = profesionalesResponse.data.filter((user: ProfesionalData) =>
-        user.user_role === "profesional"
+      setIsLoadingProfesionales(true);
+      const response = await apiClient.get<ProfesionalData[]>(API_ROUTES.GET_USERS);
+      const profesionalesData = response.data.filter(
+        (user) => user.user_role === "profesional"
       );
-
-      const especialidadesConProfesionales = especialidadesData.map((esp: EspecialidadData) => {
-        const profesionalesDeEstaEspecialidad = profesionalesData.filter((prof: ProfesionalData) =>
-          prof.especialidades && prof.especialidades.some((e) => e.id_especialidad === esp.id_especialidad)
-        );
-
-        return {
-          ...esp,
-          profesionales_count: profesionalesDeEstaEspecialidad.length,
-          profesionales: profesionalesDeEstaEspecialidad.map((prof: ProfesionalData) => ({
-            user_id: prof.user_id,
-            user_complete_name: prof.user_complete_name,
-            user_email: prof.user_email,
-            user_status: prof.user_status
-          }))
-        };
-      });
-
-      setEspecialidades(especialidadesConProfesionales);
+      setProfesionales(profesionalesData);
     } catch {
-      toast.error(`Error al cargar las ${companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"}`);
     } finally {
-      setIsLoading(false);
+      setIsLoadingProfesionales(false);
     }
-  }, [companyConfig?.plu_heading_especialidad]);
+  }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchProfesionales();
+  }, [fetchProfesionales]);
 
-  const filteredEspecialidades = especialidades.filter((esp) => {
-    const matchesSearch =
-      esp.nombre_especialidad.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      esp.id_especialidad.toString().includes(searchTerm);
+  const especialidadesConProfesionales = useMemo<EspecialidadWithProfesionales[]>(() => {
+    return especialidades.map((esp) => {
+      const profesionalesDeEstaEspecialidad = profesionales.filter(
+        (prof) =>
+          prof.especialidades &&
+          prof.especialidades.some((e) => e.id_especialidad === esp.id_especialidad)
+      );
 
-    const matchesEstado = filterEstado === "all" ||
-      (filterEstado === "active" && esp.estado_especialidad === 1) ||
-      (filterEstado === "inactive" && esp.estado_especialidad === 0);
+      return {
+        ...esp,
+        profesionales_count: profesionalesDeEstaEspecialidad.length,
+        profesionales: profesionalesDeEstaEspecialidad.map((prof) => ({
+          user_id: prof.user_id,
+          user_complete_name: prof.user_complete_name,
+          user_email: prof.user_email,
+          user_status: prof.user_status,
+        })),
+      };
+    });
+  }, [especialidades, profesionales]);
 
-    const matchesProfesionales = filterProfesionales === "all" ||
-      (filterProfesionales === "with" && (esp.profesionales_count || 0) > 0) ||
-      (filterProfesionales === "without" && (esp.profesionales_count || 0) === 0);
+  const isLoading = especialidadesLoading || isLoadingProfesionales;
 
-    return matchesSearch && matchesEstado && matchesProfesionales;
-  });
+  const filteredEspecialidades = useMemo(() => {
+    return especialidadesConProfesionales.filter((esp) => {
+      const matchesSearch =
+        esp.nombre_especialidad.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        esp.id_especialidad.toString().includes(searchTerm);
+
+      const matchesEstado =
+        filterEstado === "all" ||
+        (filterEstado === "active" && esp.estado_especialidad === 1) ||
+        (filterEstado === "inactive" && esp.estado_especialidad === 0);
+
+      const matchesProfesionales =
+        filterProfesionales === "all" ||
+        (filterProfesionales === "with" && (esp.profesionales_count || 0) > 0) ||
+        (filterProfesionales === "without" && (esp.profesionales_count || 0) === 0);
+
+      return matchesSearch && matchesEstado && matchesProfesionales;
+    });
+  }, [especialidadesConProfesionales, searchTerm, filterEstado, filterProfesionales]);
 
   const totalPages = Math.ceil(filteredEspecialidades.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -187,7 +200,14 @@ export function OperadorEspecialidadesPage() {
             <Badge variant="secondary" className="text-lg px-4 py-1">
               {filteredEspecialidades.length} de {especialidades.length}
             </Badge>
-            <Button onClick={fetchData} variant="outline" size="sm">
+            <Button
+              onClick={() => {
+                fetchEspecialidades();
+                fetchProfesionales();
+              }}
+              variant="outline"
+              size="sm"
+            >
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>

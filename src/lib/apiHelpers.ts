@@ -42,3 +42,38 @@ export function getCompanyUpdateEndpoint(companyId: number): string {
   return API_ROUTES.COMPANY_UPDATE.replace("{company_id}", String(companyId));
 }
 
+export function getEspecialidadEditEndpoint(especialidadId: number): string {
+  return API_ROUTES.EDIT_ESPECIALIDADES.replace("{especialidad_id}", String(especialidadId));
+}
+
+export function getEspecialidadBlockEndpoint(especialidadId: number): string {
+  return API_ROUTES.ESPECIALIDADES_BLOCK.replace("{especialidad_id}", String(especialidadId));
+}
+
+export function getEspecialidadUnblockEndpoint(especialidadId: number): string {
+  return API_ROUTES.ESPECIALIDADES_UNBLOCK.replace("{especialidad_id}", String(especialidadId));
+}
+
+export function getEspecialidadStatusToggleEndpoint(
+  especialidadId: number,
+  currentStatus: number
+): string {
+  const endpoint =
+    currentStatus === 1
+      ? API_ROUTES.ESPECIALIDADES_BLOCK
+      : API_ROUTES.ESPECIALIDADES_UNBLOCK;
+  return endpoint.replace("{especialidad_id}", String(especialidadId));
+}
+
+export function getEspecialidadesByCompanyEndpoint(companyId: number): string {
+  return API_ROUTES.GET_ESPECIALIDADES_BY_COMPANY.replace("{company_id}", String(companyId));
+}
+
+export function getProfesionalEspecialidadUpdateEndpoint(asignacionId: number): string {
+  return API_ROUTES.UPDATE_PROFESIONAL_ESPECIALIDAD.replace("{asignacion_id}", String(asignacionId));
+}
+
+export function getProfesionalEspecialidadDeleteEndpoint(asignacionId: number): string {
+  return API_ROUTES.DELETE_PROFESIONAL_ESPECIALIDAD.replace("{asignacion_id}", String(asignacionId));
+}
+
