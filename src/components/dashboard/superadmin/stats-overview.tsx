@@ -1,29 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Pie, PieChart, Cell, Label } from "recharts";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDashboard } from "@/context/DashboardContext";
-import { API_ROUTES } from "@/lib/api_routes";
-import { apiClient } from "@/lib/apiClient";
+import { useSuperadminStats } from "@/hooks/superadmin/useSuperadminStats";
 import { USER_STATUS } from "@/types/users";
-
-interface UserData {
-  user_id: number;
-  user_role: string;
-  user_status: number;
-}
-
-interface CompanyData {
-  company_id: number;
-  company_nombre: string;
-  company_estado: number;
-}
-
-import { Especialidad } from "@/types/especialidades";
 
 const CHART_COLORS = [
   "#8b5cf6",
@@ -37,34 +21,8 @@ const CHART_COLORS = [
 ];
 
 export function StatsOverview() {
-  const { refreshTrigger } = useDashboard();
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [companies, setCompanies] = useState<CompanyData[]>([]);
-  const [especialidades, setEspecialidades] = useState<Especialidad[]>([]);
+  const { users, companies, especialidades, isLoading } = useSuperadminStats();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [usersRes, companiesRes, especialidadesRes] = await Promise.all([
-          apiClient.get(API_ROUTES.GET_USERS),
-          apiClient.get(API_ROUTES.GET_COMPANIES),
-          apiClient.get(API_ROUTES.GET_ESPECIALIDADES),
-        ]);
-
-        setUsers(usersRes.data);
-        setCompanies(companiesRes.data);
-        setEspecialidades(especialidadesRes.data);
-      } catch (error) {
-        console.error("Error obteniendo datos:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [refreshTrigger]);
 
   const activeCompanies = companies.filter(c => c.company_estado === 1).length;
   const inactiveCompanies = companies.filter(c => c.company_estado === 0).length;

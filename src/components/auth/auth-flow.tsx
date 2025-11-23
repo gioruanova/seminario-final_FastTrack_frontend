@@ -27,7 +27,10 @@ export function AuthFlow() {
         setIsRedirecting(false);
       }
     } else {
-      if (!isPublicRoute(pathname)) {
+      if (pathname === "/") {
+        setIsRedirecting(true);
+        router.replace("/login");
+      } else if (!isPublicRoute(pathname)) {
         setIsRedirecting(true);
         router.replace("/login");
       } else {
@@ -37,7 +40,13 @@ export function AuthFlow() {
   }, [user, isLoading, pathname, router]);
 
   if (isLoading || isRedirecting) {
-    return <LoadingScreen message={isLoading ? "Verificando sesión..." : "Redirigiendo..."} />;
+    if (isLoading) {
+      return <LoadingScreen message="Por favor espera unos momentos...Lo vale..." />;
+    }
+    if (user && (pathname === "/login" || pathname === "/")) {
+      return <LoadingScreen message="Ingresando..." />;
+    }
+    return <LoadingScreen message="Redirigiendo..." />;
   }
 
   return null;

@@ -66,6 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async (): Promise<void> => {
     setIsLoggingOut(true);
+    
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
     try {
       await apiClient.get(API_ROUTES.LOGOUT);
     } catch {
@@ -91,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     refreshCompanyConfig,
     isLoading: isLoading || isLoggingOut,
+    isLoggingOut,
     isRedirecting: false,
     setIsRedirecting,
     error: null,
