@@ -147,17 +147,18 @@ export function useCreateReclamo(isOpen: boolean = false) {
     try {
       setLoading(true);
 
-      const [clientesRes, usersRes, especialidadesRes] = await Promise.all([
-        apiClient.get(CLIENT_API.GET_CLIENTES),
+      const [clientesRes, usersRes, especialidadesRes] = await Promise.allSettled([
+        apiClient.get(API_ROUTES.GET_CLIENTES_RECURRENTES),
         apiClient.get(API_ROUTES.GET_USERS),
         apiClient.get(API_ROUTES.GET_ESPECIALIDADES),
       ]);
 
       const asignacionesRaw = await fetchAsignaciones();
-      const especialidadesData = (especialidadesRes.data || []) as Especialidad[];
-      const usersData = (usersRes.data || []) as User[];
+      const especialidadesData = (especialidadesRes.status === 'fulfilled' ? especialidadesRes.value.data : []) as Especialidad[];
+      const usersData = (usersRes.status === 'fulfilled' ? usersRes.value.data : []) as User[];
       
-      const clientesActivos = (clientesRes.data || []).filter(
+      const clientesData = clientesRes.status === 'fulfilled' ? (clientesRes.value.data || []) : [];
+      const clientesActivos = clientesData.filter(
         (cliente: ClienteRecurrente) => cliente.cliente_active === 1
       );
       

@@ -5,14 +5,6 @@ export function replaceRouteId(route: string, id: string | number): string {
   return route.replace("{id}", String(id));
 }
 
-export function getUserBlockEndpoint(userId: number): string {
-  return replaceRouteId(API_ROUTES.USER_BLOCK, userId);
-}
-
-export function getUserUnblockEndpoint(userId: number): string {
-  return replaceRouteId(API_ROUTES.USER_UNBLOCK, userId);
-}
-
 export function getUserRestoreEndpoint(userId: number): string {
   return replaceRouteId(API_ROUTES.USER_RESTORE, userId);
 }
@@ -34,24 +26,12 @@ export function getFeedbackDeleteEndpoint(feedbackId: number): string {
   return API_ROUTES.FEEDBACK_DELETE.replace("{feedback_id}", String(feedbackId));
 }
 
-export function getCompanyByIdEndpoint(companyId: number): string {
-  return API_ROUTES.COMPANY_GET_BY_ID.replace("{company_id}", String(companyId));
-}
-
 export function getCompanyUpdateEndpoint(companyId: number): string {
   return API_ROUTES.COMPANY_UPDATE.replace("{company_id}", String(companyId));
 }
 
 export function getEspecialidadEditEndpoint(especialidadId: number): string {
   return API_ROUTES.EDIT_ESPECIALIDADES.replace("{especialidad_id}", String(especialidadId));
-}
-
-export function getEspecialidadBlockEndpoint(especialidadId: number): string {
-  return API_ROUTES.ESPECIALIDADES_BLOCK.replace("{especialidad_id}", String(especialidadId));
-}
-
-export function getEspecialidadUnblockEndpoint(especialidadId: number): string {
-  return API_ROUTES.ESPECIALIDADES_UNBLOCK.replace("{especialidad_id}", String(especialidadId));
 }
 
 export function getEspecialidadStatusToggleEndpoint(
@@ -63,10 +43,6 @@ export function getEspecialidadStatusToggleEndpoint(
       ? API_ROUTES.ESPECIALIDADES_BLOCK
       : API_ROUTES.ESPECIALIDADES_UNBLOCK;
   return endpoint.replace("{especialidad_id}", String(especialidadId));
-}
-
-export function getEspecialidadesByCompanyEndpoint(companyId: number): string {
-  return API_ROUTES.GET_ESPECIALIDADES_BY_COMPANY.replace("{company_id}", String(companyId));
 }
 
 export function getProfesionalEspecialidadUpdateEndpoint(asignacionId: number): string {

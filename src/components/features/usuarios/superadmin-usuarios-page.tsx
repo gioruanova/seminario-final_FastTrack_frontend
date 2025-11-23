@@ -230,8 +230,7 @@ export function SuperadminUsuariosPage() {
         editingUser={editingUser}
         isEditing={isEditing}
         companies={companies}
-        allowedRoles={["superadmin", "owner", "operador", "profesional"]}
-        showCompanySelect={true}
+        currentUserRole={currentUser?.user_role}
         onSubmit={handleSaveUser}
       />
 

@@ -23,6 +23,9 @@ import { PasswordInput } from "./PasswordInput";
 import { RoleSelect } from "./RoleSelect";
 import { useUserPermissions } from "@/hooks/users/useUserPermissions";
 import { useUserFormHandlers } from "@/hooks/users/useUserFormHandlers";
+import { useUserFormPermissions } from "@/hooks/users/useUserFormPermissions";
+import { useUserFormConfig } from "@/hooks/users/useUserFormConfig";
+import { useUserFormData } from "@/hooks/users/useUserFormData";
 
 interface UserFormProps {
   open: boolean;
@@ -30,8 +33,6 @@ interface UserFormProps {
   editingUser: User | null;
   isEditing: boolean;
   companies?: Array<{ company_id: number; company_nombre: string }>;
-  allowedRoles: string[];
-  showCompanySelect?: boolean;
   currentUserRole?: string;
   onSubmit: (data: {
     user_complete_name: string;
@@ -50,33 +51,62 @@ export function UserForm({
   editingUser,
   isEditing,
   companies = [],
-  allowedRoles,
-  showCompanySelect = false,
   currentUserRole,
   onSubmit,
 }: UserFormProps) {
-  const defaultRole = currentUserRole === USER_ROLES.OPERADOR 
-    ? USER_ROLES.PROFESIONAL 
-    : (allowedRoles[0] || "");
-  
-  const [formData, setFormData] = useState({
-    user_complete_name: "",
-    user_dni: "",
-    user_phone: "",
-    user_email: "",
-    user_role: defaultRole,
-    user_password: "",
-    company_id: "",
+  const { allowedRoles: baseAllowedRoles, shouldShowCompanyField } = useUserFormConfig({
+    currentUserRole,
+    isEditing,
   });
+
+  const allowedRoles = useMemo(() => {
+    if (isEditing && editingUser && !baseAllowedRoles.includes(editingUser.user_role)) {
+      return [...baseAllowedRoles, editingUser.user_role];
+    }
+    return baseAllowedRoles;
+  }, [baseAllowedRoles, isEditing, editingUser]);
+
+  const defaultRole = useMemo(() => {
+    if (isEditing && editingUser) {
+      return editingUser.user_role;
+    }
+    return "";
+  }, [isEditing, editingUser]);
+  
+  const initialFormData = useUserFormData({
+    open,
+    isEditing,
+    editingUser,
+    defaultRole,
+  });
+
+  const [formData, setFormData] = useState(initialFormData);
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    if (open) {
+      setFormData(initialFormData);
+    }
+  }, [open, initialFormData]);
+
   const targetUser = useMemo(() => {
-    return editingUser || { user_role: formData.user_role } as User;
-  }, [editingUser, formData.user_role]);
+    if (isEditing && editingUser) {
+      return editingUser;
+    }
+    return null;
+  }, [isEditing, editingUser]);
 
   const { canChangeRole } = useUserPermissions({
     currentUserRole,
-    targetUser,
+    targetUser: targetUser || { user_role: "" } as User,
+  });
+
+  const effectiveCanChangeRole = isEditing ? canChangeRole : true;
+
+  const { shouldIncludeCompanyIdInSubmit } = useUserFormPermissions({
+    currentUserRole,
+    isEditing,
+    showCompanySelect: shouldShowCompanyField,
   });
 
   const handleCreateUser = useCallback(async (data: {
@@ -122,39 +152,19 @@ export function UserForm({
     onSuccess: () => onOpenChange(false),
   });
 
-  useEffect(() => {
-    if (open) {
-      if (isEditing && editingUser) {
-        setFormData({
-          user_complete_name: editingUser.user_complete_name,
-          user_dni: editingUser.user_dni,
-          user_phone: editingUser.user_phone,
-          user_email: editingUser.user_email,
-          user_role: editingUser.user_role,
-          user_password: "",
-          company_id: editingUser.company_id?.toString() || "",
-        });
-      } else {
-        setFormData({
-          user_complete_name: "",
-          user_dni: "",
-          user_phone: "",
-          user_email: "",
-          user_role: defaultRole,
-          user_password: "",
-          company_id: "",
-        });
-      }
-    }
-  }, [open, isEditing, editingUser, allowedRoles, defaultRole]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const submitData = { ...formData };
+    
+    if (shouldIncludeCompanyIdInSubmit && formData.company_id) {
+      (submitData as { company_id?: string }).company_id = formData.company_id;
+    } else {
+      delete (submitData as { company_id?: string }).company_id;
+    }
+    
     await handleFormSubmit({
-      ...formData,
-      company_id: showCompanySelect && formData.company_id
-        ? parseInt(formData.company_id)
-        : undefined,
+      ...submitData,
+      company_id: submitData.company_id ? parseInt(submitData.company_id) : undefined,
     });
   };
 
@@ -228,16 +238,18 @@ export function UserForm({
             />
           </div>
 
-          <RoleSelect
-            value={formData.user_role}
-            onChange={(value) => setFormData(prev => ({ ...prev, user_role: value }))}
-            allowedRoles={allowedRoles}
-            isEditing={isEditing}
-            disabled={isSubmitting}
-            canChangeRole={canChangeRole}
-          />
+          {allowedRoles.length > 0 && (
+            <RoleSelect
+              value={formData.user_role}
+              onChange={(value) => setFormData(prev => ({ ...prev, user_role: value }))}
+              allowedRoles={allowedRoles}
+              isEditing={isEditing}
+              disabled={isSubmitting || (isEditing && !effectiveCanChangeRole) || (!isEditing && allowedRoles.length === 1)}
+              canChangeRole={effectiveCanChangeRole && allowedRoles.length > 1}
+            />
+          )}
 
-          {showCompanySelect && formData.user_role !== USER_ROLES.SUPERADMIN && (
+          {shouldShowCompanyField && formData.user_role !== USER_ROLES.SUPERADMIN && (
             <div className="space-y-2">
               <Label htmlFor="company">
                 Empresa <span className="text-red-500">*</span>
@@ -275,7 +287,7 @@ export function UserForm({
               disabled={isSubmitting}
               showPassword={showPassword}
               onTogglePassword={() => setShowPassword(!showPassword)}
-              hint="Sugerencia: Fast + últimos 4 dígitos del DNI"
+              hint="Sugerencia: Fast + hora actual"
             />
           )}
 

@@ -67,17 +67,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async (): Promise<void> => {
     setIsLoggingOut(true);
     
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
     try {
       await apiClient.get(API_ROUTES.LOGOUT);
     } catch {
     } finally {
       reset();
       router.replace("/login");
-      setTimeout(() => {
-        setIsLoggingOut(false);
-      }, 100);
+      setIsLoggingOut(false);
     }
   }, [reset, router]);
 

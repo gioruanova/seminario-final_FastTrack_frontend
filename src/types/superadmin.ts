@@ -1,4 +1,3 @@
-import { Especialidad } from "@/types/especialidades";
 import { User } from "@/types/users";
 
 export interface SuperadminUserData extends Pick<User, "user_id" | "user_role" | "user_status"> {
@@ -21,9 +20,9 @@ export interface SuperadminReclamoData {
 export interface CompanyStats {
   company_id: number;
   company_nombre: string;
-  usuarios_activos: number;
   operadores_activos: number;
   profesionales_activos: number;
+  clientes_activos: number;
   especialidades: number;
   reclamos_abiertos: number;
   reclamos_cerrados: number;

@@ -15,8 +15,6 @@ import { UserPagination } from "./shared/UserPagination";
 import { UserForm } from "./shared/UserForm";
 import { UserPasswordSheet } from "./shared/UserPasswordSheet";
 import { User, UserStatus, USER_ROLES } from "@/types/users";
-import { validateUserForm } from "@/lib/utils/userValidation";
-import { toast } from "sonner";
 
 export function OwnerUsuariosPage() {
   const { companyConfig, user } = useAuth();
@@ -76,22 +74,14 @@ export function OwnerUsuariosPage() {
     user_password?: string;
     company_id?: number | null;
   }) => {
-    const validation = validateUserForm(formData, isEditing, false);
-
-    if (!validation.isValid) {
-      if (validation.missingFields.length > 0) {
-        toast.error(`Por favor completa los siguientes campos: ${validation.missingFields.join(", ")}`);
-      }
-      if (validation.errors.length > 0) {
-        validation.errors.forEach((error) => toast.error(error));
-      }
-      return;
-    }
-
     if (isEditing && editingUser) {
-      await updateUser(editingUser.user_id, formData);
+      const updateData = { ...formData };
+      delete updateData.company_id;
+      await updateUser(editingUser.user_id, updateData);
     } else {
-      await createUser(formData);
+      const userCompanyId = user && 'company_id' in user ? user.company_id : null;
+      const createData = { ...formData, company_id: userCompanyId || null };
+      await createUser(createData);
     }
   };
 
@@ -182,7 +172,7 @@ export function OwnerUsuariosPage() {
         onOpenChange={setIsUserSheetOpen}
         editingUser={editingUser}
         isEditing={isEditing}
-        allowedRoles={[USER_ROLES.OPERADOR, USER_ROLES.PROFESIONAL]}
+        currentUserRole={user?.user_role}
         onSubmit={handleSaveUser}
       />
 

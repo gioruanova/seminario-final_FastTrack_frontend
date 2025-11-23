@@ -12,7 +12,7 @@ export function DashboardContent({ children }: { children: React.ReactNode }) {
   const { isLoggingOut } = useAuth();
 
   if (isLoggingOut) {
-    return <LoadingScreen message="Saliendo..." />;
+    return <LoadingScreen message="Cerrando sesión..." />;
   }
 
   return (

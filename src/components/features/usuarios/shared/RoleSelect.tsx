@@ -33,15 +33,15 @@ export function RoleSelect({
         Rol <span className="text-red-500">*</span>
       </Label>
       <Select
-        value={value}
+        value={value || undefined}
         onValueChange={onChange}
         disabled={disabled || !canChangeRole}
       >
         <SelectTrigger className="min-w-full cursor-pointer">
-          <SelectValue placeholder="Selecciona un rol" />
+          <SelectValue placeholder="Seleccionar rol" />
         </SelectTrigger>
         <SelectContent>
-          {allowedRoles.includes("superadmin") && !isEditing && (
+          {allowedRoles.includes("superadmin") && (
             <SelectItem value="superadmin" className="cursor-pointer">
               Superadmin
             </SelectItem>
@@ -63,9 +63,9 @@ export function RoleSelect({
           )}
         </SelectContent>
       </Select>
-      {!canChangeRole && (
+      {!canChangeRole && isEditing && (
         <p className="text-xs text-muted-foreground">
-          No puedes cambiar el rol de los usuarios
+          No puedes cambiar el rol de este usuario
         </p>
       )}
     </div>

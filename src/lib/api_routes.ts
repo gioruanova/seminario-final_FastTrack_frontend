@@ -38,5 +38,11 @@ export const API_ROUTES = {
   CREATE_PROFESIONAL_ESPECIALIDAD: `${config.apiUrl}/profesional-especialidad`,
   UPDATE_PROFESIONAL_ESPECIALIDAD: `${config.apiUrl}/profesional-especialidad/{asignacion_id}`,
   DELETE_PROFESIONAL_ESPECIALIDAD: `${config.apiUrl}/profesional-especialidad/{asignacion_id}`,
+
+  GET_CLIENTES_RECURRENTES: `${config.apiUrl}/clientes-recurrentes`,
+  CREATE_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes`,
+  UPDATE_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/{cliente_id}`,
+  BLOCK_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/block/{cliente_id}`,
+  UNBLOCK_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/unblock/{cliente_id}`,
 };
 

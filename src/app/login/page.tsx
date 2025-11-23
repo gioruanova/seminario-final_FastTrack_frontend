@@ -10,7 +10,7 @@ export default function LoginPage() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <LoadingScreen message="Saliendo..." />;
+    return <LoadingScreen message="Cerrando sesión..." />;
   }
 
   if (user) {

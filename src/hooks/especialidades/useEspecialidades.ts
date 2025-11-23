@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/api_routes";
+import { useDashboard } from "@/context/DashboardContext";
 import {
   getEspecialidadEditEndpoint,
   getEspecialidadStatusToggleEndpoint,
@@ -20,6 +21,7 @@ interface UseEspecialidadesOptions {
 
 export function useEspecialidades(options: UseEspecialidadesOptions = {}) {
   const { companyId, autoFetch = true } = options;
+  const { refreshTrigger } = useDashboard();
   const [especialidades, setEspecialidades] = useState<Especialidad[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,7 +47,7 @@ export function useEspecialidades(options: UseEspecialidadesOptions = {}) {
     if (autoFetch) {
       fetchEspecialidades();
     }
-  }, [fetchEspecialidades, autoFetch]);
+  }, [refreshTrigger, fetchEspecialidades, autoFetch]);
 
   const createEspecialidad = useCallback(
     async (data: CreateEspecialidadRequest): Promise<boolean> => {

@@ -33,7 +33,8 @@ export function useUserPermissions({
                      isTargetBlocked &&
                      (isSuperAdmin || isOwner || (isOperador && !isTargetOperador));
 
-  const canChangeRole = !isOperador;
+  const isTargetSuperAdmin = targetUser.user_role === USER_ROLES.SUPERADMIN;
+  const canChangeRole = (isSuperAdmin || isOwner || isOperador) && !isTargetSuperAdmin;
 
   return {
     canEdit,

@@ -34,9 +34,9 @@ export function CompanyStatsTable() {
             <TableHeader>
               <TableRow>
                 <TableHead className="min-w-[200px]">Empresa</TableHead>
-                <TableHead className="w-[150px] text-center">Usuarios Activos</TableHead>
                 <TableHead className="w-[150px] text-center">Operadores Activos</TableHead>
                 <TableHead className="w-[150px] text-center">Profesionales Activos</TableHead>
+                <TableHead className="w-[150px] text-center">Clientes Activos</TableHead>
                 <TableHead className="w-[150px] text-center">Especialidades</TableHead>
                 <TableHead className="w-[150px] text-center">Reclamos Abiertos</TableHead>
                 <TableHead className="w-[150px] text-center">Reclamos Cerrados</TableHead>
@@ -56,13 +56,13 @@ export function CompanyStatsTable() {
                       {stat.company_nombre}
                     </TableCell>
                     <TableCell className="text-center">
-                      {stat.usuarios_activos}
-                    </TableCell>
-                    <TableCell className="text-center">
                       {stat.operadores_activos}
                     </TableCell>
                     <TableCell className="text-center">
                       {stat.profesionales_activos}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {stat.clientes_activos}
                     </TableCell>
                     <TableCell className="text-center">
                       {stat.especialidades}

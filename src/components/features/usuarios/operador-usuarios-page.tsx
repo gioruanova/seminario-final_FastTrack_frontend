@@ -15,8 +15,6 @@ import { UserPagination } from "./shared/UserPagination";
 import { UserForm } from "./shared/UserForm";
 import { UserPasswordSheet } from "./shared/UserPasswordSheet";
 import { User, UserStatus, USER_ROLES } from "@/types/users";
-import { validateUserForm } from "@/lib/utils/userValidation";
-import { toast } from "sonner";
 
 export function OperadorUsuariosPage() {
   const { companyConfig, user } = useAuth();
@@ -32,11 +30,14 @@ export function OperadorUsuariosPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const { users, isLoading, fetchUsers, toggleUserStatus, changePassword, createUser, updateUser } = useUsers({
-    allowedRoles: [USER_ROLES.PROFESIONAL, USER_ROLES.OPERADOR],
+  const { users: allUsers, isLoading, fetchUsers, toggleUserStatus, changePassword, createUser, updateUser } = useUsers({
     excludeCurrentUser: true,
     currentUserId: user?.user_id,
   });
+
+  const users = allUsers.filter(u => 
+    u.user_role === USER_ROLES.OPERADOR || u.user_role === USER_ROLES.PROFESIONAL
+  );
 
   const { filteredUsers } = useUserFilters({
     users,
@@ -77,22 +78,14 @@ export function OperadorUsuariosPage() {
     user_password?: string;
     company_id?: number | null;
   }) => {
-    const validation = validateUserForm(formData, isEditing, false);
-
-    if (!validation.isValid) {
-      if (validation.missingFields.length > 0) {
-        toast.error(`Por favor completa los siguientes campos: ${validation.missingFields.join(", ")}`);
-      }
-      if (validation.errors.length > 0) {
-        validation.errors.forEach((error) => toast.error(error));
-      }
-      return;
-    }
-
     if (isEditing && editingUser) {
-      await updateUser(editingUser.user_id, formData);
+      const updateData = { ...formData };
+      delete updateData.company_id;
+      await updateUser(editingUser.user_id, updateData);
     } else {
-      await createUser(formData);
+      const userCompanyId = user && 'company_id' in user ? user.company_id : null;
+      const createData = { ...formData, company_id: userCompanyId || null };
+      await createUser(createData);
     }
   };
 
@@ -144,7 +137,7 @@ export function OperadorUsuariosPage() {
             onSearchChange={setSearchTerm}
             onRoleChange={setFilterRole}
             onStatusChange={setFilterStatus}
-            allowedRoles={[USER_ROLES.OPERADOR, USER_ROLES.PROFESIONAL]}
+            allowedRoles={[USER_ROLES.PROFESIONAL]}
           />
 
           {isLoading ? (
@@ -183,7 +176,6 @@ export function OperadorUsuariosPage() {
         onOpenChange={setIsUserSheetOpen}
         editingUser={editingUser}
         isEditing={isEditing}
-        allowedRoles={[USER_ROLES.PROFESIONAL]}
         currentUserRole={user?.user_role}
         onSubmit={handleSaveUser}
       />

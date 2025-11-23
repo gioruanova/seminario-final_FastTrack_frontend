@@ -18,9 +18,3 @@ export function getEspecialidadesRoute(userRole?: UserRole): string {
   return "/dashboard/owner/especialidades";
 }
 
-export function getDashboardRoute(userRole?: UserRole): string {
-  if (userRole === "owner") return "/dashboard/owner";
-  if (userRole === "operador") return "/dashboard/operador";
-  return "/dashboard/owner";
-}
-

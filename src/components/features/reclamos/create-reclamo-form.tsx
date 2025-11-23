@@ -18,8 +18,8 @@ import { ValidationMessage } from "./validation-message";
 import {
   getClientesRoute,
   getProfesionalesRoute,
-  getDashboardRoute,
 } from "@/lib/routes/dashboard-routes";
+import { getDashboardRoute } from "@/lib/auth/routes";
 
 export function CreateReclamoForm() {
   const { user, companyConfig } = useAuth();
@@ -56,7 +56,11 @@ export function CreateReclamoForm() {
   const handleCancel = useCallback(() => {
     resetForm();
     clearError();
-    router.push(getDashboardRoute(user?.user_role));
+    if (user?.user_role) {
+      router.push(getDashboardRoute(user.user_role));
+    } else {
+      router.push("/login");
+    }
   }, [resetForm, clearError, router, user]);
 
   const validateForm = useCallback(() => {

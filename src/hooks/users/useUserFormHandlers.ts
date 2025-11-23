@@ -36,8 +36,10 @@ export function useUserFormHandlers({
     setIsSubmitting(true);
 
     try {
-      const isSuperAdmin = formData.user_role === USER_ROLES.SUPERADMIN;
-      const validation = validateUserForm(formData, isEditing, !isSuperAdmin);
+      const isSuperAdmin = currentUserRole === USER_ROLES.SUPERADMIN;
+      const isNonSuperadminEditing = isEditing && currentUserRole && currentUserRole !== USER_ROLES.SUPERADMIN;
+      const requireCompany = isSuperAdmin && !isNonSuperadminEditing && formData.user_role !== USER_ROLES.SUPERADMIN;
+      const validation = validateUserForm(formData, isEditing, requireCompany);
 
       if (!validation.isValid) {
         if (validation.missingFields.length > 0) {
@@ -51,12 +53,12 @@ export function useUserFormHandlers({
 
       const submitData = { ...formData };
       
-      if (currentUserRole === USER_ROLES.OPERADOR && !isEditing) {
+      if (currentUserRole === USER_ROLES.OPERADOR && submitData.user_role !== USER_ROLES.PROFESIONAL) {
         submitData.user_role = USER_ROLES.PROFESIONAL;
       }
-      
-      if (currentUserRole === USER_ROLES.OPERADOR && isEditing) {
-        delete (submitData as { user_role?: string }).user_role;
+
+      if (isNonSuperadminEditing) {
+        delete (submitData as { company_id?: number | null }).company_id;
       }
 
       let success = false;
