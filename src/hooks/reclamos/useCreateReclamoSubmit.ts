@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { apiClient } from "@/lib/apiClient";
 
 interface CreateReclamoData {
@@ -79,7 +79,7 @@ export function useCreateReclamoSubmit() {
         payload.agenda_hora_hasta = data.agenda_hora_hasta.trim();
       }
 
-      const response = await apiClient.post(CLIENT_API.CREAR_RECLAMO, payload);
+      const response = await apiClient.post(API_ROUTES.CREAR_RECLAMO, payload);
 
       return {
         success: true,

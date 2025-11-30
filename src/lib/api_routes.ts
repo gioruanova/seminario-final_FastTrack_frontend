@@ -44,5 +44,17 @@ export const API_ROUTES = {
   UPDATE_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/{cliente_id}`,
   BLOCK_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/block/{cliente_id}`,
   UNBLOCK_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/unblock/{cliente_id}`,
+
+  // Reclamos
+  GET_RECLAMOS: `${config.apiUrl}/reclamos`,
+  GET_AGENDA_BLOQUEADA: `${config.apiUrl}/agenda-reclamo`,
+  CREAR_RECLAMO: `${config.apiUrl}/reclamos`,
+  RECLAMO_DESCARGA: `${config.apiUrl}/vistas/reclamos/{type}`,
+  RECLAMO_GESTION_ADMIN: `${config.apiUrl}/reclamos/gestion/{id}`,
+  RECLAMO_GESTION_PROFESIONAL: `${config.apiUrl}/reclamos/profesional/gestion/{id}`,
+  ENVIAR_RECORDATORIO_RECLAMO: `${config.apiUrl}/reclamos/recordatorio/{reclamo_id}`,
+  
+  // SuperAdmin Reclamos
+  GET_RECLAMOS_SUPERADMIN: `${config.apiUrl}/superApi/reclamos`,
 };
 

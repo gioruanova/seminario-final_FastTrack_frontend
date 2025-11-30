@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useDashboard } from "@/context/DashboardContext";
-import { SUPER_API } from "@/lib/superApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { API_ROUTES } from "@/lib/api_routes";
 import { apiClient } from "@/lib/apiClient";
 import { ClienteRecurrente, ApiResponse } from "@/types/clientes";
@@ -38,7 +38,7 @@ export function useSuperadminClientes() {
       const [clientesResponse, empresasResponse, reclamosResponse] = await Promise.all([
         apiClient.get<ApiResponse<ClienteRecurrente[]> | ClienteRecurrente[]>(API_ROUTES.GET_CLIENTES_RECURRENTES),
         apiClient.get(API_ROUTES.GET_COMPANIES),
-        apiClient.get(SUPER_API.GET_RECLAMOS)
+        apiClient.get(API_ROUTES.GET_RECLAMOS_SUPERADMIN)
       ]);
 
       let clientesData: ClienteRecurrente[] = [];

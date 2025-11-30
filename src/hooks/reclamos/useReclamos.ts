@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useDashboard } from "@/context/DashboardContext";
-import { CLIENT_API } from "@/lib/clientApi/config";
+import { API_ROUTES } from "@/lib/api_routes";
 import { apiClient } from "@/lib/apiClient";
 
 interface ReclamoData {
@@ -47,7 +47,7 @@ export function useReclamos() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await apiClient.get(CLIENT_API.GET_RECLAMOS);
+      const response = await apiClient.get(API_ROUTES.GET_RECLAMOS);
       cachedReclamos = response.data;
       cacheTimestamp = now;
       setReclamos(response.data);

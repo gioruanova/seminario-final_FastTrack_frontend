@@ -132,8 +132,8 @@ export function CreateReclamoForm() {
         toast.success(`¡Reclamo creado exitosamente! El ${companyConfig?.sing_heading_reclamos?.toLowerCase() || "reclamo"} ha sido creado correctamente`);
         resetForm();
         clearError();
-        const dashboardUrl = user?.user_role === "owner" ? "/dashboard/owner" : "/dashboard/operador";
-        router.push(dashboardUrl);
+        const trabajarReclamosUrl = user?.user_role === "owner" ? "/dashboard/owner/trabajar-reclamos" : "/dashboard/operador/trabajar-reclamos";
+        router.push(trabajarReclamosUrl);
       } else {
         toast.error(`Error al crear el reclamo: ${result.message}`);
       }

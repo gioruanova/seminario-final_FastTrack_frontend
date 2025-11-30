@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { CLIENT_API } from "@/lib/clientApi/config";
 import { API_ROUTES } from "@/lib/api_routes";
 import { useAuth } from "@/context/AuthContext";
 import { apiClient } from "@/lib/apiClient";
@@ -117,7 +116,7 @@ export function useCreateReclamo(isOpen: boolean = false) {
 
     try {
       setLoadingFechas(true);
-      const response = await apiClient.get(CLIENT_API.GET_AGENDA_BLOQUEADA);
+      const response = await apiClient.get(API_ROUTES.GET_AGENDA_BLOQUEADA);
       const agenda = response.data || [];
 
       const agendaFiltrada = agenda.filter((item: AgendaBloqueada) =>
