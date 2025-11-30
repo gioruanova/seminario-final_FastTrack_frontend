@@ -46,8 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (authResult?.user) {
         router.push(getDashboardRoute(authResult.user.user_role));
-      } else {
-        throw new Error("Error al obtener datos del usuario");
+      }  else {
+        const message = "Error al obtener datos del usuario. Verificá que las cookies de terceros estén habilitadas en tu navegador.";
+        toast.error(message);
+        throw new Error(message);
       }
     } catch (error) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string } } };

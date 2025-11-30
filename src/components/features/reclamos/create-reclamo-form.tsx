@@ -292,7 +292,7 @@ export function CreateReclamoForm() {
             <Label htmlFor="cliente">
               {companyConfig?.sing_heading_solicitante || "Cliente"} <span className="text-destructive">*</span>
             </Label>
-            
+
             {!hasClientesActivos && !loadingClientes ? (
               <ValidationMessage
                 message={`No se registran ${companyConfig?.plu_heading_solicitante || "clientes"} activos/as.`}
@@ -346,7 +346,14 @@ export function CreateReclamoForm() {
 
               {!hasEspecialidadesActivas && !loadingEspecialidades ? (
                 <ValidationMessage
-                  message={`No hay especialidades activas. Contacte a su ${companyConfig?.sing_heading_owner || "administrador"} para más información.`}
+                  message={`No hay asignaciones o ${companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales"} disponible.`}
+                  actionLink={
+                    {
+                      text: "Ingrese AQUÍ",
+                      href: getProfesionalesRoute(user?.user_role),
+                    }
+
+                  }
                 />
               ) : (
                 <Select
@@ -376,7 +383,7 @@ export function CreateReclamoForm() {
               <Label htmlFor="profesional">
                 {companyConfig?.sing_heading_profesional || "Profesional"} <span className="text-destructive">*</span>
               </Label>
-              
+
               {!hasAsignacionesParaEspecialidad && !loadingAsignaciones ? (
                 <ValidationMessage
                   message={`No hay especialista disponible para esa especialidad. Para gestionar sus ${companyConfig?.plu_heading_profesional || "profesionales"} y sus ${companyConfig?.plu_heading_especialidad || "especialidades"},`}
