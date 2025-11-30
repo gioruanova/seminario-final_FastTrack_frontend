@@ -17,7 +17,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Wrench,
-  Users,
   CheckCircle,
   XCircle,
   AlertCircle,
@@ -69,7 +68,7 @@ export function OperadorEspecialidadesPage() {
   const [filterEstado, setFilterEstado] = useState<string>("all");
   const [filterProfesionales, setFilterProfesionales] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
 
   const {
     especialidades,
@@ -265,63 +264,52 @@ export function OperadorEspecialidadesPage() {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-3">
             {paginatedEspecialidades.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-muted-foreground">
                 No se encontraron {companyConfig?.plu_heading_especialidad?.toLowerCase() || "especialidades"}
               </div>
             ) : (
               paginatedEspecialidades.map((especialidad) => (
-                <Card key={especialidad.id_especialidad} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <Wrench className="h-5 w-5 text-primary" />
-                        <div>
-                          <CardTitle className="text-lg">{especialidad.nombre_especialidad}</CardTitle>
-
-                        </div>
-                      </div>
-                      {getEstadoIcon(especialidad.estado_especialidad, especialidad.profesionales_count || 0)}
+                <div
+                  key={especialidad.id_especialidad}
+                  className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="h-4 w-4 text-primary" />
+                      <span className="font-semibold text-base">{especialidad.nombre_especialidad}</span>
                     </div>
-                  </CardHeader>
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${getEstadoColor(especialidad.estado_especialidad, especialidad.profesionales_count || 0)}`}
+                    >
+                      {getEstadoIcon(especialidad.estado_especialidad, especialidad.profesionales_count || 0)}
+                      {getEstadoText(especialidad.estado_especialidad, especialidad.profesionales_count || 0)}
+                    </span>
+                  </div>
 
-                  <CardContent className="pt-0">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Estado:</span>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap uppercase ${getEstadoColor(especialidad.estado_especialidad, especialidad.profesionales_count || 0)}`}
-                        >
-                          {getEstadoText(especialidad.estado_especialidad, especialidad.profesionales_count || 0)}
+                  <div className="pl-6">
+                    <div className="text-sm text-muted-foreground">
+                      <span className="font-medium">
+                        {companyConfig?.plu_heading_profesional || "Profesionales"} asignados:
+                      </span>{" "}
+                      {especialidad.profesionales && especialidad.profesionales.length > 0 ? (
+                        <span className="text-foreground">
+                          {especialidad.profesionales.map((prof, index) => (
+                            <span key={prof.user_id}>
+                              {prof.user_complete_name}
+                              {index < especialidad.profesionales!.length - 1 && ", "}
+                            </span>
+                          ))}
                         </span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{companyConfig?.plu_heading_profesional || "profesionales"}:</span>
-                        <Badge variant="outline" className="text-sm">
-                          {especialidad.profesionales_count || 0} disponible{(especialidad.profesionales_count || 0) !== 1 ? 's' : ''}
-                        </Badge>
-                      </div>
-
-                      {especialidad.profesionales && especialidad.profesionales.length > 0 && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            <span>{companyConfig?.plu_heading_profesional || "profesionales"} asignados:</span>
-                          </div>
-                          <div className="space-y-1 max-h-20 overflow-y-auto">
-                            {especialidad.profesionales.map((prof) => (
-                              <div key={prof.user_id} className="text-xs bg-muted/50 rounded px-2 py-1">
-                                <div className="font-medium">{prof.user_complete_name}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                      ) : (
+                        <span className="text-muted-foreground italic">
+                          No hay {companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales"} asignados
+                        </span>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))
             )}
           </div>
