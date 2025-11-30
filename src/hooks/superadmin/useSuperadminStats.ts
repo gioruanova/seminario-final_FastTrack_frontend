@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useDashboard } from "@/context/DashboardContext";
 import { API_ROUTES } from "@/lib/api_routes";
-import { API_ROUTES } from "@/lib/api_routes";
 import { apiClient } from "@/lib/apiClient";
 import { Especialidad } from "@/types/especialidades";
 import { ClienteRecurrente, ApiResponse } from "@/types/clientes";
@@ -31,7 +30,7 @@ export function useSuperadminStats() {
           apiClient.get(API_ROUTES.GET_USERS),
           apiClient.get(API_ROUTES.GET_COMPANIES),
           apiClient.get(API_ROUTES.GET_ESPECIALIDADES),
-          apiClient.get(API_ROUTES.GET_RECLAMOS_SUPERADMIN),
+          apiClient.get(API_ROUTES.GET_RECLAMOS),
           apiClient.get<ApiResponse<ClienteRecurrente[]> | ClienteRecurrente[]>(API_ROUTES.GET_CLIENTES_RECURRENTES),
         ]);
 

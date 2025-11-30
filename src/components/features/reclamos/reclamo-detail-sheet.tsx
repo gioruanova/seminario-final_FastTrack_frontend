@@ -104,9 +104,7 @@ export function ReclamoDetailSheet({ reclamo, isOpen, onClose, userRole, onUpdat
     try {
       setIsSubmitting(true);
 
-      const endpoint = userRole === "profesional"
-        ? API_ROUTES.RECLAMO_GESTION_PROFESIONAL.replace("{id}", reclamo.reclamo_id.toString())
-        : API_ROUTES.RECLAMO_GESTION_ADMIN.replace("{id}", reclamo.reclamo_id.toString());
+      const endpoint = API_ROUTES.ACTUALIZAR_RECLAMO.replace("{id}", reclamo.reclamo_id.toString());
 
       const payload: {
         reclamo_estado: string;

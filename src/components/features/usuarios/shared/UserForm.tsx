@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { User, USER_ROLES } from "@/types/users";
+import { User, USER_ROLES, USER_STATUS, UserRole } from "@/types/users";
 import { Building2 } from "lucide-react";
 import { PasswordInput } from "./PasswordInput";
 import { RoleSelect } from "./RoleSelect";
@@ -98,7 +98,18 @@ export function UserForm({
 
   const { canChangeRole } = useUserPermissions({
     currentUserRole,
-    targetUser: targetUser || { user_role: "" } as User,
+    targetUser: targetUser || {
+      user_id: 0,
+      user_complete_name: "",
+      user_dni: "",
+      user_phone: "",
+      user_email: "",
+      user_role: "" as UserRole,
+      user_status: USER_STATUS.ACTIVO,
+      company_id: null,
+      created_at: "",
+      updated_at: "",
+    },
   });
 
   const effectiveCanChangeRole = isEditing ? canChangeRole : true;
