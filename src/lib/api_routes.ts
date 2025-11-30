@@ -45,7 +45,6 @@ export const API_ROUTES = {
   BLOCK_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/block/{cliente_id}`,
   UNBLOCK_CLIENTE_RECURRENTE: `${config.apiUrl}/clientes-recurrentes/unblock/{cliente_id}`,
 
-  // Reclamos (rutas unificadas - el backend decide según rol)
   GET_RECLAMOS: `${config.apiUrl}/reclamos`,
   GET_RECLAMO_BY_ID: `${config.apiUrl}/reclamos/{id}`,
   GET_AGENDA_BLOQUEADA: `${config.apiUrl}/agenda-reclamo`,
