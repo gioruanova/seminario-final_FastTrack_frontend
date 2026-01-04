@@ -11,6 +11,10 @@ interface OperadorDashboardProps {
 }
 
 export function OperadorDashboard({ user }: OperadorDashboardProps) {
+  if (!user) {
+    return null;
+  }
+
   const getDisplayName = () => {
     const userName = user.user_name;
     if (userName) {

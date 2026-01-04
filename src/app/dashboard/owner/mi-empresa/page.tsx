@@ -1,27 +1,14 @@
 "use client";
 
-import { useEffect, startTransition } from "react";
-import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { OwnerCompanySettingsCard } from "@/components/features/empresas/owner-company-settings-card";
 import { useAuth } from "@/context/AuthContext";
-import { isCompanyUser } from "@/types/auth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MiEmpresaPage() {
-  const { companyConfig, user, isLoading } = useAuth();
-  const router = useRouter();
+  const { user, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (!isLoading && companyConfig?.company?.company_estado === 0) {
-      startTransition(() => {
-        router.push("/dashboard/owner");
-      });
-    }
-  }, [companyConfig, router, isLoading]);
-
-  const isValidUser = user && isCompanyUser(user) && user.user_role === "owner";
-  const canRenderContent = isValidUser && !isLoading;
+  const canRenderContent = !isLoading;
 
   return (
     <>

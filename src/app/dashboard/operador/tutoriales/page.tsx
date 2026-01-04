@@ -3,21 +3,10 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { TutorialesVideosList } from "@/components/dashboard/shared/tutoriales-videos-list";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect, startTransition } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OperadorTutorialesPage() {
   const { companyConfig, user, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && companyConfig?.company?.company_estado === 0) {
-      startTransition(() => {
-        router.replace("/dashboard/operador");
-      });
-    }
-  }, [companyConfig, router, isLoading]);
 
   const isCompanyActive = companyConfig?.company?.company_estado === 1;
   const canRenderContent = user && isCompanyActive && !isLoading;

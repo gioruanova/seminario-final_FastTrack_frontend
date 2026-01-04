@@ -1,28 +1,15 @@
 "use client";
 
-import { useEffect, startTransition } from "react";
-import { useRouter } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { ClientesPage } from "@/components/features/clientes/clientes-page";
 import { useAuth } from "@/context/AuthContext";
-import { isCompanyUser } from "@/types/auth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OperadorClientesPage() {
-  const { user, companyConfig, isLoading } = useAuth();
-  const router = useRouter();
+  const { companyConfig, user, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (!isLoading && companyConfig?.company?.company_estado === 0) {
-      startTransition(() => {
-        router.push("/dashboard/operador");
-      });
-    }
-  }, [companyConfig, router, isLoading]);
-
-  const isValidUser = user && isCompanyUser(user) && user.user_role === "operador";
   const isCompanyActive = companyConfig?.company?.company_estado === 1;
-  const canRenderContent = isValidUser && isCompanyActive && !isLoading;
+  const canRenderContent = isCompanyActive && !isLoading;
 
   return (
     <>

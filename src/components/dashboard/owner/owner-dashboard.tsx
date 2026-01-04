@@ -11,6 +11,10 @@ interface OwnerDashboardProps {
 }
 
 export function OwnerDashboard({ user }: OwnerDashboardProps) {
+  if (!user) {
+    return null;
+  }
+
   const getDisplayName = () => {
     const userName = user.user_name;
     if (userName) {
@@ -19,7 +23,7 @@ export function OwnerDashboard({ user }: OwnerDashboardProps) {
     return user.user_email?.split('@')[0] || "Usuario";
   };
 
-const isCompanyActive = user.company_status === 1;
+  const isCompanyActive = user.company_status === 1;
 
   return (
     <div className="space-y-4">

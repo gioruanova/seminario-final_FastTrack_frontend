@@ -60,5 +60,21 @@ export function RouteGuard({
     }
   }, [user, companyConfig, isLoading, allowedRoles, requireCompanyConfig, router]);
 
+  if (isLoading) {
+    return null;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  if (!allowedRoles.includes(user.user_role)) {
+    return null;
+  }
+
+  if (requireCompanyConfig && isCompanyUser(user) && !companyConfig) {
+    return null;
+  }
+
   return <>{children}</>;
 }

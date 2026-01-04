@@ -3,26 +3,13 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { CreateReclamoForm } from "@/components/features/reclamos/create-reclamo-form";
 import { useAuth } from "@/context/AuthContext";
-import { isCompanyUser } from "@/types/auth";
-import { useRouter } from "next/navigation";
-import { useEffect, startTransition } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CrearReclamoOwnerPage() {
-  const { user, companyConfig, isLoading } = useAuth();
-  const router = useRouter();
+  const { companyConfig, user, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (!isLoading && user && isCompanyUser(user) && companyConfig?.company?.company_estado === 0) {
-      startTransition(() => {
-        router.replace("/dashboard/owner");
-      });
-    }
-  }, [user, companyConfig, router, isLoading]);
-
-  const isValidUser = user && isCompanyUser(user) && user.user_role === "owner";
   const isCompanyActive = companyConfig?.company?.company_estado === 1;
-  const canRenderContent = isValidUser && isCompanyActive && !isLoading;
+  const canRenderContent = isCompanyActive && !isLoading;
 
   return (
     <>
