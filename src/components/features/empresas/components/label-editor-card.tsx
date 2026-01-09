@@ -16,7 +16,6 @@ export function LabelEditorCard({
   singValue,
   pluValue,
   onEditSingular,
-  onEditPlural,
 }: LabelEditorCardProps) {
   return (
     <div className="rounded-lg border bg-muted/30 p-4">
@@ -51,9 +50,7 @@ export function LabelEditorCard({
               </span>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={onEditPlural}>
-            Editar
-          </Button>
+
         </div>
       </div>
     </div>

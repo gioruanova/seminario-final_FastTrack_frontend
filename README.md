@@ -129,9 +129,6 @@ Las dependencias principales son:
 - jwt-decode (para decodificar tokens JWT)
 - Sonner (para notificaciones toast)
 
-**Mapas:**
-- Leaflet y React Leaflet (para mostrar mapas cuando se necesita)
-
 ---
 
 ## Notas Adicionales
