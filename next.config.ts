@@ -15,19 +15,22 @@ const nextConfig: NextConfig = {
   },
   
   async rewrites() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL_PROD;
-    const isDev = process.env.NEXT_PUBLIC_ENVIRONMENT === "dev";
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL_PROD?.trim();
     
-    // rewrite para prod
-    if (backendUrl && !isDev) {
+    if (backendUrl) {
+      const cleanUrl = backendUrl.replace(/\/$/, '').trim();
+      
+      console.log('[Next.js Rewrites] Configurando rewrite de /api/* a:', cleanUrl);
+      
       return [
         {
           source: '/api/:path*',
-          destination: `${backendUrl}/:path*`,
+          destination: `${cleanUrl}/:path*`,
         },
       ];
     }
     
+    console.log('[Next.js Rewrites] No se configuró NEXT_PUBLIC_API_URL_PROD, sin rewrites');
     return [];
   },
   
