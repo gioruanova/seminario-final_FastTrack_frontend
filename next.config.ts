@@ -14,6 +14,23 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60,
   },
   
+  async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL_PROD;
+    const isDev = process.env.NEXT_PUBLIC_ENVIRONMENT === "dev";
+    
+    // rewrite para prod
+    if (backendUrl && !isDev) {
+      return [
+        {
+          source: '/api/:path*',
+          destination: `${backendUrl}/:path*`,
+        },
+      ];
+    }
+    
+    return [];
+  },
+  
   async headers() {
     return [
       {
