@@ -11,21 +11,20 @@ interface UseReclamoFormValidationReturn {
 export function useReclamoFormValidation(): UseReclamoFormValidationReturn {
   const {
     clientesOptions,
-    loadingClientes,
+    loading,
     especialidadesOptions,
-    loadingEspecialidades,
     profesionalesDisponibles,
     formData,
   } = useCreateReclamo(true);
 
   const hasClientesActivos = useMemo(
-    () => clientesOptions.length > 0 && !loadingClientes,
-    [clientesOptions.length, loadingClientes]
+    () => clientesOptions.length > 0 && !loading,
+    [clientesOptions.length, loading]
   );
 
   const hasEspecialidadesActivas = useMemo(
-    () => especialidadesOptions.length > 0 && !loadingEspecialidades,
-    [especialidadesOptions.length, loadingEspecialidades]
+    () => especialidadesOptions.length > 0 && !loading,
+    [especialidadesOptions.length, loading]
   );
 
   const hasAsignacionesParaEspecialidad = useMemo(() => {

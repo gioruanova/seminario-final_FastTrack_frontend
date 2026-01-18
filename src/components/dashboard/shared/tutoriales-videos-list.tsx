@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Play, Clock, CircleQuestionMark, MessageCircle } from "lucide-react";
+import Link from "next/link";
 import { VideoConfig, getVideosByRole } from "@/config/videos";
 import { formatDuration } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -51,8 +52,12 @@ export function TutorialesVideosList({ role }: TutorialesVideosListProps) {
             <CardTitle className="text-2xl">
               Tutoriales
             </CardTitle>
+
             <p className="text-sm text-muted-foreground mt-1 text-balance">
-              Te acercamo una lista de tutoriales para ayudarte a gestionar tu empresa de manera eficiente.
+              Podes acceder a nuestro manual de usuario haciendo click en <Link href="/assets/manual-uso.pdf" target="_blank" className="text-primary underline font-bold">este</Link> link.
+            </p>
+            <p className="text-sm text-muted-foreground mt-1 text-balance">
+              Te acercamos una lista de tutoriales para ayudarte a gestionar tu empresa de manera eficiente.
             </p>
           </div>
 
@@ -163,16 +168,26 @@ export function TutorialesVideosList({ role }: TutorialesVideosListProps) {
               onMouseLeave={() => setIsVideoHovered(false)}
             >
               <div className="relative w-full bg-black flex items-center rounded-lg overflow-hidden" style={{ aspectRatio: '16 / 7' }}>
-                <video
-                  key={selectedVideo.file_id}
-                  controls
-                  autoPlay={false}
-                  preload="metadata"
-                  className="w-full object-contain"
-                  src={`/assets/videos/${selectedVideo.file_name}`}
-                >
-                  Tu navegador no soporta la reproducción de videos.
-                </video>
+                {selectedVideo.file_url ? (
+                  <iframe
+                    key={selectedVideo.file_id}
+                    src={selectedVideo.file_url}
+                    className="w-full h-full border-0"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    key={selectedVideo.file_id}
+                    controls
+                    autoPlay={false}
+                    preload="metadata"
+                    className="w-full object-contain"
+                    src={`/assets/videos/${selectedVideo.file_name}`}
+                  >
+                    Tu navegador no soporta la reproducción de videos.
+                  </video>
+                )}
 
                 <div className={`absolute top-0 left-0 right-0 z-10 pointer-events-none transition-opacity duration-300 ${isVideoHovered ? 'opacity-100' : 'opacity-0'}`}>
                   <div className="bg-black/80 backdrop-blur-md px-3 py-2 text-white border-b border-white/10 flex flex-row items-center gap-2">

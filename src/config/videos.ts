@@ -4,75 +4,77 @@
   file_title: string;
   file_duration: number; 
   file_role: string[]; 
-  fil_tag: boolean; 
+  fil_tag: boolean;
+  file_url?: string; // URL externa (Google Drive, etc.) - opcional
 }
 
 export const videosConfig: VideoConfig[] = [
   {
     file_id: 1,
-    file_name: "sample-1.mp4",
-    file_title: "Como gestiono mi usuario",
-    file_duration: 58,
+    file_name: "ft-demo.mp4",
+    file_title: "Introduccion a Fast Track",
+    file_duration: 924,
     file_role: ["all"],
-    fil_tag: false
+    fil_tag: true,
+    file_url: "https://drive.google.com/file/d/1vbQz_JZff75WmiOs_ZDM8_cwrJgXgQp_/preview"
   },
-  {
-    file_id: 2,
-    file_name: "sample-1.mp4",
-    file_title: "Enviar un feedback",
-    file_duration: 58,
-    file_role: ["all"],
-    fil_tag: false
-  },
-  {
-    file_id: 5,
-    file_name: "sample-1.mp4",
-    file_title: "Gestionar mi empresa",
-    file_duration: 58,
-    file_role: ["owner"],
-    fil_tag: false
-  },
-  {
-    file_id: 6,
-    file_name: "sample-1.mp4",
-    file_title: "Gestionar las especialidades de mi empresa",
-    file_duration: 58,
-    file_role: ["owner"],
-    fil_tag: false
-  },
-  {
-    file_id: 7,
-    file_name: "sample-1.mp4",
-    file_title: "Gestionar usuarios y profesionales",
-    file_duration: 58,
-    file_role: ["owner", "operador"],
-    fil_tag: true
-  },
-  {
-    file_id: 8,
-    file_name: "sample-1.mp4",
-    file_title: "Gestionar clientes recurrentes",
-    file_duration: 58,
-    file_role: ["owner", "operador"],
-    fil_tag: true
-  },
+  // {
+  //   file_id: 2,
+  //   file_name: "sample-1.mp4",
+  //   file_title: "Enviar un feedback",
+  //   file_duration: 58,
+  //   file_role: ["all"],
+  //   fil_tag: false
+  // },
+  // {
+  //   file_id: 5,
+  //   file_name: "sample-1.mp4",
+  //   file_title: "Gestionar mi empresa",
+  //   file_duration: 58,
+  //   file_role: ["owner"],
+  //   fil_tag: false
+  // },
+  // {
+  //   file_id: 6,
+  //   file_name: "sample-1.mp4",
+  //   file_title: "Gestionar las especialidades de mi empresa",
+  //   file_duration: 58,
+  //   file_role: ["owner"],
+  //   fil_tag: false
+  // },
+  // {
+  //   file_id: 7,
+  //   file_name: "sample-1.mp4",
+  //   file_title: "Gestionar usuarios y profesionales",
+  //   file_duration: 58,
+  //   file_role: ["owner", "operador"],
+  //   fil_tag: true
+  // },
+  // {
+  //   file_id: 8,
+  //   file_name: "sample-1.mp4",
+  //   file_title: "Gestionar clientes recurrentes",
+  //   file_duration: 58,
+  //   file_role: ["owner", "operador"],
+  //   fil_tag: true
+  // },
 
-  {
-    file_id: 7,
-    file_name: "sample-1.mp4",
-    file_title: "Ver las especialidades y gestionar profesionales",
-    file_duration: 58,
-    file_role: ["operador"],
-    fil_tag: false
-  },
-  {
-    file_id: 9,
-    file_name: "sample-1.mp4",
-    file_title: "Gestionar nuevos pedidos",
-    file_duration: 58,
-    file_role: ["owner", "operador"],
-    fil_tag: true
-  },
+  // {
+  //   file_id: 7,
+  //   file_name: "sample-1.mp4",
+  //   file_title: "Ver las especialidades y gestionar profesionales",
+  //   file_duration: 58,
+  //   file_role: ["operador"],
+  //   fil_tag: false
+  // },
+  // {
+  //   file_id: 9,
+  //   file_name: "sample-1.mp4",
+  //   file_title: "Gestionar nuevos pedidos",
+  //   file_duration: 58,
+  //   file_role: ["owner", "operador"],
+  //   fil_tag: true
+  // },
 
 ];
 

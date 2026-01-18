@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateReclamo } from "@/hooks/reclamos/useCreateReclamo";
 import { useCreateReclamoSubmit } from "@/hooks/reclamos/useCreateReclamoSubmit";
 import { useReclamoFormValidation } from "@/hooks/reclamos/useReclamoFormValidation";
@@ -29,8 +30,7 @@ export function CreateReclamoForm() {
     updateField,
     handleClienteChange,
     clientesOptions,
-    loadingClientes,
-    loadingEspecialidades,
+    loading,
     especialidadesOptions,
     loadingAsignaciones,
     profesionalesDisponibles,
@@ -287,30 +287,46 @@ export function CreateReclamoForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="cliente">
-              {companyConfig?.sing_heading_solicitante || "Cliente"} <span className="text-destructive">*</span>
-            </Label>
+        {loading ? (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="cliente">
+                {companyConfig?.sing_heading_solicitante || "Cliente"} <span className="text-destructive">*</span>
+              </Label>
 
-            {!hasClientesActivos && !loadingClientes ? (
-              <ValidationMessage
-                message={`No se registran ${companyConfig?.plu_heading_solicitante || "clientes"} activos/as.`}
-                actionLink={{
-                  text: "Ingresar AQUÍ",
-                  href: getClientesRoute(user?.user_role),
-                }}
-              />
-            ) : (
-              <>
-                <Select
-                  value={formData.cliente_id?.toString() || ""}
-                  onValueChange={(value) => handleClienteChange(parseInt(value))}
-                  disabled={loadingClientes || !hasClientesActivos}
-                >
-                  <SelectTrigger id="cliente" className="cursor-pointer w-full">
-                    <SelectValue placeholder={loadingClientes ? `Cargando ${companyConfig?.sing_heading_solicitante?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}...`} />
-                  </SelectTrigger>
+              {!hasClientesActivos ? (
+                <ValidationMessage
+                  message={`No se registran ${companyConfig?.plu_heading_solicitante || "clientes"} activos/as.`}
+                  actionLink={{
+                    text: "Ingresar AQUÍ",
+                    href: getClientesRoute(user?.user_role),
+                  }}
+                />
+              ) : (
+                <>
+                  <Select
+                    value={formData.cliente_id?.toString() || ""}
+                    onValueChange={(value) => handleClienteChange(parseInt(value))}
+                    disabled={!hasClientesActivos}
+                  >
+                    <SelectTrigger id="cliente" className="cursor-pointer w-full">
+                      <SelectValue placeholder={`Seleccionar ${companyConfig?.sing_heading_solicitante?.toLowerCase()}...`} />
+                    </SelectTrigger>
                   <SelectContent className="cursor-pointer">
                     {clientesOptions
                       .filter((cliente) => cliente?.cliente_id && cliente?.cliente_complete_name)
@@ -336,15 +352,15 @@ export function CreateReclamoForm() {
                 )}
               </>
             )}
-          </div>
+            </div>
 
-          {hasClientesActivos && (
+            {hasClientesActivos && (
             <div className="space-y-2">
               <Label htmlFor="especialidad">
                 {companyConfig?.sing_heading_especialidad || "Especialidad"} <span className="text-destructive">*</span>
               </Label>
 
-              {!hasEspecialidadesActivas && !loadingEspecialidades ? (
+              {!hasEspecialidadesActivas ? (
                 <ValidationMessage
                   message={`No hay asignaciones o ${companyConfig?.plu_heading_profesional?.toLowerCase() || "profesionales"} disponible.`}
                   actionLink={
@@ -359,10 +375,10 @@ export function CreateReclamoForm() {
                 <Select
                   value={formData.especialidad_id?.toString() || ""}
                   onValueChange={(value) => handleEspecialidadChange(parseInt(value))}
-                  disabled={loadingEspecialidades || !hasEspecialidadesActivas}
+                  disabled={!hasEspecialidadesActivas}
                 >
                   <SelectTrigger id="especialidad" className="cursor-pointer w-full">
-                    <SelectValue placeholder={loadingEspecialidades ? `Cargando ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...` : `Seleccionar ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...`} />
+                    <SelectValue placeholder={`Seleccionar ${companyConfig?.sing_heading_especialidad?.toLowerCase()}...`} />
                   </SelectTrigger>
                   <SelectContent className="cursor-pointer">
                     {especialidadesOptions
@@ -611,6 +627,7 @@ export function CreateReclamoForm() {
             </Button>
           </div>
         </div>
+        )}
       </CardContent>
     </Card>
   );
